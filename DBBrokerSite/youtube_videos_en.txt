@@ -1,0 +1,2 @@
+﻿press|54oUiqJNTuI|DBBroker - ORM .NET library for SQL Server
+intro_pt_br|list=PL2GwqYthLFjhXYBYsGWl6f9LrTxW-lDbA&v=8OKhioGi27g|Introdução ao DBBroker (4 Vídeos)

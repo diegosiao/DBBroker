@@ -2,4 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/DBBroker/bin/Debug
+/DBBroker/bin
+/.vs/DBBroker/v16/.suo
+/.vs/DBBroker/config/applicationhost.config
+/DBBroker/obj

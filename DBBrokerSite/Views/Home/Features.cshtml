@@ -1,0 +1,40 @@
+﻿@model DBBrokerSite.Models.FeaturesViewModel
+@{ 
+    ViewBag.Title = Model.Title;
+}
+<h2>@Model.Title</h2>
+
+<div class="row">
+    <div class="col-md-12 col-md-offset-1">
+        <h3>@Model.ScriptGen</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-lg-10">
+        <p>@Html.Raw(Model.ScriptGenParag1)</p>
+        <p>@Model.ScriptGenParag2</p>
+        <p>@Model.ScriptGenParag3</p>
+        <p class="badge">@Model.ScriptGenParag4</p>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-lg-1"></div>
+    <div class="col-md-10">
+        <h3>@Model.ConnStrEncryption</h3>
+    </div>
+    <div class="col-lg-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-lg-10">
+        <p>@Model.ConnStrEncryptionParag1</p>
+        <p>@Model.ConnStrEncryptionParag2</p>
+        <span class="badge">@Model.ConnStrEncryptionParag3</span>
+    </div>
+    <div class="col-md-1"></div>
+</div>

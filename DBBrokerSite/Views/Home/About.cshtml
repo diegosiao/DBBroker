@@ -1,0 +1,30 @@
+﻿@using DBBrokerSite.Models
+@model AboutViewModel
+@{
+    ViewBag.Title = Model.Title;
+}
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-5">
+        <img src="~/Img/diego_profile.png" alt="Diego Morais (diegosiao@gmail.com)" width="120" />
+        <p><a href="mailto:diegosiao@gmail.com" target="_top">Diego Morais (diegosiao@gmail.com)</a></p>
+        <p style="font-size: smaller">@Model.Especialization</p>
+        <p style="font-size: smaller">@Model.Certification</p>
+    </div>
+    <div class="col-md-7"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>@Model.TxLittleHistory</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <p>@Model.History1</p>
+        <p>@Html.Raw(Model.History2)</p>
+        <p>@Html.Raw(Model.History3)</p>
+    </div>
+</div>

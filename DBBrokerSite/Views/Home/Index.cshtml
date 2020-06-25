@@ -1,0 +1,75 @@
+﻿@using DBBrokerSite.Models
+@model HomeIndexViewModel
+@{
+    ViewBag.Title = "Home Page ";
+}
+<div id="fb-root"></div>
+
+<script>
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v2.4";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="jumbotron text-center" style="background-image: url(../../Img/squares-background.jpg);color:white;">
+    <h1><img src="~/Img/dbbroker_logo_350.png" alt="DBBroker"/></h1>
+    <p class="lead">@Model.MainSubtitle</p>
+    <p><a href="~/Home/Download" class="btn btn-danger btn-lg">Download</a> &nbsp; <a href="~/Home/InstallViaNuget" class="btn btn-info btn-lg" >Install via NuGet</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-1">
+        <div class="fb-like"></div>
+    </div>    
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>@Model.Block1Title</h2>
+        <p>
+            @Model.Block1Content
+        </p>
+        <p>@Html.ActionLink(Model.LearnMore, "GettingStarted", null, htmlAttributes: new { @class = "btn btn-default btn-lg" }) </p>
+    </div>
+    <div class="col-md-4">
+        <h2>@Model.Block2Title</h2>
+        <p>
+            @Model.Block2Content
+        </p>
+        <p>@Html.ActionLink(Model.LearnMore, "Features", null, new { @class = "btn btn-default btn-lg" }) </p>
+    </div>
+
+    <div class="col-md-4">
+        <h2>@Model.Block3Title</h2>
+        <p>@Model.Block3Content</p>
+
+        @if (Model.UserLanguage == DBBrokerSite.Controllers.SupportedLanguages.English)
+        {
+            <div class="text-right">
+                <br />
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                    <input type="hidden" name="cmd" value="_s-xclick">
+                    <input type="hidden" name="hosted_button_id" value="NKGNWM2V46TEU">
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                    <img alt="" border="0" src="https://www.paypalobjects.com/pt_BR/i/scr/pixel.gif" width="1" height="1">
+                </form>
+            </div>
+        }
+        else if(Model.UserLanguage == DBBrokerSite.Controllers.SupportedLanguages.Português)
+        {
+            <div class="text-right">
+                <!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
+                <form action="https://pagseguro.uol.com.br/checkout/v2/donation.html" method="post">
+                    <!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
+                    <input type="hidden" name="currency" value="BRL" />
+                    <input type="hidden" name="receiverEmail" value="diegosiao@gmail.com" />
+                    <input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/doacoes/209x48-doar-assina.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
+                </form>
+                <!-- FINAL FORMULARIO BOTAO PAGSEGURO -->
+            </div>
+        }
+    </div>
+</div>
