@@ -1,0 +1,2 @@
+C:\Users\Diego\Documents\git\DBBroker\DBBrokerSite\obj\Debug\DBBrokerSite.csprojAssemblyReference.cache
+C:\Users\Diego\Documents\git\DBBroker\DBBrokerSite\obj\Debug\DBBrokerSite.csproj.CoreCompileInputs.cache

@@ -797,9 +797,14 @@ namespace DBBroker.Engine
                 if (IsDomainClass(prop))
                 {
                     object value = prop.GetValue(obj, null);
+
                     if (value != null)
                         value = GetIdValue(value);
-                    parametros.Add(Configuration.GetParameter<T>(mapped_field, value == null || ((long)value) == 0 ? DBNull.Value : value));
+
+                    int idObj;
+                    value = int.TryParse(value?.ToString(), out idObj) && idObj > 0 ? (object)idObj : DBNull.Value;
+
+                    parametros.Add(Configuration.GetParameter<T>(mapped_field, value));
                 }
                 else if(prop.PropertyType.Equals(typeof(byte[])) && prop_value == null)
                 {

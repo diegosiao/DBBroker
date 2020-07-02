@@ -1,0 +1,856 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DBBroker</name>
+    </assembly>
+    <members>
+        <member name="T:DBBroker.Engine.Configuration">
+            <summary>
+            This class holds information of the DBBroker.config file.
+            </summary>
+        </member>
+        <member name="F:DBBroker.Engine.Configuration.EncryptionPassword">
+            <summary>
+            The required password used to encrypt and decrypt the DBBroker.config file.
+            <para>The password informed in the creation or encryption of the DBBroker.config file must match to the one informed in this property before any database interaction.</para>
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.Namespace">
+            <summary>
+            The mapped namespace of this configuration context.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.Line">
+            <summary>
+            Line of this configuration in file
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.DatabaseContext">
+            <summary>
+            The database context of the namespace.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.ConnectionString">
+            <summary>
+            The connection string associated with the respective namespace.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.GetByLine(System.Int32)">
+            <summary>
+            Gets the configuration instance that represents the specified line in DBBroker.config file.
+            </summary>
+            <param name="Line">Number of the line in DBBroker.config</param>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.GetByType``1">
+            <summary>
+            Gets the configuration instance that represents the line in DBBroker.config file for the namespace of the type informed.
+            </summary>
+            <typeparam name="T">Any type from the namespace of the desired line in DBBroker.config file</typeparam>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.Reload">
+            <summary>
+            Clear all existing configuration values and reloads them from DBBroker.config file.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.Data">
+            <summary>
+            Holds every line of DBBroker.config file. Use the namespace as Key.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.Configuration.Count">
+            <summary>
+            Number of configuration lines in DBBroker.config file.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.GetOpenConnection``1">
+            <summary>
+            Gets an open database connection based on configuration of the namespace of the type specified. 
+            </summary>
+            <typeparam name="T">Type of the connection context</typeparam>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.GetOpenConnection(DBBroker.Engine.Configuration)">
+            <summary>
+            Gets an open database connection based on configuration specified. 
+            </summary>
+            <param name="context">
+                <para>The configuration context specified in DBBroker.config file from which this connection should be generated.</para>
+                <para>You can get one using <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/>. If null, the first line of the DBBroker.config file is assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.GetLastInsertedIdFunction``1(DBBroker.Mapping.DBMappedClass)">
+            <summary>
+            ATTENTION: For Oracle context an empty sequence name will get a function returning '0'
+            </summary>
+            <typeparam name="T">The context type for this operation</typeparam>
+            <param name="map">For Oracle context inform the Sequence</param>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.EncryptConfigFile(System.String[])">
+            <summary>
+            Encrypts the specified string array as lines of the 'DBBroker.config' file considering the value of <see cref="F:DBBroker.Engine.Configuration.EncryptionPassword"/> as the password. The same password is required for decryption when loading configuration values.
+            </summary>
+            <param name="configurationLines">The line(s) content(s) of the DBBroker.config file.
+            <para>Each line in format:</para>
+            <para>Mapped namespace|SQLServer|Connection string</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.Configuration.EncryptConfigFile">
+            <summary>
+            Encrypts the contents of the existing 'DBBroker.config' file considering the value of <see cref="F:DBBroker.Engine.Configuration.EncryptionPassword"/> as the password. The same password is required for decryption when loading configuration values.
+            <para></para>
+            </summary>
+        </member>
+        <member name="T:DBBroker.Engine.SupportedDatabases">
+            <summary>
+            SQL Server is the only fully supported database of this project under GNU LICENSE (MySQL not officially supported)
+            <para>Please refer to http://www.getdbbroker.com/Home/License </para>
+            </summary>
+        </member>
+        <member name="F:DBBroker.Engine.SupportedDatabases.SQLServer">
+            <summary>
+            The only officially supported database under GNU LICENSE
+            </summary>
+        </member>
+        <member name="F:DBBroker.Engine.SupportedDatabases.MySQL">
+            <summary>
+            Future versions will probably fully support this database engine. For now, use with caution.
+            </summary>
+        </member>
+        <member name="F:DBBroker.Engine.SupportedDatabases.Oracle">
+            <summary>
+            Future versions will probably fully support this database engine. For now, use with caution.
+            </summary>
+        </member>
+        <member name="T:DBBroker.Engine.DBBroker`1">
+            <summary>
+            <para>This is the special class that your data access classes should inherit from.</para>
+            <para>Example:</para>
+            public class DBPerson : DBBroker&lt;Person>
+            <para>{</para>
+            <para>}</para>
+            <para>To contribute or learn visit http://www.getdbbroker.com</para>
+            </summary>
+            <typeparam name="T">The context type for database interactions.</typeparam>
+        </member>
+        <member name="P:DBBroker.Engine.DBBroker`1.IgnoreLists">
+            <summary>
+            Informs if the properties of type <see cref="T:System.Collections.Generic.List`1"/> should not be loaded.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.DBBroker`1.RecordsAffected">
+            <summary>
+            Depending on the session configuration, shows the number of affected records in the last execution
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.GetTransaction">
+            <summary>
+            Gets an instance of a database transaction with its own open connection.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.GetTransaction(System.Data.IsolationLevel)">
+            <summary>
+            Gets an instance of a database transaction with its own open connection.
+            </summary>
+            <param name="isolationLevel">The database isolation level for this transaction</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.Save(`0)">
+            <summary>
+            Inserts or updates the database record of <typeparamref name="T"/>.
+            </summary>
+            <param name="obj">The instance to be persisted</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.Save(`0,System.Data.Common.DbTransaction)">
+            <summary>
+            Inserts or updates the database record of <typeparamref name="T"/> using a database transaction.
+            </summary>
+            <param name="obj">The instance to be persisted</param>
+            <param name="transaction">
+                <para>The database transaction in which this execution should run.</para>
+                <para>WARNING: If specified, make sure to commit appropriately.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.Delete(System.Int32)">
+            <summary>
+            Deletes the database record of <typeparamref name="T"/> by primary key.
+            </summary>
+            <param name="Id">Primary key value of the record</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.Delete(System.Int32,System.Data.Common.DbTransaction)">
+            <summary>
+            Deletes the database record of <typeparamref name="T"/> by primary key.
+            </summary>
+            <param name="Id">Primary key value of the record</param>
+            <param name="transaction">The database transaction in which the command should be ran</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.GetById(System.Int32)">
+            <summary>
+            Get the database record of <typeparamref name="T"/> by primary key.
+            </summary>
+            <param name="Id">Primary key value of the record</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.GetAll">
+            <summary>
+            Get all records of <typeparamref name="T"/> in the database.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.GetAll(System.String)">
+            <summary>
+            Get all records of <typeparamref name="T"/> in the database.
+            </summary>
+            <param name="orderByColumns">Columns separated by comma to be applied in the ORDER BY clause</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Data.Common.DbParameter)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">Parameter used in the specified SQL command or script.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter})">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Data.Common.DbParameter,System.Data.CommandType)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">Parameter used in the specified SQL command or script.</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Data.Common.DbParameter,System.Data.CommandType,System.Int32)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">Parameter used in the specified SQL command or script.</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+            <param name="levelOfLoad">Informs how deep DBBroker should go while loading the mapped subproperties of objects</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Data.Common.DbParameter,System.Data.CommandType,System.Int32,System.Data.Common.DbTransaction)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">Parameter used in the specified SQL command or script.</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+            <param name="levelOfLoad">Informs how deep DBBroker should go while loading the mapped subproperties of objects</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},System.Data.CommandType)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},System.Data.CommandType,System.Int32)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+            <param name="levelOfLoad">Informs how deep DBBroker should go while loading the mapped subproperties of objects</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},System.Data.CommandType,System.Int32,System.Data.Common.DbTransaction)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+            <param name="levelOfLoad">Informs how deep DBBroker should go while loading the mapped subproperties of objects</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBroker`1.ExecCmdSQL(System.String,System.Data.Common.DbParameter,System.Collections.Generic.List{System.Data.Common.DbParameter},System.Data.CommandType,System.Int32,System.Data.Common.DbTransaction)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:System.Collections.Generic.List`1"/> with the data from rows as instances of <typeparamref name="T"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+                <para>As a convenience to avoid the creation of a <see cref="T:System.Collections.Generic.List`1"/> instance when only one parameter will be used.</para>
+                <para>If informed, the value of '<paramref name="parameters"/>' will be ignored.</para>
+            </param>
+            <param name="parameters">Parameters used in the specified SQL command or script</param>
+            <param name="commandType">Informs the type of the SQL specified</param>
+            <param name="levelOfLoad">Informs how deep DBBroker should go while loading the mapped subproperties of objects</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back</param>
+        </member>
+        <member name="T:DBBroker.Engine.DBBrokerLive">
+            <summary>
+            <para>This class executes any SQL command through the static method <see cref="T:DBBroker.Engine.DBBrokerLive"/>.ExecCmdSQL() which transforms rows of the first result set returning an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/>.</para>
+            <para>This approach is great only because of the runtime resolution and flexibility, but in the other hand is error prone. Always prefer the conventional mapping for data access.</para>
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter,DBBroker.Engine.Configuration)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+            </param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter,DBBroker.Engine.Configuration,System.Data.CommandType)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter,DBBroker.Engine.Configuration,System.Data.CommandType,System.Data.Common.DbTransaction)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter,DBBroker.Engine.Configuration,System.Data.CommandType,System.Data.Common.DbTransaction,System.String)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back.</param>
+            <param name="entityName">An alias to the entity formed by the result of this execution.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter})">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},DBBroker.Engine.Configuration)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},DBBroker.Engine.Configuration,System.Data.CommandType)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},DBBroker.Engine.Configuration,System.Data.CommandType,System.Data.Common.DbTransaction)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Collections.Generic.List{System.Data.Common.DbParameter},DBBroker.Engine.Configuration,System.Data.CommandType,System.Data.Common.DbTransaction,System.String)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back.</param>
+            <param name="entityName">An alias to the entity formed by the result of this execution.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.ExecCmdSQL(System.String,System.Data.Common.DbParameter,System.Collections.Generic.List{System.Data.Common.DbParameter},DBBroker.Engine.Configuration,System.Data.CommandType,System.Data.Common.DbTransaction,System.String)">
+            <summary>
+            Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="T:DBBroker.Engine.DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="T:DBBroker.Engine.DBBrokerLiveRow"/>.
+            </summary>
+            <param name="cmdText">SQL command or script that will be executed.</param>
+            <param name="parameter">
+                <para>Parameter used in the specified SQL command or script.</para>
+                <para>As a convenience to avoid the creation of a DbParameterCollection instance when only one parameter will be used.</para>
+                <para>If informed, the value of '<paramref name="parameters"/>' will be ignored.</para>
+            </param>
+            <param name="parameters">Parameters used in the specified SQL command or script.</param>
+            <param name="context">
+                <para>The configuration context for this execution defined by a line in DBBroker.config file. You can use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</para>
+                <para>If not informed, the first line of DBBroker.config file will be assumed.</para>
+            </param>
+            <param name="commandType">Informs the type of the SQL specified.</param>
+            <param name="transaction">Transaction in which this command should run. If an error is raised, it will be rolled back.</param>
+            <param name="entityName">An alias to the entity formed by the result of this execution.</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.GetTransaction(DBBroker.Engine.Configuration)">
+            <summary>
+            Gets an instance of a initialized database transaction with its own open connection.
+            </summary>
+            <param name="context">
+                <para>The configuration context specified in DBBroker.config file from which this database transaction should be generated.</para>
+                <para>You can get one using <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/>. If null, the first line of the DBBroker.config file is assumed.</para>
+            </param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLive.GetTransaction(DBBroker.Engine.Configuration,System.Data.IsolationLevel)">
+            <summary>
+            Gets an instance of a database transaction with its own open connection.
+            </summary>
+            <param name="context">
+                <para>The configuration context specified in DBBroker.config file from which this database transaction should be generated.</para>
+                <para>You can get one using <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/>. If null, the first line of the DBBroker.config file is assumed.</para>
+            </param>
+            <param name="isolationLevel">The database isolation level for this transaction</param>
+        </member>
+        <member name="T:DBBroker.Engine.DBBrokerException">
+            <summary>
+            The generic DBBroker exception
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerException.#ctor(System.String)">
+            <summary>
+            The constructor of the the generic DBBroker exception
+            </summary>
+            <param name="message">The error message</param>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerException.#ctor(System.String,System.Exception)">
+            <summary>
+            The constructor of the the generic DBBroker exception
+            </summary>
+            <param name="message">The error message</param>
+            <param name="innerException">The prior or inner error that caused this exception</param>
+        </member>
+        <member name="T:DBBroker.Engine.DBBrokerLiveRow">
+            <summary>
+            <para>This class represents a single row of the first result set returned by the SQL script executed by the static method <see cref="T:DBBroker.Engine.DBBrokerLive"/>.ExecCmdSQL().</para>
+            <para>You can access the values of the row represented by an instance of this class by index, column name, or one of the Get() methods. E.g.: dbbroker_live_row["personame"]</para> 
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.DBBrokerLiveRow.EntityName">
+            <summary>
+            The alias given to the entity formed by the SQL script that generated this object.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Engine.DBBrokerLiveRow.ColumnNames">
+            <summary>
+            All columns returned by the SQL command that generated this object.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLiveRow.Get(System.String)">
+            <summary>
+            Get the value by column name. The first occurrence will be considered.
+            </summary>
+            <param name="column_name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLiveRow.Get(System.Int32)">
+            <summary>
+            Get the value by column index. 
+            </summary>
+            <param name="column_index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLiveRow.Get``1(System.String)">
+            <summary>
+            Get the value by column name casting it as the specified type parameter.
+            </summary>
+            <typeparam name="T">The type to the value of the specified column name.</typeparam>
+            <param name="column_name">
+            Column name in the result generated by the SQL. The first occurrence will be considered.
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:DBBroker.Engine.DBBrokerLiveRow.Get``1(System.Int32)">
+            <summary>
+            Get the value by column index casting it as the specified type parameter.
+            </summary>
+            <typeparam name="T">The type to the value of the specified column index.</typeparam>
+            <param name="column_index">
+            Column name in the result generated by the SQL. The first occurrence will be considered.
+            </param>
+            <returns></returns>
+        </member>
+        <member name="P:DBBroker.Engine.DBBrokerLiveRow.Item(System.String)">
+            <summary>
+            Get the value by column name. The first occurrence of the name will be considered.
+            </summary>
+            <param name="column_name">The name of the column to get the value.</param>
+            <returns>The object correspondent to column name specified</returns>
+        </member>
+        <member name="P:DBBroker.Engine.DBBrokerLiveRow.Item(System.Int32)">
+            <summary>
+            Get the value by column index. 
+            </summary>
+            <param name="column_index">The zero-based index of the column to get the value.</param>
+            <returns>The object correspondent to column index specified.</returns>
+        </member>
+        <member name="T:DBBroker.Engine.DBBrokerLiveRowCollection">
+            <summary>
+            This class represents the first result set of any SQL script executed by the static method <see cref="T:DBBroker.Engine.DBBrokerLive"/>.ExecCmdSQL.
+            </summary>
+        </member>
+        <member name="T:DBBroker.Engine.SqlScriptMaker">
+            <summary>
+            A helper class that generates the database SQL script of objects that reflects the mapped and specified domain.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.SqlScriptMaker.#ctor">
+            <summary>
+            Takes the first declared namespace in DBBroker.config file to generate the SQL script to create the objects in database that reflects it.
+            <para>Using this constructor when more than one namespace is defined will raise a DBBrokerException.</para>
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.SqlScriptMaker.#ctor(DBBroker.Engine.Configuration)">
+            <summary>
+            Takes the specified context namespace to generate the SQL script to create the objects in database that reflects it.
+            </summary>
+            <param name="context">The configuration context that should be used to generate the script. Use <see cref="M:DBBroker.Engine.Configuration.GetByType``1"/> to get one.</param>
+        </member>
+        <member name="M:DBBroker.Engine.SqlScriptMaker.GetDatabaseScript">
+            <summary>
+            Gets the generated SQL script of the database objects for the model specified in the construction.
+            </summary>
+        </member>
+        <member name="M:DBBroker.Engine.SqlScriptMaker.SaveDatabaseScript(System.String)">
+            <summary>
+            Saves to file the generated SQL script of the database objects specified by the constructor. 
+            </summary>
+            <param name="filePath">The path to the file of the generated SQL script. </param>
+        </member>
+        <member name="T:DBBroker.Mapping.Map">
+            <summary>
+            Parent class of all mapping classes. It is kind of an internal thing and not useful in your mappings. ;)
+            <para>By the way... have you already visited www.getdbbroker.com?</para>
+            </summary>
+        </member>
+        <member name="T:DBBroker.Mapping.DBMappedTo">
+            <summary>
+            Maps a property to a not conventional column name in database
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedTo.Column">
+            <summary>
+            Name of the database column name mapped to that property
+            </summary>
+        </member>
+        <member name="T:DBBroker.Mapping.DBMappedClass">
+            <summary>
+            Attribute to map the domain classes
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedClass.Table">
+            <summary>
+            Table to which this class should be mapped in the database
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedClass.Sequence">
+            <summary>
+            <para>For Oracle context, the sequence associated with the primary key</para>
+            <para>If not informed, you will not be aware of the created Id after INSERT commands automatically</para>
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedClass.PrimaryKey">
+            <summary>
+            Primary key of this class in the table specified
+            </summary>
+        </member>
+        <member name="T:DBBroker.Mapping.DBMappedList">
+            <summary>
+            <para>Maps the references of a one-to-many relationship represented by a property of type System.Collections.Generic.List</para>
+            <remarks>DBBroker will not take care of the state of elements in List individually, only the references represented by it.</remarks>
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedList.RelationshipTable">
+            <summary>
+            Table in which this one-to-many relationship should be stored
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedList.ParentColumnIds">
+            <summary>
+            Name of column that holds the parent Id values
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBMappedList.ChildrenColumnIds">
+            <summary>
+            Name of column that holds the children Id values
+            </summary>
+        </member>
+        <member name="T:DBBroker.Mapping.DBReadOnly">
+            <summary>
+            Should be used in properties that has initial value defined by a database mechanism.
+            <para>The related property will be ignored in SQL instructions of INSERT and UPDATE.</para>
+            </summary>
+        </member>
+        <member name="P:DBBroker.Mapping.DBReadOnly.DBDefaultValue">
+            <summary>
+            Database default value or function. This information is used in the script creation only (<see cref="T:DBBroker.Engine.SqlScriptMaker"/>).
+            <para>e.g.: GETDATE()</para>
+            </summary>
+        </member>
+        <member name="T:DBBroker.Mapping.DBTransient">
+            <summary>
+            Informs to DBBroker that this property is not persisted and should be ignored.
+            </summary>
+        </member>
+        <member name="T:DBBroker.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.AssemblyNotFound">
+            <summary>
+              Looks up a localized string similar to The informed namespace &apos;{0}&apos; was not found in the application context. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigConnStrNotFound">
+            <summary>
+              Looks up a localized string similar to A corresponding ConnectionString was not found to the namespace &apos;{0}&apos;. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigDatabaseOption">
+            <summary>
+              Looks up a localized string similar to As database option, you need to inform &apos;SQLServer&apos; or &apos;MySQL&apos; (MySQL not fully supported)..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigFileAlreadyEncripted">
+            <summary>
+              Looks up a localized string similar to The &apos;DBBroker.config&apos; is already encrypted..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigFileFormat">
+            <summary>
+              Looks up a localized string similar to Every line of the DBBroker.config file must have the format: &apos;My.Namespace|{SQLServer or MySQL}|ConnectionString&apos;. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigFileNotFound">
+            <summary>
+              Looks up a localized string similar to The DBBroker.config configuration file was not found in &apos;{0}&apos;. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerConfigInfoIncomplete">
+            <summary>
+              Looks up a localized string similar to Please inform lines of the configuration file as elements of the array. Array null or empty..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.DBBrokerScriptMessage">
+             <summary>
+               Looks up a localized string similar to  /* Generated as a courtesy without warranty by DBBroker */
+             /* ==================================================== */
+             /* Why not paying a coffee for us at www.getdbbroker.com? */
+             /* We need your help to keep moving. */
+             /* Donations via PayPal - quick and safe ;) */
+             /* Creation: {0} */
+            
+             /* [!]
+               - REMEMBER TO CREATE OR SET THE PROPER DATABASE CONTEXT BEFORE YOU RUN THIS SCRIPT;
+               - REVISE THIS SCRIPT;
+             */.
+             </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.EncryptionPasswordInvalid">
+            <summary>
+              Looks up a localized string similar to The format of the encrypted DBBroker.config file is invalid. Make sure you are using the same password used to create it (Configuration.EncryptionPassword)..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.EncryptionPasswordNull">
+            <summary>
+              Looks up a localized string similar to The encryption password in property &apos;Configuration.EncryptionPassword&apos; cannot be null or shorter than 6 characters when working with encrypted DBBroker.config file..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorBadList">
+            <summary>
+              Looks up a localized string similar to The property &apos;{0}&apos; needs to be of type &apos;System.Collections.Generic.List&apos;..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorConfigFileHasNoSuchLine">
+            <summary>
+              Looks up a localized string similar to The DBBroker.config file has does not have the line &apos;{0}&apos;. It has &apos;{1}&apos; line(s)..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorConfigurationContextRequired">
+            <summary>
+              Looks up a localized string similar to The configuration context cannot be null..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorExecutingSqlCommand">
+            <summary>
+              Looks up a localized string similar to The execution of the SQL script failed. {0} SQL: &apos;{1}&apos;. (That message is restrict to debugging).
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorIdValueNotValid">
+            <summary>
+              Looks up a localized string similar to The value found in {0} to &apos;Id&apos; property is invalid integer. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorIncompleteMap">
+            <summary>
+              Looks up a localized string similar to Please inform the corresponding table and primary key to the class &apos;{0}&apos; using the [DBMappedClass] attribute in this class. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorLoadingProp">
+            <summary>
+              Looks up a localized string similar to Fail during the load of property &apos;{0}.{1}&apos;. {2}. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMappedListCheckMapping">
+            <summary>
+              Looks up a localized string similar to Por favor, verifique os valores do atributo [DBMappedList] na propriedade &apos;{0}.{1}&apos;.  Há algo errado..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMappedListInfo">
+            <summary>
+              Looks up a localized string similar to Please inform all properties of the attribute [DBMappedList] of &apos;{0}.{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMappedListUsage">
+            <summary>
+              Looks up a localized string similar to The property &apos;{0}.{1}&apos; must be of type &apos;System.Collections.Generic.List&apos; .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMessageDefault">
+            <summary>
+              Looks up a localized string similar to Oops... Something went wrong during a try of recovering data. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMissingIdProp">
+            <summary>
+              Looks up a localized string similar to Every mapped class need a &apos;Id&apos; integer property. The class &apos;{0}&apos; does not have it. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorMultipleDatabases">
+            <summary>
+              Looks up a localized string similar to Wow... DBBroker does not allow multiple databases mechanisms (SQLServer and MySQL) in the same context. That would be a mess..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorNamespaceAlreadyInformed">
+            <summary>
+              Looks up a localized string similar to The namespace &apos;{0}&apos; appears more than once in DBBroker.config file..
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorNamespaceNotFound">
+            <summary>
+              Looks up a localized string similar to The namespace &apos;{0}&apos; was not specified in the file DBBroker.config.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorSavingObject">
+            <summary>
+              Looks up a localized string similar to Something went wrong while saving the data to &apos;{0}&apos;. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorScriptMultipleNamespacesMapped">
+            <summary>
+              Looks up a localized string similar to There is more than one mapped namespaces. Please use the ScriptGenerator constructor where you can specify a namespace. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorTranAssociatedConnectionNull">
+            <summary>
+              Looks up a localized string similar to The transaction specified has an invalid connection. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorUnableToConnect">
+            <summary>
+              Looks up a localized string similar to It was not possible to connect to the database. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.ErrorUnexpectedNullProp">
+            <summary>
+              Looks up a localized string similar to Internal unexpected error. [581].
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.MultipleAssembliesWithSameNamespace">
+            <summary>
+              Looks up a localized string similar to There is more than one assembly in context with the namespace &apos;{0}&apos;. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.NullOrEmptyColumnName">
+            <summary>
+              Looks up a localized string similar to The column name cannot be null or empty. .
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.Unnamed">
+            <summary>
+              Looks up a localized string similar to Unnamed.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.WarningPropertyNotMapped">
+            <summary>
+              Looks up a localized string similar to WARNING: The property &apos;{0}&apos; was not mapped. Type not convertible: {1}.
+            </summary>
+        </member>
+        <member name="P:DBBroker.Properties.Resources.WarningTransactionNotCommited">
+            <summary>
+              Looks up a localized string similar to Make sure you commit the external transaction informed..
+            </summary>
+        </member>
+    </members>
+</doc>
