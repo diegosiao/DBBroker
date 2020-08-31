@@ -23,7 +23,7 @@ namespace DBBroker.Engine
         {
             return ExecCmdSQL(cmdText: cmdText, parameter: null, parameters: null, context: null, commandType: CommandType.Text, transaction: null, entityName: null);
         }
-        
+
         /// <summary>
         /// Executes the specified SQL command or script. Then an attempt to load the first result set will be made to transform it in an instance of <see cref="DBBrokerLiveRowCollection"/> with the data from rows as instances of <see cref="DBBrokerLiveRow"/>.
         /// </summary>
@@ -205,14 +205,14 @@ namespace DBBroker.Engine
             if (string.IsNullOrEmpty(cmdText))
                 cmdText = "SELECT ''; ";
 
-            DBBrokerLiveRowCollection objects = new DBBrokerLiveRowCollection();
+            var objects = new DBBrokerLiveRowCollection();
 
-            bool isExternalTransaction = (transaction != null);
+            var isExternalTransaction = transaction != null;
 
             if (isExternalTransaction && transaction.Connection == null)
                 throw new DBBrokerException(Resources.ErrorTranAssociatedConnectionNull);
 
-            DbConnection connection = null;
+            DbConnection connection;
 
             if (isExternalTransaction)
                 connection = transaction.Connection;
@@ -221,62 +221,64 @@ namespace DBBroker.Engine
 
             try
             {
-                DbCommand command = connection.CreateCommand();
-                command.CommandText = cmdText;
-                command.CommandType = commandType;
-
-                if (transaction != null)
-                    command.Transaction = transaction;
-
-                if (parameter != null)
-                    command.Parameters.Add(parameter);
-                
-                if (parameters != null && parameters.Count > 0)
-                    foreach(DbParameter param in parameters)
-                        command.Parameters.Add(param);
-
-                DbDataReader reader = command.ExecuteReader();
-                DBBroker<object>.RecordsAffected = reader.RecordsAffected;
-
-                if (reader.HasRows)
+                using (var command = connection.CreateCommand())
                 {
-                    using (reader)
+                    command.CommandText = cmdText;
+                    command.CommandType = commandType;
+
+                    if (transaction != null)
+                        command.Transaction = transaction;
+
+                    if (parameter != null)
+                        command.Parameters.Add(parameter);
+
+                    if (parameters != null && parameters.Count > 0)
+                        foreach (DbParameter param in parameters)
+                            command.Parameters.Add(param);
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        string[] fields = new string[reader.FieldCount];
-                        for (int i = 0; i < reader.FieldCount; i++)
-                            fields[i] = reader.GetName(i);
+                        DBBroker<object>.RecordsAffected = reader.RecordsAffected;
 
-                        while (reader.Read())
+                        if (reader.HasRows)
                         {
-                            var obj = new DBBrokerLiveRow(fields, entityName);
+                            string[] fields = new string[reader.FieldCount];
+                            for (int i = 0; i < reader.FieldCount; i++)
+                                fields[i] = reader.GetName(i);
 
-                            for (int i = 0; i < fields.Length; i++)
-                                obj[i] = reader.GetValue(i);
+                            while (reader.Read())
+                            {
+                                var obj = new DBBrokerLiveRow(fields, entityName);
 
-                            objects.Add(obj);
-                        } 
+                                for (int i = 0; i < fields.Length; i++)
+                                    obj[i] = reader.GetValue(i);
+
+                                objects.Add(obj);
+                            }
+                        }
                     }
                 }
-
-                reader.Close();
-
-                if (!isExternalTransaction)
-                    connection.Dispose();
-
-                return objects;
             }
             catch (Exception ex)
             {
-                if (transaction != null && transaction.Connection != null)
-                    transaction.Rollback();
-
                 if (Debugger.IsAttached)
                     throw new DBBrokerException(string.Format(Resources.ErrorExecutingSqlCommand, new string[] { ex.Message, cmdText }), ex);
                 else
                     throw new DBBrokerException(Resources.ErrorMessageDefault, ex);
+            } 
+            finally
+            {
+                try
+                {
+                    if (!isExternalTransaction)
+                        connection?.Dispose();
+                }
+                catch { /* Any errors trying to dispose the connection can be safely omitted */ }
             }
+
+            return objects;
         }
-        
+
         /// <summary>
         /// Gets an instance of a initialized database transaction with its own open connection.
         /// </summary>
