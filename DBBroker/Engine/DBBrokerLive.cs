@@ -226,7 +226,7 @@ namespace DBBroker.Engine
                     command.CommandText = cmdText;
                     command.CommandType = commandType;
 
-                    if (transaction != null)
+                    if (isExternalTransaction)
                         command.Transaction = transaction;
 
                     if (parameter != null)
