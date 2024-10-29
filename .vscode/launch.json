@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C#: DbBroker CLI Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "dotnet: build CLI",
+            "program": "${workspaceFolder}/DbBroker.Cli/bin/Debug/net8.0/DbBroker.Cli.dll",
+            "args": [
+                "sync"
+            ],
+            "cwd": "${workspaceFolder}/DbBroker.Cli",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}

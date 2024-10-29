@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "build c:/Users/USER/git/DBBroker/DbBroker.Cli/DbBroker.Cli.csproj",
+			"file": "c:/Users/USER/git/DBBroker/DbBroker.Cli/DbBroker.Cli.csproj",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build CLI"
+		}
+	]
+}

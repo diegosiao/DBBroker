@@ -1,0 +1,9 @@
+{
+  "databases": [
+    {
+      "namespace": "eShop.Edm",
+      "connectionString": "Server=10.2.19.239;Database=master;User Id=sa;Password=sa;",
+      "tables": []
+    }
+  ]
+}
