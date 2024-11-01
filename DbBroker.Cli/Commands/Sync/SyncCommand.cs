@@ -1,7 +1,7 @@
-using System.ComponentModel;
-using System.Data.SqlClient;
 using System.Text.Json;
+using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Model;
+using DbBroker.Cli.Services.Providers.SqlServer;
 
 namespace DbBroker.Cli.Commands.Sync;
 
@@ -26,22 +26,25 @@ public class SyncCommand
         }
 
         $"Loading {configFiles.Count()} configuration(s) file(s):".Log();
-        List<DbBrokerConfig> configs = [];
+        List<DbBrokerConfigContext> contexts = [];
         foreach (var configFile in configFiles)
         {
             $"- {configFile}".Log();
             if (TryParseConfig(configFile, out DbBrokerConfig? config))
             {
-                configs.Add(config!);
+                contexts.AddRange(config!.Contexts!);
             }
         }
 
-        using (var connection = new SqlConnection(configs[0].Databases.First().ConnectionString))
-        {
-            connection.Open();
-        }
+        var tasks = contexts.Select(x => x.Provider switch
+            {
+                SupportedDatabaseProviders.SqlServer => new SqlServerClassGenerator().GenerateAsync(x),
+                _ => throw new NotSupportedException($"Database provider not supported: {x.Provider}"),
+            });
 
-        "Entity Data Models successfully synchronized.".Success();
+        Task.WhenAll(tasks).Wait();
+
+        "Entity Data Models synchronized.".Success();
         return 0;
     }
 

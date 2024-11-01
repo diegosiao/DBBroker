@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbBroker.Cli", "DbBroker.Cli\DbBroker.Cli.csproj", "{638007D9-F403-4D4E-BB91-D366B9F4C265}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBBroker.Core", "DBBroker.Core\DBBroker.Core.csproj", "{4D7C85A9-59EA-461E-939F-8EB5797742E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbBroker.Core", "DBBroker.Core\DbBroker.Core.csproj", "{4D7C85A9-59EA-461E-939F-8EB5797742E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBBroker.Example.Cli", "DBBroker.Example.Cli\DBBroker.Example.Cli.csproj", "{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}"
 EndProject

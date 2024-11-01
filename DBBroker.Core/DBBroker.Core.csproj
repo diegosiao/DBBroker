@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>DBBroker</PackageId>
+    <PackageId>DbBroker.Core</PackageId>
     <Version>1.0.0</Version>
     <Authors>YourName</Authors>
     <Description>NuGet package to execute a command before every build.</Description>

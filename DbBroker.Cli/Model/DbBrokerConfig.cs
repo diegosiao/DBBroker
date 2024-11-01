@@ -2,16 +2,16 @@ namespace DbBroker.Cli.Model;
 
 public class DbBrokerConfig
 {
-    public IEnumerable<DbBrokerConfigDatabase>? Databases { get; set; }
+    public IEnumerable<DbBrokerConfigContext>? Contexts { get; set; }
 
     public DateTime? LastSynced { get; set; }
 }
 
-public class DbBrokerConfigDatabase
+public class DbBrokerConfigContext
 {
     public required string Namespace { get; set; }
 
-    public SupportedDatabaseVendors Vendor { get; set; } = SupportedDatabaseVendors.SqlServer;
+    public SupportedDatabaseProviders Provider { get; set; } = SupportedDatabaseProviders.SqlServer;
 
     public required string ConnectionString { get; set; }
 
@@ -26,40 +26,5 @@ public class DbBrokerConfigDatabaseTable
 
     public string? PrimaryKeyColumn { get; set; }
 
-    public required IEnumerable<DbBrokerConfigDatabaseColumn> Columns { get; set; }
-}
-
-public class DbBrokerConfigDatabaseColumn
-{
-    /*
-    SELECT
-    t.table_name,
-    c.column_name,
-    c.data_type,
-    c.data_length,
-    c.nullable,
-    c.data_default,
-    o.last_ddl_time,
-    t.owner
-FROM
-    all_tables t
-JOIN
-    all_tab_columns c ON t.table_name = c.table_name
---JOIN
---    all_objects o ON t.table_name = o.object_name AND o.object_type = 'TABLE'
---WHERE t.owner = 'YOUR_SCHEMA'
-ORDER BY
-    t.table_name, c.column_id;
-    */
-    public Guid Id { get; set; }
-
-    public Guid TableId { get; set; }
-
-    public required string ColumnName { get; set; }
-
-    public required string DataType { get; set; }
-
-    public string? DataTypeLength { get; set; }
-
-    public bool Nullable { get; set; }
+    public required IEnumerable<DbBrokerConfigContextColumn> Columns { get; set; }
 }

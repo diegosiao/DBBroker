@@ -1,9 +1,11 @@
 {
-  "databases": [
+  "contexts": [
     {
-      "namespace": "eShop.Edm",
-      "connectionString": "Server=10.2.19.239;Database=master;User Id=sa;Password=sa;",
-      "tables": []
+      "namespace": "eShop.DataModels",
+      "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
+      "vendor": "SqlServer",
+      "tables": [],
+      "views": []
     }
   ]
 }

@@ -1,6 +1,6 @@
 namespace DbBroker.Cli;
 
-public enum SupportedDatabaseVendors
+public enum SupportedDatabaseProviders
 {
     SqlServer,
     Oracle

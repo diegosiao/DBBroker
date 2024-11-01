@@ -1,16 +1,15 @@
 ﻿using CommandLine;
 using DbBroker.Cli.Commands.Init;
 using DbBroker.Cli.Commands.Sync;
+using DbBroker.Cli.Extensions;
 
 namespace DbBroker.Cli;
 
-
+/// <summary>
+/// DbBroker .NET tool to create and synchronize Entity Data Models
+/// </summary>
 class Program
 {
-    /// <summary>
-    /// DbBroker tool to create and synchronize Entity Data Models
-    /// </summary>
-    /// <param name="args"></param>    
     static void Main(string[] args) 
     {
         $"Running DbBroker...".Log();

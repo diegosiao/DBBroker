@@ -1,6 +1,4 @@
-using System;
-
-namespace DbBroker.Cli;
+namespace DbBroker.Cli.Extensions;
 
 public static class ConsoleExtensions
 {
