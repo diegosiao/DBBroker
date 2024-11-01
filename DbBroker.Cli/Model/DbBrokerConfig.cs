@@ -11,7 +11,7 @@ public class DbBrokerConfigDatabase
 {
     public required string Namespace { get; set; }
 
-    public SupportedDatabaseVendors Vendor { get; set; } = SupportedDatabaseVendors.SqlServer;
+    public SupportedDatabaseProviders Vendor { get; set; } = SupportedDatabaseProviders.SqlServer;
 
     public required string ConnectionString { get; set; }
 
@@ -55,11 +55,15 @@ ORDER BY
 
     public Guid TableId { get; set; }
 
+    public required string SchemaName { get; set; }
+
+    public required string TableName { get; set; }
+
     public required string ColumnName { get; set; }
 
     public required string DataType { get; set; }
 
-    public string? DataTypeLength { get; set; }
+    public string? MaxLength { get; set; }
 
-    public bool Nullable { get; set; }
+    public bool IsNullable { get; set; }
 }

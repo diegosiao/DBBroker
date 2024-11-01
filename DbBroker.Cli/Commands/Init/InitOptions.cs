@@ -10,8 +10,8 @@ public class InitOptions
         'v', 
         "vendor", 
         HelpText = "Database vendor <SqlServer|Oracle>", 
-        Default = SupportedDatabaseVendors.SqlServer)]
-    public SupportedDatabaseVendors Vendor { get; init; }
+        Default = SupportedDatabaseProviders.SqlServer)]
+    public SupportedDatabaseProviders Vendor { get; init; }
 
     [Option('c', "connectionString", HelpText = "Database vendor connection string", Required = true)]
     public required string ConnectionString { get; init; }
