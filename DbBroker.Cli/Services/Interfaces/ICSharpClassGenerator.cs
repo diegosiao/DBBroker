@@ -1,8 +1,8 @@
-using DbBroker.Cli.Model;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Services.Interfaces;
 
-public interface IClassGenerator
+public interface ICSharpClassGenerator
 {
     Task<int> GenerateAsync(DbBrokerConfigContext configurationFiles);
 }

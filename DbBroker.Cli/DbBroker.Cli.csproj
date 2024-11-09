@@ -6,11 +6,27 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <!-- Nuget -->
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>DbBroker.Cli</PackageId>
+    <Version>1.0.0</Version>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dbbroker</ToolCommandName>
+    <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
+    <Description>CLI to generate Entity Data Models</Description>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="Dapper" Version="2.1.44" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DbBroker.Common\DbBroker.Common.csproj" />
   </ItemGroup>
 
 </Project>

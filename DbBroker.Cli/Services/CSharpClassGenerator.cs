@@ -1,11 +1,11 @@
 using System.Text;
 using DbBroker.Cli.Extensions;
-using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Interfaces;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Services.Providers.SqlServer;
 
-public class SqlServerClassGenerator : IClassGenerator
+public class CSharpClassGenerator : ICSharpClassGenerator
 {
     public async Task<int> GenerateAsync(DbBrokerConfigContext context)
     {
@@ -13,14 +13,18 @@ public class SqlServerClassGenerator : IClassGenerator
         
         using var connection = context.GetDbConnection();
 
+        var sqlTransformer = context.GetSqlTransformer();
+
         var tableDescriptors = await context
             .GetMetadataProvider()
             .GetTableDescriptorsAsync(connection, context);
 
         foreach (var tableDescriptor in tableDescriptors)
         {
-            var outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), "eShop", "DataModels");
-            Directory.CreateDirectory(outputDirectory);
+            var outputDirectory = (context.Namespace?.Split('.')?.Length > 1 ? string.Join('/', context.Namespace.Split('.').Skip(1)) : context.Namespace) ?? string.Empty;
+            outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
+
+            Directory.CreateDirectory(context.OutputDirectory ?? outputDirectory);
             
             var propsString = new StringBuilder();
             foreach (var item in tableDescriptor.Value.Columns)
@@ -29,17 +33,17 @@ public class SqlServerClassGenerator : IClassGenerator
 
                 propsString.AppendLine(
                     Constants.EDM_PROPERTY_TEMPLATE
-                        .Replace("$TYPE", new SqlServerSqlTransformer().GetCSharpType(item.DataType, item?.MaxLength ?? "50", item?.IsNullable ?? false))
+                        .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "50", item?.IsNullable ?? false))
                         .Replace("$KEY", isPrimaryKey ? "Key, " : string.Empty)
                         .Replace("$COLUMN_NAME", item?.ColumnName)
                         .Replace("$NAME", item?.ColumnName.ToCamelCase()));
             }
 
             File.WriteAllText(
-                Path.Combine(outputDirectory, $"{tableDescriptor.Value.TableName}Edm.cs"),
+                Path.Combine(outputDirectory, $"{tableDescriptor.Value.TableName}DataModel.cs"),
                 Constants.EDM_CLASS_TEMPLATE
                     .Replace("$NAMESPACE", context.Namespace ?? "-")
-                    .Replace("$CLASSNAME", tableDescriptor.Value.TableName)
+                    .Replace("$CLASSNAME", $"{tableDescriptor.Value.TableName}DataModel")
                     .Replace("$PROPERTIES", propsString.ToString()));
         }
 

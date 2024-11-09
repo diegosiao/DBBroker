@@ -2,8 +2,8 @@
   "contexts": [
     {
       "namespace": "eShop.DataModels",
-      "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
       "provider": "SqlServer",
+      "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
       "tables": [],
       "views": []
     }

@@ -1,12 +1,24 @@
 ﻿using System.Collections;
+using System.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Xml.XPath;
+using eShop.DataModels;
+using DbBroker;
+using Dapper;
 
 Console.WriteLine("Hello, World!");
 
 Playground.Play();
+
+var customer = new Customers();
+customer.Name = "";
+
+var connection = new SqlConnection("");
+connection.DbInsert(customer, null);
+
+
 
 // dotnet nuget add source C:\Users\USER\git\DBBroker\DBBroker.Core\bin\Debug -n DBBrokerNugetSource
 

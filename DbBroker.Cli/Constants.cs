@@ -28,20 +28,14 @@ public static class Constants
 @"using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DBBroker.Model;
 
 namespace $NAMESPACE;
 
-public class $CLASSNAME 
+public class $CLASSNAME : DataModelBase
 {
 $PROPERTIES
 
-    private Dictionary<string, bool> _IsNotPristine { get; set; } = [];
-
-    public bool IsPristine(string propertyName) => !_IsNotPristine.ContainsKey(propertyName);
-
-
-    // WIP
-    // private string[] _isNotPristineArray = [8]; // number of properties
 }
 ";
 }

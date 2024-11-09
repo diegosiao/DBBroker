@@ -1,5 +1,6 @@
 using System.Data.Common;
 using DbBroker.Cli.Model;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Services.Interfaces;
 

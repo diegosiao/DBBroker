@@ -1,5 +1,4 @@
-using System;
-using DbBroker.Cli.Model;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Repositories.Interfaces;
 

@@ -1,17 +1,12 @@
-using System.Text.Json;
 using DbBroker.Cli.Extensions;
-using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Providers.SqlServer;
+using DbBroker.Common.Model;
+using Newtonsoft.Json;
 
 namespace DbBroker.Cli.Commands.Sync;
 
 public class SyncCommand
 {
-    static JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     public static int Execute(SyncOptions options)
     {
         "Synchronizing...".Log();
@@ -36,11 +31,7 @@ public class SyncCommand
             }
         }
 
-        var tasks = contexts.Select(x => x.Provider switch
-            {
-                SupportedDatabaseProviders.SqlServer => new SqlServerClassGenerator().GenerateAsync(x),
-                _ => throw new NotSupportedException($"Database provider not supported: {x.Provider}"),
-            });
+        var tasks = contexts.Select(x => new CSharpClassGenerator().GenerateAsync(x));
 
         Task.WhenAll(tasks).Wait();
 
@@ -54,7 +45,7 @@ public class SyncCommand
         try
         {
             var json = File.ReadAllText(configFile);
-            config = JsonSerializer.Deserialize<DbBrokerConfig>(json, _jsonSerializerOptions);
+            config = JsonConvert.DeserializeObject<DbBrokerConfig>(json);
             return true;
         }
         catch (Exception ex)

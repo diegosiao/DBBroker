@@ -1,4 +1,4 @@
-namespace DbBroker.Cli;
+namespace DbBroker.Common;
 
 public enum SupportedDatabaseProviders
 {

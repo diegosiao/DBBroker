@@ -1,6 +1,8 @@
 using System;
 using CommandLine;
 using DbBroker.Cli.Extensions;
+using DbBroker.Common;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Commands.Init;
 

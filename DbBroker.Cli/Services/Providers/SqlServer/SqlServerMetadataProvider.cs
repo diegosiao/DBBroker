@@ -2,6 +2,7 @@ using System.Data.Common;
 using Dapper;
 using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Interfaces;
+using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Services.Providers.SqlServer;
 

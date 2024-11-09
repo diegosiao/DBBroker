@@ -1,9 +1,0 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Target Name="PreBuildWindows" BeforeTargets="BeforeBuild" Condition="'$(OS)' == 'Windows_NT'">
-        <Exec
-            Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Write-Host 'Pre-build command executed on Windows!'&quot;" />
-    </Target>
-    <Target Name="PreBuildUnix" BeforeTargets="BeforeBuild" Condition="'$(OS)' != 'Windows_NT'">
-        <Exec Command="echo 'Pre-build command executed on Unix-like system!'" />
-    </Target>
-</Project>
