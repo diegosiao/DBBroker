@@ -19,6 +19,8 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             .GetMetadataProvider()
             .GetTableDescriptorsAsync(connection, context);
 
+        var providerDefaultConfig = context.GetDefaultProviderConfig();
+
         foreach (var tableDescriptor in tableDescriptors)
         {
             var outputDirectory = (context.Namespace?.Split('.')?.Length > 1 ? string.Join('/', context.Namespace.Split('.').Skip(1)) : context.Namespace) ?? string.Empty;
@@ -38,13 +40,22 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         .Replace("$COLUMN_NAME", item?.ColumnName)
                         .Replace("$NAME", item?.ColumnName.ToCamelCase()));
             }
+            
+
 
             File.WriteAllText(
                 Path.Combine(outputDirectory, $"{tableDescriptor.Value.TableName}DataModel.cs"),
                 Constants.EDM_CLASS_TEMPLATE
                     .Replace("$NAMESPACE", context.Namespace ?? "-")
                     .Replace("$CLASSNAME", $"{tableDescriptor.Value.TableName}DataModel")
-                    .Replace("$PROPERTIES", propsString.ToString()));
+                    .Replace("$TABLE", tableDescriptor.Value.TableName)
+                    .Replace("$SCHEMA", tableDescriptor.Value.SchemaName)
+                    .Replace("$PROPERTIES", propsString.ToString())
+                    .Replace("$PROVIDER", context.Provider.ToString())
+                    .Replace("$ISQLINSERTTEMPLATETYPEFULLNAME", 
+                        context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName))?.SqlInsertTemplateType 
+                        ?? context.DefaultSqlInsertTemplateTypeFullName
+                        ?? providerDefaultConfig.ISqlInsertTemplateTypeFullName));
         }
 
         return 0;

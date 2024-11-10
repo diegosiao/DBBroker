@@ -16,6 +16,18 @@
             "cwd": "${workspaceFolder}/DbBroker.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
+        },
+        {
+            "name": "C#: DbBroker Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/DbBroker.Example.Cli/bin/Debug/net8.0/DbBroker.Example.Cli.dll",
+            "args": [
+                "sync"
+            ],
+            "cwd": "${workspaceFolder}/DbBroker.Example.Cli",
+            "stopAtEntry": false,
+            "console": "internalConsole"
         }
     ]
 }

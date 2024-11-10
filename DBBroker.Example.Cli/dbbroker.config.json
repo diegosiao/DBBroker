@@ -4,6 +4,7 @@
       "namespace": "eShop.DataModels",
       "provider": "SqlServer",
       "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
       "tables": [],
       "views": []
     }

@@ -1,28 +1,49 @@
-﻿using System.Collections;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using System.Linq.Expressions;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Xml.XPath;
 using eShop.DataModels;
 using DbBroker;
-using Dapper;
+using DbBroker.Model;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("DBBroker showtime!");
 
-Playground.Play();
+CustomersDataModel customer = new()
+{
+    Id = Guid.NewGuid(),
+    Name = "John Three Sixteen",
+    CreatedAt = DateTime.Now,
+    CreatedBy = "Diego",
+};
 
-var customer = new Customers();
-customer.Name = "";
+OrdersDataModel order = new()
+{
+    Id = Guid.NewGuid(),
+    StatusId = 1,
+    CustomerId = customer.Id,
+    CreatedAt = DateTime.Now,
+    CreatedBy = "Diego",
+};
 
-var connection = new SqlConnection("");
-connection.DbInsert(customer, null);
+var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;");
+connection.Open();
 
+var transaction = connection.BeginTransaction();
+connection.DbInsert(customer, transaction);
+connection.DbInsert(order, transaction);
 
+transaction.Commit();
 
-// dotnet nuget add source C:\Users\USER\git\DBBroker\DBBroker.Core\bin\Debug -n DBBrokerNugetSource
+Console.WriteLine($"New customer and order inserted. ");
 
-// dotnet add package DBBroker --source DBBrokerNugetSource
+order.StatusId = 2;
+order.ModifiedAt = DateTime.Now.AddMinutes(5);
+order.ModifiedBy = "Diego";
+
+var rowsAffected = connection.DbUpdate(order)
+    .AddFilter(x => x.StatusId, SqlEquals.To(1))
+    .AddFilter(x => x.CustomerId, SqlEquals.To(customer.Id))
+    .Execute();
+
+Console.WriteLine($"{rowsAffected} rows affected. ");
 
 // dotnet dbbroker init
 // dotnet dbbroker sync
@@ -60,17 +81,17 @@ public class OrdersPendingLem : OrderEdm // Entity Relation Model OU LogicModel
     public ListEdm<OrderNoteEdm> OrderNotes { get; set; }
 }
 
-public class CustomerEdm 
+public class CustomerEdm
 {
 
 }
 
-public class ProductEdm 
+public class ProductEdm
 {
     public string Name { get; set; }
 }
 
-public class OrderNoteEdm 
+public class OrderNoteEdm
 {
 
 }
@@ -146,7 +167,6 @@ public static class Playground
 }
 
 
-//////
 ///
 public static class PropertyPathHelper
 {

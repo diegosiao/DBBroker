@@ -15,5 +15,10 @@ public class DbBrokerConfigContext
     /// </summary>
     public string OutputDirectory { get; set; }
 
+    /// <summary>
+    /// The fully qualified type of the default template implementation of <see cref="Interfaces.ISqlInsertTemplate"/>
+    /// </summary>
+    public string DefaultSqlInsertTemplateTypeFullName { get; set; }
+
     public IEnumerable<DbBrokerConfigContextTable> Tables { get; set; } = [];
 }

@@ -28,14 +28,21 @@ public static class Constants
 @"using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DbBroker.Common;
 using DBBroker.Model;
 
 namespace $NAMESPACE;
 
-public class $CLASSNAME : DataModelBase
+[Table(name: ""$TABLE"", Schema = ""$SCHEMA"")]
+public class $CLASSNAME : DataModelBase<$CLASSNAME>
 {
 $PROPERTIES
 
+    static $CLASSNAME()
+    {
+        Provider = SupportedDatabaseProviders.$PROVIDER;
+        ISqlInsertTemplateTypeFullName = ""$ISQLINSERTTEMPLATETYPEFULLNAME"";
+    }
 }
 ";
 }
