@@ -9,5 +9,5 @@ public interface ISqlExpression
 
     IEnumerable<object> Parameters { get; }
 
-    string RenderSql(string columnName, int index);
+    string RenderSql(string columnName, IEnumerable<DbParameter> parameters, int index);
 }

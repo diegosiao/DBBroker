@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace DbBroker.Model;
 
@@ -9,4 +10,11 @@ public class CommandFilter
     public int Index { get; set; }
 
     public SqlExpression SqlExpression { get; set; }
+
+    public IEnumerable<DbParameter> Parameters { get; set; }
+
+    public string RenderSql()
+    {
+        return SqlExpression.RenderSql(DataModelMapProperty.ColumnName, Parameters, 0);
+    }
 }

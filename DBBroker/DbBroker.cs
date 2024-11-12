@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 using DbBroker.Common.Model.Interfaces;
+using DbBroker.Extensions;
 using DbBroker.Model;
-using DBBroker.Extensions;
-using DBBroker.Model;
 
 namespace DbBroker;
 
@@ -18,8 +17,15 @@ public static class DbBroker
     /// </summary>
     internal static Dictionary<string, ISqlInsertTemplate> SqlInsertTemplates = [];
 
-    public static bool DbInsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModelBase<TDataModel>
+    private static void ValidateDataModelContext<TDataModel>(DbConnection connection, TDataModel dataModel)
     {
+        // 
+    }
+
+    public static bool Insert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        ValidateDataModelContext(connection, dataModel);
+
         var insertColumns = dataModel
             .DataModelMap
             .MappedProperties
@@ -27,7 +33,7 @@ public static class DbBroker
             .Select(x => x.Value);
 
         var parameters = insertColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter($"@{x.ColumnName}", x.PropertyInfo.GetValue(dataModel)));
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));
 
         var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
             .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
@@ -53,21 +59,41 @@ public static class DbBroker
         return true;
     }
 
-    public static async Task<bool> DbInsertAsync<TDataModel>(TDataModel dataModel, DbTransaction transaction) where TDataModel : DataModelBase<TDataModel>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TDataModel"></typeparam>
+    /// <param name="connection"></param>
+    /// <param name="columns">
+    ///     <para>The columns to included in the SELECT command.</para>
+    ///     <para>Regardless of the depth being loaded, if no column of the Data Model is specified, all columns will be included.</para>
+    ///     <para>Collections are not loaded by default, it is necessary to explicitly declare the collection property.</para>
+    /// </param>
+    /// <param name="orderByAsc"></param>
+    /// <param name="orderByDesc"></param>
+    /// <param name="transaction"></param>
+    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties are loaded.</param>
+    public static SqlSelectCommand<TDataModel> Select<TDataModel>(
+        this DbConnection connection, 
+        IEnumerable<Expression<Func<TDataModel, object>>> columns = null,
+        IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
+        IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
+        DbTransaction transaction = null,
+        int depth = 0) where TDataModel : DataModel<TDataModel>
     {
-
-        return true;
+        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, transaction, depth);
     }
 
     /// <summary>
-    /// CAUTION: The Key property is ignored if in pristine state, call AddFilter() to specify explicitly the record to be updated.
+    /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
+    /// <para>Call <see cref="SqlUpdateCommand{TDataModel}.AddFilter{TProperty}(System.Linq.Expressions.Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
     /// </summary>
     /// <typeparam name="TDataModel"></typeparam>
     /// <param name="connection"></param>
     /// <param name="entity"></param>
     /// <param name="transaction"></param>
     /// <returns></returns>
-    public static SqlUpdateCommand<TDataModel> DbUpdate<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModelBase<TDataModel>
+    public static SqlUpdateCommand<TDataModel> Update<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
         var updateColumns = dataModel
             .DataModelMap
@@ -76,8 +102,27 @@ public static class DbBroker
             .Select(x => x.Value);
 
         var parameters = updateColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter($"@{x.ColumnName}", x.PropertyInfo.GetValue(dataModel)));        
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));        
 
         return new SqlUpdateCommand<TDataModel>(dataModel, updateColumns, parameters, connection, transaction);
+    }
+
+    /// <summary>
+    /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
+    /// <para>Call <see cref="SqlDeleteCommand{TDataModel}.AddFilter{TProperty}(System.Linq.Expressions.Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
+    /// </summary>
+    /// <typeparam name="TDataModel">The data model instance that represents the database record to be deleted</typeparam>
+    /// <param name="connection"></param>
+    /// <param name="dataModel"></param>
+    /// <param name="transaction"></param>
+    /// <returns></returns>
+    public static SqlDeleteCommand<TDataModel> Delete<TDataModel>(this DbConnection connection, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        return new SqlDeleteCommand<TDataModel>(
+            Activator.CreateInstance<TDataModel>(), 
+            columns: [], 
+            parameters: [], 
+            connection, 
+            transaction);
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.Data.Common;
 using DbBroker.Common;
-using DBBroker.Model;
+using DbBroker.Model;
 
-namespace DBBroker.Extensions;
+namespace DbBroker.Extensions;
 
 public static class ResolversExtensions
 {
-    public static DbConnection GetConnection<TDataModel>(this DataModelBase<TDataModel> dataModelBase)
+    public static DbConnection GetConnection<TDataModel>(this DataModel<TDataModel> dataModelBase)
     {
         return null;
     }
@@ -16,7 +16,8 @@ public static class ResolversExtensions
     {
         return provider switch
         {
-            SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), name, value) as DbParameter,
+            SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter,
+            SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType(""), $":{name}", value) as DbParameter,
             _ => throw new ArgumentException("Not supported database provider"),
         };
     }

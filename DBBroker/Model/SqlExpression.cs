@@ -15,5 +15,5 @@ public abstract class SqlExpression : ISqlExpression
         SqlOperator = sqlOperator;
     }
 
-    public abstract string RenderSql(string columnName, int index);
+    public abstract string RenderSql(string columnName, IEnumerable<DbParameter> parameters, int index);
 }

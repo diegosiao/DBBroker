@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.Reflection;
 using Dapper;
 
-namespace DBBroker.Example.Cli;
+namespace DbBroker.Example.Cli;
 
 public class DbHelper
 {

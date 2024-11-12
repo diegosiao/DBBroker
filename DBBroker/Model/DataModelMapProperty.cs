@@ -6,7 +6,7 @@ public class DataModelMapProperty
 {
     public string ColumnName { get; set; }
 
-    public string PropertyName { get; set; }
+    public string PropertyName => PropertyInfo?.Name;
 
     public bool IsKey { get; set; }
 

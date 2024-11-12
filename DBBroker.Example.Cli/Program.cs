@@ -27,8 +27,8 @@ var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=s
 connection.Open();
 
 var transaction = connection.BeginTransaction();
-connection.DbInsert(customer, transaction);
-connection.DbInsert(order, transaction);
+connection.Insert(customer, transaction);
+connection.Insert(order, transaction);
 
 transaction.Commit();
 
@@ -38,12 +38,59 @@ order.StatusId = 2;
 order.ModifiedAt = DateTime.Now.AddMinutes(5);
 order.ModifiedBy = "Diego";
 
-var rowsAffected = connection.DbUpdate(order)
+var rowsAffected = connection.Update(order)
     .AddFilter(x => x.StatusId, SqlEquals.To(1))
     .AddFilter(x => x.CustomerId, SqlEquals.To(customer.Id))
     .Execute();
 
-Console.WriteLine($"{rowsAffected} rows affected. ");
+Console.WriteLine($"{rowsAffected} row(s) updated. ");
+
+rowsAffected = connection.Delete<OrderStatusDataModel>()
+    .AddFilter(x => x.Id, SqlEquals.To(6))
+    .Execute();
+
+Console.WriteLine($"{rowsAffected} row(s) deleted. ");
+
+var costumersNotes = connection
+    .Select<CustomersNotesDataModel>(
+        columns: [
+            (x => x.CustomerIdRef!.ALL)
+        ],
+        depth: 2)
+    .Execute()
+    .ToArray();
+
+Console.WriteLine(string.Join(",", costumersNotes.Select(x => x.NoteContent)));
+Console.WriteLine(string.Join(",", costumersNotes.Select(x => x.CustomerIdRef?.Name)));
+
+var hashSet = new HashSet<CustomersDataModel>(ReferenceEqualityComparer.Instance)
+{
+    costumersNotes[0].CustomerIdRef,
+    costumersNotes[1].CustomerIdRef,
+    costumersNotes[2].CustomerIdRef
+}; 
+
+Console.WriteLine($"HashSet contains {hashSet.Count} items.");
+
+// var costumers = connection
+//     .Select<CustomersDataModel>(
+//         columns: [
+//             (x => x.Name),
+//         ],
+//         orderByAsc: [
+//             (x => x.Name),
+//             (x => x.Birthday)
+//         ],
+//         depth: 1)
+//     .AddFilter(x => x.CreatedBy, SqlEquals.To("Diego Morais"))
+//     .Execute();
+
+// Console.WriteLine("COSTUMERS RETRIEVED:");
+// Console.WriteLine("===================");
+// foreach (var costumer in costumers)
+// {
+//     Console.WriteLine($"Name: {costumer.Name}");
+// }
 
 // dotnet dbbroker init
 // dotnet dbbroker sync
@@ -111,9 +158,9 @@ public record OrderProductsEdm
 /// Soluciona o problema do mapeamento de listas
 /// </summary>
 /// <typeparam name="T">Base Entity Data Model</typeparam>
-public class ListEdm<T> : List<T> where T : class
+public class ListEdm<T> : List<T> where T : class // DataModel<T>
 {
-    public T DataModel { get; set; }
+    public T? DataModel { get; set; }
 }
 
 public static class Playground
@@ -130,7 +177,6 @@ public static class Playground
         // (Too much SQL) DAPPER -------->  [ DbBroker ]  <-------- EF (Zero SQL)
 
         /*
-
         dotnet install -g DbBroker.Cli  (dotnet tool)
         dotnet add package DbBroker.Core (library)
 

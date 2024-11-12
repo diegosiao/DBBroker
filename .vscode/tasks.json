@@ -8,6 +8,14 @@
 			"group": "build",
 			"problemMatcher": [],
 			"label": "dotnet: build CLI"
+		},
+		{
+			"type": "dotnet",
+			"task": "build ${workspaceFolder}/DbBroker.Example.Cli/DbBroker.Example.Cli.csproj",
+			"file": "${workspaceFolder}/DbBroker.Example.Cli/DbBroker.Example.Cli.csproj",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build Example CLI"
 		}
 	]
 }

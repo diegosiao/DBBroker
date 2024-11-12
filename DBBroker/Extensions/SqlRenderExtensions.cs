@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using DbBroker.Model;
@@ -12,8 +11,24 @@ public static class SqlRenderExtensions
         var whereClause = new StringBuilder();
         foreach (var filter in filters)
         {
-            whereClause.AppendLine($"AND {filter.SqlExpression.RenderSql(filter.DataModelMapProperty.ColumnName, filter.Index)}");
+            whereClause.AppendLine($"AND {filter.RenderSql()}");
         }
         return whereClause.ToString();
+    }
+
+    public static string RenderJoinsColumns(this IEnumerable<SqlJoin> joins)
+    {
+        return string.Empty;
+    }
+
+    public static string RenderJoins(this IEnumerable<SqlJoin> joins)
+    {
+        StringBuilder joinsClause = new();
+        foreach (var join in joins)
+        {
+            joinsClause.Append(@$"{(join.ColumnAllowNulls ? "LEFT " : string.Empty)}JOIN {join.SchemaName}.{join.RefTableName} {join.RefTableNameAlias} ");
+            joinsClause.AppendLine(@$"ON {join.RefTableNameAlias}.{join.RefColumnName} = {join.TableAliasName}.{join.ColumnName}");
+        }
+        return joinsClause.ToString();
     }
 }

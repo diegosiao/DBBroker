@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+
 namespace DbBroker.Model;
 
 public class SqlEquals : SqlExpression
@@ -12,8 +16,8 @@ public class SqlEquals : SqlExpression
         return new SqlEquals(value);
     }
 
-    public override string RenderSql(string columnName, int index)
+    public override string RenderSql(string columnName, IEnumerable<DbParameter> parameters, int index)
     {
-        return $"{columnName} = @{columnName}{index}";
+        return $"{columnName} = {parameters.FirstOrDefault()?.ParameterName}";
     }
 }

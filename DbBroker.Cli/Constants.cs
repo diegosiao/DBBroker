@@ -24,19 +24,27 @@ public static class Constants
         }
     }";
 
+    public const string EDM_REFERENCE_TEMPLATE =
+@"
+    [DataModelReference(nameof($$PROPERTYNAME$$), schemaName: ""$$SCHEMANAME$$"", tableName: ""$$TABLENAME$$"", columnName: ""$$COLUMNNAME$$"", columnAllowNulls: $$COLUMNALLOWNULLS$$, refColumnName: ""$$REFCOLUMNNAME$$"", refSchemaName: ""$$REFSCHEMANAME$$"", refTableName: ""$$REFTABLENAME$$"")]
+    public $$REFTYPENAME$$? $$PROPERTYNAME$$Ref { get; set; }
+";
+
     public const string EDM_CLASS_TEMPLATE =
 @"using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DbBroker.Attributes;
 using DbBroker.Common;
 using DBBroker.Model;
 
 namespace $NAMESPACE;
 
 [Table(name: ""$TABLE"", Schema = ""$SCHEMA"")]
-public class $CLASSNAME : DataModelBase<$CLASSNAME>
+public class $CLASSNAME : DataModel<$CLASSNAME>
 {
 $PROPERTIES
+$REFERENCES
 
     static $CLASSNAME()
     {

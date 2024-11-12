@@ -19,5 +19,7 @@ public class DataModelMap
     /// </summary>
     public Dictionary<string, DataModelMapProperty> MappedProperties { get; set; } = [];
 
+    public Dictionary<string, DataModelMapReference> MappedReferences { get; set; } = [];
+
     public ISqlInsertTemplate SqlInsertTemplate { get; set; }
 }

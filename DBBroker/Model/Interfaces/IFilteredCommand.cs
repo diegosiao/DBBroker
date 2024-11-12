@@ -1,12 +1,12 @@
 using System;
 using System.Linq.Expressions;
-using DBBroker.Model;
+using DbBroker.Model;
 
 namespace DbBroker.Model.Interfaces;
 
-public interface IFilteredCommand<TDataModel> where TDataModel : DataModelBase<TDataModel>
+public interface IFilteredCommand<TDataModel, TReturn> where TDataModel : DataModel<TDataModel>
 {
-    IFilteredCommand<TDataModel> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
+    IFilteredCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
 
-    int Execute();
+    TReturn Execute();
 }
