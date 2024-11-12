@@ -11,3 +11,5 @@ Because of his straight forward approach it is quick and easy start persisting y
 ## Quick Start
 
 https://www.youtube.com/watch?v=1LIjTpHPY-o
+
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/diegosiao)
