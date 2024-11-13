@@ -10,7 +10,7 @@ public class SqlServerSqlTransformer : ISqlTransformer
             case "uniqueidentifier":
                 return isNullable ? "Guid?" : "Guid";
             case "varchar":
-                return isNullable ? "string?" : "string";
+                return "string?";
             case "date":
             case "datetime":
                 return isNullable ? "DateTime?" : "DateTime";
