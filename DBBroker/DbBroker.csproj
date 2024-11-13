@@ -12,9 +12,13 @@
     <Version>3.0.1</Version>
     <Authors>Diego De Medeiros (diegosiao)</Authors>
     <Company></Company>
-    <Description>A lightweight and simple to use .NET library and CLI for manipulating databases. You're gonna love it.</Description>
-    <PackageTags>orm;data;mapping;sql server;</PackageTags>
+    <Copyright></Copyright>
+    <Description>A lightweight and simple to use .NET library for manipulating database records.</Description>
+    <PackageTags>orm, data, mapping, sql server</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
     <IncludeSource>true</IncludeSource>
@@ -24,6 +28,7 @@
   
   <ItemGroup>
     <None Include="Images\logo.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

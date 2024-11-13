@@ -23,7 +23,7 @@ OrdersDataModel order = new()
     CreatedBy = "Diego",
 };
 
-var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;");
+using var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;");
 connection.Open();
 
 var transaction = connection.BeginTransaction();
