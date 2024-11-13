@@ -21,12 +21,12 @@
             "name": "C#: DbBroker Debug",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "dotnet: build Example CLI",
-            "program": "${workspaceFolder}/DbBroker.Example.Cli/bin/Debug/net8.0/DbBroker.Example.Cli.dll",
+            "preLaunchTask": "dotnet: build Showcase CLI",
+            "program": "${workspaceFolder}/DbBroker.Showcase.Cli/bin/Debug/net8.0/DbBroker.Showcase.Cli.dll",
             "args": [
                 "sync"
             ],
-            "cwd": "${workspaceFolder}/DbBroker.Example.Cli",
+            "cwd": "${workspaceFolder}/DbBroker.Showcase.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
         }

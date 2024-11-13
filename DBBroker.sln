@@ -5,11 +5,11 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbBroker.Cli", "DbBroker.Cli\DbBroker.Cli.csproj", "{638007D9-F403-4D4E-BB91-D366B9F4C265}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbBroker.Example.Cli", "DBBroker.Example.Cli\DbBroker.Example.Cli.csproj", "{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker", "DBBroker\DbBroker.csproj", "{7CFB8562-9B08-44F6-AC7A-134DABF87741}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Common", "DbBroker.Common\DbBroker.Common.csproj", "{2AB2592F-0851-46CD-8B2B-25D6EA9E6C1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Showcase.Cli", "DbBroker.Showcase.Cli\DbBroker.Showcase.Cli.csproj", "{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{638007D9-F403-4D4E-BB91-D366B9F4C265}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638007D9-F403-4D4E-BB91-D366B9F4C265}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{638007D9-F403-4D4E-BB91-D366B9F4C265}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE933A5A-CFBC-4D23-8064-24A37EDDEDAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7CFB8562-9B08-44F6-AC7A-134DABF87741}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7CFB8562-9B08-44F6-AC7A-134DABF87741}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CFB8562-9B08-44F6-AC7A-134DABF87741}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{2AB2592F-0851-46CD-8B2B-25D6EA9E6C1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2AB2592F-0851-46CD-8B2B-25D6EA9E6C1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2AB2592F-0851-46CD-8B2B-25D6EA9E6C1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,11 +11,11 @@
 		},
 		{
 			"type": "dotnet",
-			"task": "build ${workspaceFolder}/DbBroker.Example.Cli/DbBroker.Example.Cli.csproj",
-			"file": "${workspaceFolder}/DbBroker.Example.Cli/DbBroker.Example.Cli.csproj",
+			"task": "build ${workspaceFolder}/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
+			"file": "${workspaceFolder}/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
 			"group": "build",
 			"problemMatcher": [],
-			"label": "dotnet: build Example CLI"
+			"label": "dotnet: build Showcase CLI"
 		}
 	]
 }

@@ -36,7 +36,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DbBroker.Attributes;
 using DbBroker.Common;
-using DBBroker.Model;
+using DbBroker.Model;
 
 namespace $NAMESPACE;
 
