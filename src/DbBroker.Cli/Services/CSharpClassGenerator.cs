@@ -21,6 +21,10 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
         var providerDefaultConfig = context.GetDefaultProviderConfig();
 
+        var allKeys = tableDescriptors
+            .Select(tableDescriptor => tableDescriptor.Value.Keys)
+            .SelectMany(x => x);
+
         foreach (var tableDescriptor in tableDescriptors)
         {
             var outputDirectory = (context.Namespace?.Split('.')?.Length > 1 ? string.Join('/', context.Namespace.Split('.').Skip(1)) : context.Namespace) ?? string.Empty;
@@ -30,6 +34,35 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
             StringBuilder propsString = new();
             StringBuilder refsString = new();
+            StringBuilder collectionsString = new();
+            // Find out all references to this table
+            var referencesTo = allKeys.Where(x => x.ReferencedTable.Equals(tableDescriptor.Value.TableName));
+            if (referencesTo.Any())
+            {
+                foreach (var reference in referencesTo)
+                {
+                    var primaryKeyColumnName = tableDescriptors[reference.TableFullName]
+                        .Keys?
+                        .FirstOrDefault(x => x.ConstraintType.Equals("PrimaryKey"))?
+                        .ColumnName;
+
+                    if(primaryKeyColumnName is not null){
+                        collectionsString.AppendLine(
+                            Constants.EDM_COLLECTION_REFERENCE_TEMPLATE
+                                .Replace("$$PROPERTYNAME$$", $"{reference.TableName.ToCamelCase()}{reference.ColumnName}")
+                                .Replace("$$SCHEMANAME$$", reference.SchemaName)
+                                .Replace("$$TABLENAME$$", reference.ReferencedTable)
+                                .Replace("$$COLUMNNAME$$", reference.ReferencedColumn)
+                                .Replace("$$REFCOLUMNNAME$$", reference.ColumnName)
+                                .Replace("$$REFSCHEMANAME$$", reference.SchemaName)
+                                .Replace("$$REFTABLENAME$$", reference.TableName)
+                                .Replace("$$PKCOLUMNNAME$$", primaryKeyColumnName)
+                                .Replace("$$REFTYPENAME$$", $"{reference.TableName.ToCamelCase()}DataModel")
+                        );
+                    }
+                }
+            }
+
             foreach (var item in tableDescriptor.Value.Columns)
             {
                 var isPrimaryKey = tableDescriptor
@@ -61,9 +94,9 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                             .Replace("$$REFCOLUMNNAME$$", foreignKey.ReferencedColumn)
                             .Replace("$$REFSCHEMANAME$$", foreignKey.SchemaName)
                             .Replace("$$REFTABLENAME$$", foreignKey.ReferencedTable)
+                            .Replace("$$PKCOLUMNNAME$$", foreignKey.ReferencedColumn)
                             .Replace("$$REFTYPENAME$$", $"{tableDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName}DataModel")
                     );
-
                 }
             }
 
@@ -76,6 +109,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                     .Replace("$SCHEMA", tableDescriptor.Value.SchemaName)
                     .Replace("$PROPERTIES", propsString.ToString())
                     .Replace("$REFERENCES", refsString.ToString())
+                    .Replace("$COLLECTIONS", collectionsString.ToString())
                     .Replace("$PROVIDER", context.Provider.ToString())
                     .Replace("$ISQLINSERTTEMPLATETYPEFULLNAME",
                         context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName))?.SqlInsertTemplateType

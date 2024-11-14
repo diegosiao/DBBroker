@@ -1,80 +1,169 @@
 ﻿using System.Data.SqlClient;
 using System.Linq.Expressions;
-using eShop.DataModels;
+using EShop.DataModels;
 using DbBroker;
 using DbBroker.Model;
+using Dapper;
 
 Console.WriteLine("DBBroker showtime!");
 Console.WriteLine("==================");
 
 Console.WriteLine("- Make sure you executed 'dbbroker sync' to generate the Data Models. ");
 
-CustomersDataModel customer = new()
-{
-    Id = Guid.NewGuid(),
-    Name = "John Three Sixteen",
-    CreatedAt = DateTime.Now,
-    CreatedBy = "Diego",
-};
+// CustomersDataModel customer = new()
+// {
+//     Id = Guid.NewGuid(),
+//     Name = "John Three Sixteen",
+//     CreatedAt = DateTime.Now,
+//     CreatedBy = "Diego",
+// };
 
-OrdersDataModel order = new()
-{
-    Id = Guid.NewGuid(),
-    StatusId = 1,
-    CustomerId = customer.Id,
-    CreatedAt = DateTime.Now,
-    CreatedBy = "Diego",
-};
+// OrdersDataModel order = new()
+// {
+//     Id = Guid.NewGuid(),
+//     StatusId = 1,
+//     CustomerId = customer.Id,
+//     CreatedAt = DateTime.Now,
+//     CreatedBy = "Diego",
+// };
 
 var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;");
 connection.Open();
 
-var transaction = connection.BeginTransaction();
-connection.Insert(customer, transaction);
-connection.Insert(order, transaction);
+// var transaction = connection.BeginTransaction();
+// connection.Insert(customer, transaction);
+// connection.Insert(order, transaction);
 
-transaction.Commit();
+// transaction.Commit();
 
-Console.WriteLine($"New customer and order inserted. ");
+// Console.WriteLine($"New customer and order inserted. ");
 
-order.StatusId = 2;
-order.ModifiedAt = DateTime.Now.AddMinutes(5);
-order.ModifiedBy = "Diego";
+// order.StatusId = 2;
+// order.ModifiedAt = DateTime.Now.AddMinutes(5);
+// order.ModifiedBy = "Diego";
 
-var rowsAffected = connection.Update(order)
-    .AddFilter(x => x.StatusId, SqlEquals.To(1))
-    .AddFilter(x => x.CustomerId, SqlEquals.To(customer.Id))
-    .Execute();
+// var rowsAffected = connection.Update(order)
+//     .AddFilter(x => x.StatusId, SqlEquals.To(1))
+//     .AddFilter(x => x.CustomerId, SqlEquals.To(customer.Id))
+//     .Execute();
 
-Console.WriteLine($"{rowsAffected} row(s) updated. ");
+// Console.WriteLine($"{rowsAffected} row(s) updated. ");
 
-rowsAffected = connection.Delete<OrderStatusDataModel>()
-    .AddFilter(x => x.Id, SqlEquals.To(6))
-    .Execute();
+// rowsAffected = connection.Delete<OrderStatusDataModel>()
+//     .AddFilter(x => x.Id, SqlEquals.To(6))
+//     .Execute();
 
-Console.WriteLine($"{rowsAffected} row(s) deleted. ");
+// Console.WriteLine($"{rowsAffected} row(s) deleted. ");
 
-var costumersNotes = connection
-    .Select<CustomersNotesDataModel>(
-        columns: [
-            (x => x.CustomerIdRef!.ALL)
+// Type[] types = [
+//     typeof(CustomersDataModel),
+//     typeof(CustomersNotesDataModel), 
+//     // typeof(OrdersDataModel),
+//     // typeof(PromotionsEnrollmentsDataModel),
+//     // typeof()
+//     ];
+
+// CustomersDataModel model = null;
+// var lookup = new Dictionary<Guid, CustomersDataModel>();
+// var result = connection.Query<CustomersDataModel, CustomersNotesDataModel, CustomersDataModel>(
+//     @"select CustId, Name, Id, NoteContent
+//     from Customers c
+//     join CustomersNotes n on n.CustomerId = c.CustId
+//     where c.CustId = '31AF4AC2-5BC6-4050-AA0C-543BBE7BB99D'; ",
+//     //types: types,
+//     map: (cust, note) =>
+//     {
+//         if (!lookup.TryGetValue(cust.CustId, out var currentCustomer)) 
+//         { 
+//             currentCustomer = cust; 
+//             lookup.Add(currentCustomer.CustId, currentCustomer); 
+//         }
+//         if (note != null) 
+//         { 
+//             currentCustomer.CustomersNotesCustomerIdRefs.Append(note); 
+//         }
+
+//         Console.WriteLine(currentCustomer.GetHashCode() + " - what?");
+//         return currentCustomer;
+//     },
+//     splitOn: "CustId,Id")
+//     .ToArray();
+
+// Console.WriteLine($"Result: {result.Length} records");
+
+// CustomersDataModel model = null;
+// var lookup = new Dictionary<Guid, CustomersDataModel>();
+
+// var result = connection.Query<CustomersDataModel, CustomersNotesDataModel, CustomersDataModel>(
+//     @"SELECT c.CustId, c.Name, n.Id, n.NoteContent
+//       FROM Customers c
+//       LEFT JOIN CustomersNotes n ON n.CustomerId = c.CustId
+//       WHERE c.CustId = '31AF4AC2-5BC6-4050-AA0C-543BBE7BB99D';",
+//     map: (cust, note) =>
+//     {
+//         if (!lookup.TryGetValue(cust.CustId, out var currentCustomer))
+//         {
+//             currentCustomer = cust;
+//             currentCustomer.CustomersNotesCustomerIdRefs = new List<CustomersNotesDataModel>();
+//             lookup.Add(currentCustomer.CustId, currentCustomer);
+//         }
+//         if (note != null)
+//         {
+//             currentCustomer.CustomersNotesCustomerIdRefs.Add(note);
+//         }
+
+//         Console.WriteLine(currentCustomer.GetHashCode() + " - what?");
+//         return currentCustomer;
+//     },
+//     splitOn: "Id")
+//     .Distinct()
+//     .ToArray();
+
+// // Output the results
+// foreach (var customer in result)
+// {
+//     Console.WriteLine($"Customer: {customer.Name}");
+//     foreach (var note in customer.CustomersNotesCustomerIdRefs)
+//     {
+//         Console.WriteLine($"  Note: {note.NoteContent}");
+//     }
+// }
+// return;
+
+var customers = connection
+    .Select<CustomersDataModel>(
+        include: [
+            (x => x.CustId),
+            (x => x.Name),
+            (x => x.CustomersNotesCustomerIdRefs)
         ],
         depth: 2)
-    .Execute()
-    .ToArray();
+    .AddFilter(x => x.CustId, SqlEquals.To("31AF4AC2-5BC6-4050-AA0C-543BBE7BB99D"))
+    .Execute();
 
-Console.WriteLine(string.Join(",", costumersNotes.Select(x => x.NoteContent)));
-Console.WriteLine(string.Join(",", costumersNotes.Select(x => x.CustomerIdRef?.Name)));
-Console.WriteLine(string.Join(",", costumersNotes.Select(x => x.StatusIdRef?.Status)));
+Console.WriteLine(string.Join(",", customers.Select(x => x.Name)));
+Console.WriteLine(string.Join(",", customers.Select(x => x.CreatedBy)));
 
-var hashSet = new HashSet<CustomersDataModel>(ReferenceEqualityComparer.Instance)
-{
-    costumersNotes[0].CustomerIdRef,
-    costumersNotes[1].CustomerIdRef,
-    costumersNotes[2].CustomerIdRef
-}; 
+Console.WriteLine($"{customers.Count()} record(s) retrieved.");
 
-Console.WriteLine($"HashSet contains {hashSet.Count} items.");
+var orders = connection
+    .Select<OrdersDataModel>(
+        include: [],
+        depth: 2)
+    .AddFilter(x => x.Id, SqlEquals.To("31AF4AC2-5BC6-4050-AA0C-543BBE7BB99D"))
+    .Execute();
+
+Console.WriteLine(orders.Count() + " orders");
+
+
+// var hashSet = new HashSet<CustomersDataModel>(ReferenceEqualityComparer.Instance)
+// {
+//     customersNotes[0].CustomerIdRef,
+//     costumersNotes[1].CustomerIdRef,
+//     costumersNotes[2].CustomerIdRef
+// }; 
+
+//Console.WriteLine($"HashSet contains {hashSet.Count} items.");
 
 // var costumers = connection
 //     .Select<CustomersDataModel>(
@@ -102,19 +191,6 @@ Console.WriteLine($"HashSet contains {hashSet.Count} items.");
 // [Customers] synced
 // [Cars] synced
 // Finished. Project up-to-date with database schema.
-
-/*
-var connection = new SqlConnection("your_connection_string"); 
-var sql = "SELECT o.OrderId, o.Status, c.CustomerId, c.Name, p.ProductId, p.ProductName FROM Orders o " + "INNER JOIN Customers c ON o.CustomerId = c.CustomerId " + "INNER JOIN Products p ON p.OrderId = o.OrderId"; // Get the generic method info var methodInfo = typeof(SqlMapper) .GetMethod("Query", new[] { typeof(SqlConnection), typeof(string), typeof(object), typeof(SqlTransaction), typeof(bool), typeof(string), typeof(int?), typeof(CommandType?) }); // Make the method generic var genericMethod = methodInfo.MakeGenericMethod(typeof(Order), typeof(Customer), typeof(Product), typeof(Order)); // Parameters for the method var parameters = new object[] { connection, sql, null, // parameters null, // transaction true, // buffered "CustomerId,ProductId", // splitOn null, // commandTimeout null // commandType }; // Invoke the method var result = genericMethod.Invoke(null, parameters); // Convert the result to a List of Order var orders = result as IEnumerable<Order>; foreach (var order in orders) { Console.WriteLine(order); }
-
-var result = await _dbbroker
-    .Select<OrdersInProductionElm>(depth: 3)
-    .AddFilter(order => order.CreatedAd, Sql.Between,  new [ DateTime.Now.Date, DateTime.Now.Date.AddDays(1) ])
-    .AddFilter(order => order.StatusId, Sql.Equals, 1)
-    .AddFilter(order => order.Products.DataModel.Name, Sql.Like, "%tooth paste%", toLower: true)
-    .QueryAsync();
-
-*/
 
 public class OrderEdm // Entity Data Model: Mapeamento direto OU DataModel
 {

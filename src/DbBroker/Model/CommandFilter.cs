@@ -13,8 +13,10 @@ public class CommandFilter
 
     public IEnumerable<DbParameter> Parameters { get; set; }
 
+    public string Alias { get; set; }
+
     public string RenderSql()
     {
-        return SqlExpression.RenderSql(DataModelMapProperty.ColumnName, Parameters, 0);
+        return SqlExpression.RenderSql(Alias, DataModelMapProperty.ColumnName, Parameters, 0);
     }
 }

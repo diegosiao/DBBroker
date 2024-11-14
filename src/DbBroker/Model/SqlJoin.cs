@@ -13,6 +13,8 @@ public class SqlJoin
 
     public string TableName { get; set; }
 
+    public string TablePrimaryKeyColumnName { get; set; }
+
     public string TableAliasName { get; set; }
 
     public string ColumnName { get; set; }
@@ -28,4 +30,10 @@ public class SqlJoin
     public string RefColumnNameAlias => $"{RefTableNameAlias}_{RefColumnName}";
 
     public PropertyInfo RefPropertyInfo { get; set; }
+
+    public Type RefPropertyCollectionType { get; set; }
+
+    public object TransientRef { get; set; }
+
+    public bool IsCollection => RefPropertyCollectionType is not null;
 }

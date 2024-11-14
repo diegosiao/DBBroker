@@ -64,10 +64,10 @@ public static class DbBroker
     /// </summary>
     /// <typeparam name="TDataModel"></typeparam>
     /// <param name="connection"></param>
-    /// <param name="columns">
-    ///     <para>The columns to included in the SELECT command.</para>
-    ///     <para>Regardless of the depth being loaded, if no column of the Data Model is specified, all columns will be included.</para>
-    ///     <para>Collections are not loaded by default, it is necessary to explicitly declare the collection property.</para>
+    /// <param name="include">
+    ///     <para>The properties to be included in the SELECT command.</para>
+    ///     <para>Regardless of the depth being loaded, if no property of the Data Model is specified, all properties will be included.</para>
+    ///     <para>Collections are not loaded by default, it is necessary to explicitly include the collection property. Only collections on Data Model root properties are considered.</para>
     /// </param>
     /// <param name="orderByAsc"></param>
     /// <param name="orderByDesc"></param>
@@ -75,13 +75,13 @@ public static class DbBroker
     /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties are loaded.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(
         this DbConnection connection, 
-        IEnumerable<Expression<Func<TDataModel, object>>> columns = null,
+        IEnumerable<Expression<Func<TDataModel, object>>> include = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
         DbTransaction transaction = null,
         int depth = 0) where TDataModel : DataModel<TDataModel>
     {
-        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, transaction, depth);
+        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, include, orderByAsc, orderByDesc, transaction, depth);
     }
 
     /// <summary>

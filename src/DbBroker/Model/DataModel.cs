@@ -51,7 +51,7 @@ public abstract class DataModel<T> : IDataModel
 
     protected static SupportedDatabaseProviders Provider;
 
-    readonly string[] _internalProperties =  [ "ALL", "DataModelMap" ];
+    readonly string[] _internalProperties = ["ALL", "DataModelMap"];
 
     private DataModelMap GetDataModelMap()
     {
@@ -68,7 +68,7 @@ public abstract class DataModel<T> : IDataModel
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
             Provider = Provider,
-            SqlInsertTemplate = sqlInsertTemplate
+            SqlInsertTemplate = sqlInsertTemplate,
         };
 
         var index = 0;
@@ -79,11 +79,15 @@ public abstract class DataModel<T> : IDataModel
                 continue;
             }
 
-            // Object Reference
-            if (typeof(IDataModel).IsAssignableFrom(property.PropertyType))
+            if (property.GetCustomAttribute<KeyAttribute>() != null)
             {
-                var referenceAttribute = property.GetCustomAttribute<DataModelReferenceAttribute>();
+                dataModelMap.KeyProperty = property;
+            }
 
+            // Object Reference
+            var referenceAttribute = property.GetCustomAttribute<DataModelReferenceAttribute>();
+            if (referenceAttribute is not null)
+            {
                 dataModelMap.MappedReferences.Add(property.Name, new DataModelMapReference
                 {
                     SchemaName = dataModelMap.SchemaName,
@@ -99,11 +103,25 @@ public abstract class DataModel<T> : IDataModel
                 continue;
             }
 
-            // Collection Reference (HashSet)
-            // if (typeof(IDataModelHashSet).IsAssignableFrom(property.PropertyType))
-            // {
-            //     // continue;
-            // }
+            // Collection Reference
+            var collectionAttribute = property.GetCustomAttribute<DataModelCollectionReferenceAttribute>();
+            if (collectionAttribute is not null)
+            {
+                dataModelMap.MappedCollections.Add(property.Name, new DataModelMapCollectionReference
+                {
+                    SchemaName = dataModelMap.SchemaName,
+                    TableName = dataModelMap.TableName,
+                    ColumnName = collectionAttribute.ColumnName,
+                    RefSchemaName = collectionAttribute.RefSchemaName,
+                    RefTableName = collectionAttribute.RefTableName,
+                    RefColumnName = collectionAttribute.RefColumnName,
+                    Index = index,
+                    PropertyInfo = property,
+                    DataModelCollectionType = collectionAttribute.DataModelType,
+                    RefTablePrimaryKeyColumnName = collectionAttribute.RefTablePrimaryKeyColumnName,
+                });
+                continue;
+            }
 
             // Debug.WriteLine(property.Name);
             var dataModelProperty = new DataModelMapProperty()

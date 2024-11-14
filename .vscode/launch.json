@@ -9,11 +9,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "dotnet: build CLI",
-            "program": "${workspaceFolder}/DbBroker.Cli/bin/Debug/net8.0/DbBroker.Cli.dll",
+            "program": "${workspaceFolder}/src/DbBroker.Cli/bin/Debug/net8.0/DbBroker.Cli.dll",
             "args": [
                 "sync"
             ],
-            "cwd": "${workspaceFolder}/DbBroker.Cli",
+            "cwd": "${workspaceFolder}/src/DbBroker.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
         },
@@ -22,11 +22,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "dotnet: build Showcase CLI",
-            "program": "${workspaceFolder}/DbBroker.Showcase.Cli/bin/Debug/net8.0/DbBroker.Showcase.Cli.dll",
+            "program": "${workspaceFolder}/src/DbBroker.Showcase.Cli/bin/Debug/net8.0/DbBroker.Showcase.Cli.dll",
             "args": [
                 "sync"
             ],
-            "cwd": "${workspaceFolder}/DbBroker.Showcase.Cli",
+            "cwd": "${workspaceFolder}/src/DbBroker.Showcase.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
         }

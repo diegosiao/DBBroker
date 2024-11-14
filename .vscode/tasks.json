@@ -3,16 +3,16 @@
 	"tasks": [
 		{
 			"type": "dotnet",
-			"task": "build ${workspaceFolder}/DbBroker.Cli/DbBroker.Cli.csproj",
-			"file": "${workspaceFolder}/DbBroker.Cli/DbBroker.Cli.csproj",
+			"task": "build ${workspaceFolder}/src/DbBroker.Cli/DbBroker.Cli.csproj",
+			"file": "${workspaceFolder}/src/DbBroker.Cli/DbBroker.Cli.csproj",
 			"group": "build",
 			"problemMatcher": [],
 			"label": "dotnet: build CLI"
 		},
 		{
 			"type": "dotnet",
-			"task": "build ${workspaceFolder}/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
-			"file": "${workspaceFolder}/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
+			"task": "build ${workspaceFolder}/src/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
+			"file": "${workspaceFolder}/src/DbBroker.Showcase.Cli/DbBroker.Showcase.Cli.csproj",
 			"group": "build",
 			"problemMatcher": [],
 			"label": "dotnet: build Showcase CLI"

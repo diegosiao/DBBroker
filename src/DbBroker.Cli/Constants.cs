@@ -30,6 +30,12 @@ public static class Constants
     public $$REFTYPENAME$$? $$PROPERTYNAME$$Ref { get; set; }
 ";
 
+    public const string EDM_COLLECTION_REFERENCE_TEMPLATE =
+@"
+    [DataModelCollectionReference(schemaName: ""$$SCHEMANAME$$"", tableName: ""$$TABLENAME$$"", columnName: ""$$COLUMNNAME$$"", refColumnName: ""$$REFCOLUMNNAME$$"", refSchemaName: ""$$REFSCHEMANAME$$"", refTableName: ""$$REFTABLENAME$$"", refTablePrimaryKeyColumnName: ""$$PKCOLUMNNAME$$"", dataModelType: typeof($$REFTYPENAME$$))]
+    public IEnumerable<$$REFTYPENAME$$>? $$PROPERTYNAME$$Refs { get; set; }
+";
+
     public const string EDM_CLASS_TEMPLATE =
 @"using System;
 using System.ComponentModel.DataAnnotations;
@@ -45,6 +51,7 @@ public class $CLASSNAME : DataModel<$CLASSNAME>
 {
 $PROPERTIES
 $REFERENCES
+$COLLECTIONS
 
     static $CLASSNAME()
     {

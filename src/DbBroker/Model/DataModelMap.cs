@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using DbBroker.Common;
 using DbBroker.Common.Model.Interfaces;
 
@@ -12,6 +13,8 @@ public class DataModelMap
 
     public string TableFullName => $"{SchemaName}.{TableName}";
 
+    public PropertyInfo KeyProperty { get; set; }
+
     public SupportedDatabaseProviders Provider { get; set; }
     
     /// <summary>
@@ -20,6 +23,8 @@ public class DataModelMap
     public Dictionary<string, DataModelMapProperty> MappedProperties { get; set; } = [];
 
     public Dictionary<string, DataModelMapReference> MappedReferences { get; set; } = [];
+
+    public Dictionary<string, DataModelMapCollectionReference> MappedCollections { get; set; } = [];
 
     public ISqlInsertTemplate SqlInsertTemplate { get; set; }
 }
