@@ -6,17 +6,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  
-  <!-- Nuget -->
+
+  <!-- https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DbBroker.Cli</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.0-alpha</Version>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dbbroker</ToolCommandName>
     <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
     <Description>CLI to generate Entity Data Models</Description>
     <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIconUrl>https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-100x100.png</PackageIconUrl>
   </PropertyGroup>
 

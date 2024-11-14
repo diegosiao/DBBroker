@@ -4,7 +4,7 @@ using DbBroker.Cli.Services.Interfaces;
 
 public class SqlServerSqlTransformer : ISqlTransformer
 {
-    public string GetCSharpType(string databaseType, string databaseTypeLength, bool isNullable)
+    public string? GetCSharpType(string databaseType, string databaseTypeLength, bool isNullable)
     {
         switch (databaseType.ToLower()){
             case "uniqueidentifier":
@@ -20,7 +20,7 @@ public class SqlServerSqlTransformer : ISqlTransformer
             case "int":
                 return isNullable ? "int?" : "int";
             default:
-                throw new InvalidOperationException($"Database type unsupported: {databaseType}");
+                return null;
         }
     }
 }

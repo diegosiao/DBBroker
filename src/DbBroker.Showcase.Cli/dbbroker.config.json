@@ -1,9 +1,9 @@
 {
   "contexts": [
     {
-      "namespace": "EShop.DataModels",
+      "namespace": "EShop.DataModels.SqlServer",
       "provider": "SqlServer",
-      "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
+      "connectionString": "Server=127.0.0.1,1439;Database=DbBroker;User Id=sa;Password=dbbroker1!;",
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
       "tables": [],
       "views": []

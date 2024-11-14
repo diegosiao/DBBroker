@@ -87,6 +87,7 @@ public static class DbBroker
     /// <summary>
     /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
     /// <para>Call <see cref="SqlUpdateCommand{TDataModel}.AddFilter{TProperty}(System.Linq.Expressions.Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
+    /// 
     /// </summary>
     /// <typeparam name="TDataModel"></typeparam>
     /// <param name="connection"></param>

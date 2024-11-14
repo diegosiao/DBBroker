@@ -45,6 +45,7 @@ public static class DbBrokerConfigContextExtensions
         return context.Provider switch
         {
             SupportedDatabaseProviders.SqlServer => new SqlServerSqlTransformer(),
+            SupportedDatabaseProviders.Oracle => new OracleSqlTransformer(),
             _ => throw new ArgumentException("Provider not supported."),
         };
     }
