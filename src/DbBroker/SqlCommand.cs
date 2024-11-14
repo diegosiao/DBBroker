@@ -65,7 +65,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$COLUMNS$$", string.Join(",", Columns.Select(x => $"{x.ColumnName}=@{x.ColumnName}")))
-            .Replace("$$FILTERS$$", Filters.Any() ? Filters.RenderWhereClause() : "1=1"); // TODO: Expose a configuration flag to avoid destructive UPDATE by default
+            .Replace("$$FILTERS$$", Filters.RenderWhereClause()); // TODO: Expose a configuration flag to avoid destructive UPDATE by default
     }
 
     public virtual TReturn Execute()
@@ -86,6 +86,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         command.Parameters.AddRange(Parameters.ToArray());
         command.Parameters.AddRange(filterParameters.ToArray());
         command.Transaction = Transaction;
+        // command.CommandTimeout
 
         return (TReturn)(object)command.ExecuteNonQuery();
     }

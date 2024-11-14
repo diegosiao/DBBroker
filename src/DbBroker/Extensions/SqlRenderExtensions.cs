@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using DbBroker.Model;
 
@@ -8,6 +9,11 @@ public static class SqlRenderExtensions
 {
     public static string RenderWhereClause(this IEnumerable<CommandFilter> filters)
     {
+        if (filters is null || !filters.Any())
+        {
+            return "1=1";
+        }
+
         var whereClause = new StringBuilder();
         foreach (var filter in filters)
         {

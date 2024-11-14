@@ -10,11 +10,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DBBroker</PackageId>
     <Version>3.0.1</Version>
-    <Authors>Diego De Medeiros (diegosiao)</Authors>
+    <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>
-    <Description>A lightweight and simple to use .NET library for manipulating database records.</Description>
-    <PackageTags>orm, data, mapping, sql server</PackageTags>
+    <Description>A lightweight and simple to use .NET library for manipulating database records. Used with DBBroker.Cli dotnet tool which generates the Data Models.</Description>
+    <PackageTags>orm, data, mapping, sql server, oracle, mysql</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
@@ -27,7 +27,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Include="DataModelKeyComparer.cs" />
     <None Include="Images\logo.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>

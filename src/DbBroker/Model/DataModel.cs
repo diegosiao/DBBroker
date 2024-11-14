@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DbBroker.Attributes;
@@ -123,7 +124,6 @@ public abstract class DataModel<T> : IDataModel
                 continue;
             }
 
-            // Debug.WriteLine(property.Name);
             var dataModelProperty = new DataModelMapProperty()
             {
                 ColumnName = property.GetCustomAttribute<ColumnAttribute>().Name,

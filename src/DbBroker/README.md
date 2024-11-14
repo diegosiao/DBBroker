@@ -38,6 +38,16 @@ connection.Insert(customer);
 
 For more examples go [here](https://github.com/diegosiao/DBBroker).
 
+## Supported Databases
+
+| Database | Status |
+|----------|--------|
+| SQL Server | ✅ |
+| Oracle | 🛠️(WIP) |
+| Postgres | ❌ |
+| MySQL | ❌ |
+| MariaDB | ❌ |
+
 ## Contribute
 
 Is there a Database provider you want to see supported? Contributors are welcome!
