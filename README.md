@@ -1,26 +1,26 @@
 <div align="center">
   <img src="/assets/logo-with-name.png" alt="DBBroker logo" />
   <br/>
-  A lightweight and simple to use .NET tool and library to make manipulating database records effortless.
+  A lightweight and user-friendly .NET tool and library for effortless database records manipulation.
 </div>
 
 ## Philosophy
 
-First of all, there is no such thing as a silver bullet that kills all kinds of monsters in the world. 
+First and foremost, there is no such thing as a one-size-fits-all solution.
 
-With that said, every kind of application can benefit from DBBroker features, from the simpler to the complex ones intended for restrict scenarios with, for example, the following requirements:
+That being said, DBBroker offers features that benefit any kind of application, from the simplest to the most complex, particularly in security-restricted scenarios. Here are some key requirements it addresses:
 
-- Applications should **NOT** bear the responsibility nor privilege to execute [DDL](https://en.wikipedia.org/wiki/Data_definition_language).
+- Applications should NOT be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language)..
 
-- Applications' Data Access Objects should reflect databases as clients not the opposite.
+- Applications' Data Access Objects should act as clients to the database, not the other way around.
 
-- [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) cannot be used because of a development process lead by [Database Administrators](https://en.wikipedia.org/wiki/Database_administration).
+- [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) are not an option due to a development process led by Database Administrators.
 
-These are common requirements for applications in many organizations where solutions are database centered, like the one where this tool was developed initially.
+These are common needs for many organizations with database-centered solutions, such as the one where this tool was initially developed.
 
 ## Quick Start
 
-On your terminal navigate to the `*.csproj` directory of your application, then follow the steps bellow.
+Open your terminal and navigate to your application's *.csproj directory. Then follow these steps:
 
 **Step 1:** Install `DBBroker.Cli` .NET tool globally.
 
@@ -40,7 +40,7 @@ dotnet nuget add DBBroker
 dotnet dbbroker init --namespace="EShop.DataModels" --connection-string "[your-connection-string]" --provider Oracle
 ```
 
-**Step 4:** Synchronize your project with your database. That command will generate the Data Models.
+**Step 4:** Synchronize your project with your database to generate the Data Models.
 
 ```bash
 dotnet dbbroker sync
@@ -100,7 +100,7 @@ Retrieving multiple and filtered records.
 ```C#
 var inactiveCustomers = await connection.Select<CustomersDataModel>()
   .AddFilter(x => x.StatusId, SqlEquals.To(3))
-  .FetchFirst(records: 100, skip: 300) // help implementing a 'load more' strategy
+  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' strategy
   .ExecuteAsync();
 ```
 
