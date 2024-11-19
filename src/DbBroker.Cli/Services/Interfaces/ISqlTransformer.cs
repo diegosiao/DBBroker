@@ -12,5 +12,5 @@ public interface ISqlTransformer
     /// <param name="databaseTypeLength">The database type length or option</param>
     /// <param name="isNullable">True if the column accepts null, false otherwise</param>
     /// <returns>The C# type name or null if the database type is unsupported</returns>
-    string? GetCSharpType(string databaseType, string databaseTypeLength, bool isNullable);
+    string? GetCSharpType(string databaseType, string? databaseTypeLength, bool isNullable);
 }

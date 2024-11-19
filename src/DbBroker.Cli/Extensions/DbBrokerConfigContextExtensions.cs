@@ -6,6 +6,7 @@ using DbBroker.Cli.Services.Providers.Oracle;
 using DbBroker.Cli.Services.Providers.SqlServer;
 using DbBroker.Common;
 using DbBroker.Common.Model;
+using Oracle.ManagedDataAccess.Client;
 
 namespace DbBroker.Cli.Extensions;
 
@@ -22,6 +23,7 @@ public static class DbBrokerConfigContextExtensions
         return context.Provider switch
         {
             SupportedDatabaseProviders.SqlServer => new SqlConnection(context.ConnectionString),
+            SupportedDatabaseProviders.Oracle => new OracleConnection(context.ConnectionString),
             _ => throw new ArgumentException("Provider not supported."),
         };
     }
@@ -31,7 +33,8 @@ public static class DbBrokerConfigContextExtensions
         return context.Provider switch
         {
             SupportedDatabaseProviders.SqlServer => new SqlServerMetadataProvider(),
-            _ => throw new ArgumentException("Provider not supported."),
+            SupportedDatabaseProviders.Oracle => new OracleMetadaProvider(),
+            _ => throw new ArgumentException($"Provider not supported: {context.Provider}."),
         };
     }
 

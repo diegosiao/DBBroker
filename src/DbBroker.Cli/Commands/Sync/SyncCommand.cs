@@ -35,8 +35,14 @@ public class SyncCommand
 
         Task.WhenAll(tasks).Wait();
 
-        "Entity Data Models synchronized.".Success();
-        return 0;
+        if (tasks.Sum(x => x.Result).Equals(0))
+        {
+            "Data Models synchronized.".Success();
+            return ExitCodes.SUCCESS;
+        }
+
+        "There is an error synchronizing the Data Models. Check the logs for more information.".Error();
+        return 1;
     }
 
     private static bool TryParseConfig(string configFile, out DbBrokerConfig? config)

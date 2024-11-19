@@ -7,6 +7,14 @@
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
       "tables": [],
       "views": []
+    },
+    {
+      "namespace": "EShop.DataModels.Oracle",
+      "provider": "Oracle",
+      "connectionString": "Server=127.0.0.1,1529;Database=DbBroker;User Id=system;Password=oracle;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
+      "tables": [],
+      "views": []
     }
   ]
 }

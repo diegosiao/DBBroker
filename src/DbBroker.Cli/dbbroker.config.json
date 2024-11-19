@@ -1,9 +1,17 @@
 {
   "contexts": [
     {
-      "namespace": "EShop.DataModels",
-      "connectionString": "Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;",
+      "namespace": "EShop.DataModels.SqlServer",
+      "connectionString": "Server=localhost,1439;Database=DbBroker;User Id=sa;Password=dbbroker1!;",
       "provider": "SqlServer",
+      "tables": [],
+      "views": []
+    },
+    {
+      "namespace": "EShop.DataModels.Oracle",
+      "provider": "Oracle",
+      "connectionString": "user id=dbbroker;password=password;data source=//localhost:1529/xe;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
       "tables": [],
       "views": []
     }

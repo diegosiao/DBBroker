@@ -7,7 +7,6 @@ ENV ACCEPT_EULA=Y
 # Copy the initialization scripts
 COPY init.sql /init.sql
 COPY entrypoint.sh /entrypoint.sh
-COPY entrypoint.ps1 /entrypoint.ps1
 
 # Grant permissions to the entrypoint script
 # RUN chmod +x /entrypoint.sh
