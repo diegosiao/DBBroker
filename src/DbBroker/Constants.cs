@@ -13,10 +13,10 @@ public class Constants
     UPDATE $$TABLEFULLNAME$$
     SET $$COLUMNS$$
     WHERE 1=1
-    $$FILTERS$$;";
+    $$FILTERS$$";
 
     public const string SqlDeleteTemplate = @"
     DELETE $$TABLEFULLNAME$$
     WHERE 1=1
-    $$FILTERS$$;";
+    $$FILTERS$$";
 }

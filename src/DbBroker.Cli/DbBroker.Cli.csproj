@@ -10,8 +10,8 @@
   <!-- https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>DbBroker.Cli</PackageId>
-    <Version>1.0.0-alpha</Version>
+    <PackageId>DBBroker.Cli</PackageId>
+    <Version>1.0.0</Version>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dbbroker</ToolCommandName>
     <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>

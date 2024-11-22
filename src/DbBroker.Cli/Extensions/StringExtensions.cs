@@ -1,5 +1,3 @@
-using System;
-
 namespace DbBroker.Cli.Extensions;
 
 public static class StringExtensions

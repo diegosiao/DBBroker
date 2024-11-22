@@ -1,4 +1,5 @@
 using System.Text;
+using DbBroker.Cli.Commands.Sync;
 using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Services.Interfaces;
 using DbBroker.Common.Model;
@@ -52,7 +53,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         {
                             collectionsString.AppendLine(
                                 Constants.EDM_COLLECTION_REFERENCE_TEMPLATE
-                                    .Replace("$$PROPERTYNAME$$", $"{reference.TableName.ToCamelCase()}{reference.ColumnName}")
+                                    .Replace("$$PROPERTYNAME$$", $"{reference.TableName.ToCamelCase()}{reference.ColumnName.ToCamelCase()}")
                                     .Replace("$$SCHEMANAME$$", reference.SchemaName)
                                     .Replace("$$TABLENAME$$", reference.ReferencedTable)
                                     .Replace("$$COLUMNNAME$$", reference.ReferencedColumn)
@@ -98,7 +99,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                                 .Replace("$$REFSCHEMANAME$$", foreignKey.SchemaName)
                                 .Replace("$$REFTABLENAME$$", foreignKey.ReferencedTable)
                                 .Replace("$$PKCOLUMNNAME$$", foreignKey.ReferencedColumn)
-                                .Replace("$$REFTYPENAME$$", $"{tableDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName}DataModel")
+                                .Replace("$$REFTYPENAME$$", $"{tableDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName.ToCamelCase()}DataModel")
                         );
                     }
                 }
@@ -115,7 +116,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         .Replace("$COLLECTIONS", collectionsString.ToString())
                         .Replace("$PROVIDER", context.Provider.ToString())
                         .Replace("$ISQLINSERTTEMPLATETYPEFULLNAME",
-                            context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName))?.SqlInsertTemplateType
+                            context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName))?.SqlInsertTemplateTypeFullName
                             ?? context.DefaultSqlInsertTemplateTypeFullName
                             ?? providerDefaultConfig.ISqlInsertTemplateTypeFullName));
             }
@@ -123,6 +124,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
         catch (Exception ex)
         {
             $"{context.Namespace} | {ex.Message}".Error();
+            SyncCommand.Results.Add(context.Namespace, 1);
             return 1;
         }
 

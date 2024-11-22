@@ -1,3 +1,4 @@
+name: dbbroker-showcase
 services:
   sqlserver:
     build:

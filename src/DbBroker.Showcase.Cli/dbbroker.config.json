@@ -5,14 +5,20 @@
       "provider": "SqlServer",
       "connectionString": "Server=127.0.0.1,1439;Database=DbBroker;User Id=sa;Password=dbbroker1!;",
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
-      "tables": [],
+      "tables": [
+        {
+          "name": "",
+          "schema": "",
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate"
+        }
+      ],
       "views": []
     },
     {
       "namespace": "EShop.DataModels.Oracle",
       "provider": "Oracle",
-      "connectionString": "Server=127.0.0.1,1529;Database=DbBroker;User Id=system;Password=oracle;",
-      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
+      "connectionString": "user id=dbbroker;password=password;data source=//localhost:1529/xe;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleExplicitKeySqlInsertTemplate",
       "tables": [],
       "views": []
     }

@@ -64,7 +64,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     {
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
-            .Replace("$$COLUMNS$$", string.Join(",", Columns.Select(x => $"{x.ColumnName}=@{x.ColumnName}")))
+            .Replace("$$COLUMNS$$", string.Join(",", Columns.Select(x => $"{x.ColumnName}={Parameters.First(p => p.ParameterName[1..].Equals(x.ColumnName)).ParameterName}")))
             .Replace("$$FILTERS$$", Filters.RenderWhereClause()); // TODO: Expose a configuration flag to avoid destructive UPDATE by default
     }
 

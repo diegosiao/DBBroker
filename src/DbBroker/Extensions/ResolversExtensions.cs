@@ -17,7 +17,7 @@ public static class ResolversExtensions
         return provider switch
         {
             SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter,
-            SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType(""), $":{name}", value) as DbParameter,
+            SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter,
             _ => throw new ArgumentException("Not supported database provider"),
         };
     }

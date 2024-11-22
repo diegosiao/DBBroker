@@ -1,7 +1,8 @@
-﻿using System.Data.SqlClient;
-using EShop.DataModels;
+﻿using EShop.DataModels.Oracle;
 using DbBroker;
 using DbBroker.Model;
+using Oracle.ManagedDataAccess.Client;
+using System.Diagnostics;
 
 Console.WriteLine("DBBroker showtime!");
 Console.WriteLine("==================");
@@ -21,16 +22,18 @@ All good? Showtime now? (y/n)
 
 ");
 
-if (!Console.ReadLine()?.ToLower().Equals("y") ?? true)
+if (!Debugger.IsAttached && (!Console.ReadLine()?.ToLower().Equals("y") ?? true))
 {
     return;
 }
+
+
 
 // (Too much SQL) Dapper ------->  [ DBBroker ⭐ ]  <------- EF (Too much management)
 
 CustomersDataModel customer = new()
 {
-    Id = Guid.NewGuid(),
+    Id = Guid.NewGuid().ToByteArray(),
     Name = "John Three Sixteen",
     CreatedAt = DateTime.Now,
     CreatedBy = "Diego",
@@ -38,28 +41,38 @@ CustomersDataModel customer = new()
 
 OrdersDataModel order = new()
 {
-    Id = Guid.NewGuid(),
+    Id = Guid.NewGuid().ToByteArray(),
     StatusId = 1,
     CustomerId = customer.Id,
     CreatedAt = DateTime.Now,
     CreatedBy = "Diego",
 };
 
-var connection = new SqlConnection("Server=127.0.0.1;Database=DbBroker;User Id=sa;Password=sa123;");
+var connection = new OracleConnection("user id=dbbroker;password=password;data source=//localhost:1529/xe;");
 connection.Open();
 
 // using a transaction
 var transaction = connection.BeginTransaction();
-connection.Insert(customer, transaction);
-connection.Insert(order, transaction);
-
-transaction.Commit();
+try
+{
+    connection.Insert(customer, transaction);
+    connection.Insert(order, transaction);
+    transaction.Commit();
+}
+catch (Exception ex)
+{
+    transaction.Rollback();
+    Console.WriteLine(ex.Message);
+}
 
 Console.WriteLine($"New customer and order inserted. ");
 
-order.StatusId = 2;
-order.ModifiedAt = DateTime.Now.AddMinutes(5);
-order.ModifiedBy = "Diego";
+order = new()
+{
+    StatusId = 2,
+    ModifiedAt = DateTime.Now.AddMinutes(5),
+    ModifiedBy = "Diego"
+};
 
 // Updating multiple records
 var rowsAffected = connection.Update(order)
@@ -84,7 +97,7 @@ var customers = connection
             (x => x.CustomersNotesCustomerIdRefs)
         ],
         depth: 2)
-    .AddFilter(x => x.Id, SqlEquals.To("31AF4AC2-5BC6-4050-AA0C-543BBE7BB99D"))
+    .AddFilter(x => x.Id, SqlEquals.To(customer.Id))
     .Execute();
 
 Console.WriteLine(string.Join(",", customers.Select(x => x.Name)));

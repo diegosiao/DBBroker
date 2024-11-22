@@ -24,7 +24,7 @@ public static class DbBrokerConfigContextExtensions
         {
             SupportedDatabaseProviders.SqlServer => new SqlConnection(context.ConnectionString),
             SupportedDatabaseProviders.Oracle => new OracleConnection(context.ConnectionString),
-            _ => throw new ArgumentException("Provider not supported."),
+            _ => throw new ArgumentException($"Provider not supported: {context.Provider}"),
         };
     }
 
@@ -49,7 +49,7 @@ public static class DbBrokerConfigContextExtensions
         {
             SupportedDatabaseProviders.SqlServer => new SqlServerSqlTransformer(),
             SupportedDatabaseProviders.Oracle => new OracleSqlTransformer(),
-            _ => throw new ArgumentException("Provider not supported."),
+            _ => throw new ArgumentException($"Provider not supported: {context.Provider}"),
         };
     }
 }

@@ -1,19 +1,17 @@
-using System;
 using DbBroker.Common.Model.Interfaces;
 
 namespace DbBroker.Model.Providers.Oracle;
 
-public class OracleSequenceSqlInsertTemplate : ISqlInsertTemplate
+public class OracleExplicitKeySqlInsertTemplate : ISqlInsertTemplate
 {
     public string SqlTemplate =>
         @$"
     INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
-    VALUES ($$PARAMETERS$$);
-    ";
+    VALUES ($$PARAMETERS$$)";
 
     public string KeyOutputParameterName => string.Empty;
 
-    public bool IncludeKeyColumn => false;
+    public bool IncludeKeyColumn => true;
 
-    public bool TryRetrieveKey => true;
+    public bool TryRetrieveKey => false;
 }

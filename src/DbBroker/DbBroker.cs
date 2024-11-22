@@ -38,7 +38,7 @@ public static class DbBroker
         var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
             .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
             .Replace("$$COLUMNS$$", string.Join(",", insertColumns.Select(x => x.ColumnName)))
-            .Replace("$$PARAMETERS$$", string.Join(",", insertColumns.Select(x => $"@{x.ColumnName}")));
+            .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)));
 
         if (connection.State != ConnectionState.Open)
         {

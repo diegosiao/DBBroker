@@ -18,7 +18,7 @@
             "console": "internalConsole"
         },
         {
-            "name": "C#: DbBroker Debug",
+            "name": "C#: DbBroker Showcase Debug",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "dotnet: build Showcase CLI",

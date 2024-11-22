@@ -6,13 +6,14 @@ using DbBroker.Cli.Extensions;
 namespace DbBroker.Cli;
 
 /// <summary>
-/// DbBroker .NET tool to create and synchronize Entity Data Models
+/// DBBroker CLI is a .NET tool to create and synchronize Data Models
 /// </summary>
 class Program
 {
     static void Main(string[] args) 
     {
-        $"Running DbBroker...".Log();
+        $"Running DBBroker v1.0.1-alpha...".Log();
+
         Parser.Default.ParseArguments<InitOptions, SyncOptions>(args)
                       .MapResult(
                           (InitOptions opts) => InitOptions.Execute(opts),

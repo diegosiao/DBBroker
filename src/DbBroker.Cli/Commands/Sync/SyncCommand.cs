@@ -7,6 +7,8 @@ namespace DbBroker.Cli.Commands.Sync;
 
 public class SyncCommand
 {
+    internal static Dictionary<string, int> Results = [];
+
     public static int Execute(SyncOptions options)
     {
         "Synchronizing...".Log();
@@ -31,17 +33,23 @@ public class SyncCommand
             }
         }
 
-        var tasks = contexts.Select(x => new CSharpClassGenerator().GenerateAsync(x));
+        var tasks = contexts
+            .Select(x => new CSharpClassGenerator().GenerateAsync(x));
 
         Task.WhenAll(tasks).Wait();
 
-        if (tasks.Sum(x => x.Result).Equals(0))
+        if (Results.Sum(x => x.Value) == 0)
         {
             "Data Models synchronized.".Success();
             return ExitCodes.SUCCESS;
         }
 
-        "There is an error synchronizing the Data Models. Check the logs for more information.".Error();
+        "There is an error synchronizing the Data Models.".Error();
+        "Namespaces with error(s): ".Error();
+        foreach (var result in Results)
+        {
+            $"- {result.Key}: Code {result.Value}".Error();
+        }
         return 1;
     }
 
