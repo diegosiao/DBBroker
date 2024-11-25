@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DbBroker.Common.Model.Interfaces;
 
 public interface ISqlInsertTemplate
@@ -8,20 +10,32 @@ public interface ISqlInsertTemplate
     bool IncludeKeyColumn { get; }
 
     /// <summary>
+    /// The template should include:
     /// <para>$$TABLEFULLNAME$$ - The schema and table name</para>
-    /// <para>$$COLUMNS$$ - The list of columns</para>
-    /// <para>$$PARAMETERS$$ - The parameters to be inserted</para>
+    /// <para>$$COLUMNS$$ - The CSV list of columns</para>
+    /// <para>$$PARAMETERS$$ - The CSV parameters names to be inserted</para>
+    /// Optionally:
+    /// <para>$$SEQUENCENAME$$ - The schema and sequence name associated</para>
     /// </summary>
     string SqlTemplate { get; }
 
     /// <summary>
-    /// Inform this value to replace the default behavior of retrieving the key from a scalar query.
-    /// After execution, an attempt to load the value from an output parameter with this specified name will be made. 
-    /// </summary>
-    string KeyOutputParameterName { get; }
-
-    /// <summary>
     /// Specify if an attempt to retrieve the key value should be made after an INSERT. Explicit keys does not need this attempt.
+    /// <para>The property <see cref="KeyOutputParameterName"/> will be used for that attempt if specified.</para>
     /// </summary>
     bool TryRetrieveKey { get; }
+
+    /// <summary>
+    /// Additional information required for the implementation of this template.
+    /// <para>The key is the name of the parameter and the value is a description for the parameter.</para>
+    /// <para>E.g.: { "SequenceName", "Name of the database sequence associated with this template and/or target table." }</para>
+    /// </summary>
+    public Dictionary<string, string> Parameters { get; }
+
+    /// <summary>
+    /// The instance value if the template can be shared with multiple Data Models, null if a new instance should be created for every reference.
+    /// </summary>
+    public ISqlInsertTemplate Instance { get; }
+
+    public string ReplaceParameters(string sqlInsert);
 }

@@ -13,5 +13,9 @@ public class DbBrokerConfigContextTable
 
     public string SqlInsertTemplateTypeFullName { get; set; }
 
+    public string SqlInsertTemplate { get; set; }
+
+    public Dictionary<string, object> SqlInsertTemplateArguments { get; set; }
+
     public IEnumerable<DbBrokerConfigContextColumn> Columns { get; set; }
 }

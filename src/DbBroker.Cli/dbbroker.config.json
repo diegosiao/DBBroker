@@ -10,9 +10,18 @@
     {
       "namespace": "EShop.DataModels.Oracle",
       "provider": "Oracle",
-      "connectionString": "user id=dbbroker;password=password;data source=//localhost:1529/xe;",
+      "connectionString": "user id=dbbroker;password=dbbroker1!;data source=//localhost:1529/xe;",
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleExplicitKeySqlInsertTemplate",
-      "tables": [],
+      "tables": [
+        {
+          "name": "ORDER_STATUS",
+          "SqlInsertTemplateTypeFullName": "",
+          "SqlInsertTemplate": "OracleSequence",
+          "SqlInsertTemplateArguments": {
+            "sequence": "ORDER_STATUS_SEQ"
+          }
+        }
+      ],
       "views": []
     }
   ]

@@ -56,7 +56,8 @@ $COLLECTIONS
     static $CLASSNAME()
     {
         Provider = SupportedDatabaseProviders.$PROVIDER;
-        ISqlInsertTemplateTypeFullName = ""$ISQLINSERTTEMPLATETYPEFULLNAME"";
+        SqlInsertTemplateTypeFullName = ""$ISQLINSERTTEMPLATETYPEFULLNAME"";
+        SqlInsertTemplateTypeArguments = [$ISQLINSERTTEMPLATETYPEARGUMENTS];
     }
 }
 ";

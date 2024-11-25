@@ -12,11 +12,6 @@ namespace DbBroker;
 
 public static class DbBroker
 {
-    /// <summary>
-    /// Key: Fully qualified name of the type implementing ISqlInsertTemplate />
-    /// </summary>
-    internal static Dictionary<string, ISqlInsertTemplate> SqlInsertTemplates = [];
-
     private static void ValidateDataModelContext<TDataModel>(DbConnection connection, TDataModel dataModel)
     {
         // 
@@ -33,29 +28,51 @@ public static class DbBroker
             .Select(x => x.Value);
 
         var parameters = insertColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
+            .ToList();
 
         var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
             .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
             .Replace("$$COLUMNS$$", string.Join(",", insertColumns.Select(x => x.ColumnName)))
-            .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)));
+            .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)))
+            // Not required
+            .Replace("$$KEY_COLUMN$$", dataModel
+            .DataModelMap
+            .MappedProperties
+            .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
 
         if (connection.State != ConnectionState.Open)
         {
             connection.Open();
         }
 
+        DbParameter keyParameter = null;
+        if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
+        {
+            keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
+
+            // TODO Improve the key data type handling
+            keyParameter.DbType = DbType.Int32;
+            keyParameter.Direction = ParameterDirection.Output;
+            parameters.Add(keyParameter);
+        }
+
         var command = connection.CreateCommand();
-        command.CommandText = sqlInsert;
+        command.CommandText = dataModel.DataModelMap.SqlInsertTemplate.ReplaceParameters(sqlInsert);
         command.Parameters.AddRange(parameters.ToArray());
-        command.Transaction = transaction;       
-        
-        if (!dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
+        command.Transaction = transaction;
+
+        if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
         {
             command.ExecuteNonQuery();
+            dataModel
+                .DataModelMap
+                .MappedProperties
+                .FirstOrDefault(x => x.Value.IsKey).Value.PropertyInfo.SetValue(dataModel, keyParameter.Value);
             return true;
         }
 
+        command.ExecuteNonQuery();
         return true;
     }
 
@@ -74,7 +91,7 @@ public static class DbBroker
     /// <param name="transaction"></param>
     /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties are loaded.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(
-        this DbConnection connection, 
+        this DbConnection connection,
         IEnumerable<Expression<Func<TDataModel, object>>> include = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
@@ -103,7 +120,7 @@ public static class DbBroker
             .Select(x => x.Value);
 
         var parameters = updateColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));        
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));
 
         return new SqlUpdateCommand<TDataModel>(dataModel, updateColumns, parameters, connection, transaction);
     }
@@ -120,10 +137,10 @@ public static class DbBroker
     public static SqlDeleteCommand<TDataModel> Delete<TDataModel>(this DbConnection connection, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
         return new SqlDeleteCommand<TDataModel>(
-            Activator.CreateInstance<TDataModel>(), 
-            columns: [], 
-            parameters: [], 
-            connection, 
+            Activator.CreateInstance<TDataModel>(),
+            columns: [],
+            parameters: [],
+            connection,
             transaction);
     }
 }

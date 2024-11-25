@@ -1,33 +1,31 @@
 ﻿using EShop.DataModels.Oracle;
 using DbBroker;
 using DbBroker.Model;
-using Oracle.ManagedDataAccess.Client;
 using System.Diagnostics;
+using DbBroker.Extensions;
 
-Console.WriteLine("DBBroker showtime!");
-Console.WriteLine("==================");
-Console.WriteLine(
+Console.Write(
 @"
-- Make sure you have installed DBBroker.Cli and executed 'dbbroker sync' to generate the Data Models.
-- Make sure you have the database containers running.
+==================
+DBBroker Showtime!
+==================
 
-    > docker-compose -f dbbroker-showcase-docker-compose.yaml up
+- Make sure you have installed DBBroker.Cli and executed 'dbbroker sync' to generate the Data Models.
+- Make sure you have the database containers running and ready.
+
+    > docker-compose up --build
     > dotnet install -g DbBroker.Cli
-    > dbbroker init
     > dbbroker sync
 
-For more information go to https://nuget.org/DBBroker.Cli
+For more information go to https://nuget.org/packages/DBBroker.Cli or https://nuget.org/packages/DBBroker
 
-All good? Showtime now? (y/n)
-
-");
+All good? Showtime now? 
+(y/n): ");
 
 if (!Debugger.IsAttached && (!Console.ReadLine()?.ToLower().Equals("y") ?? true))
 {
     return;
 }
-
-
 
 // (Too much SQL) Dapper ------->  [ DBBroker ⭐ ]  <------- EF (Too much management)
 
@@ -36,7 +34,7 @@ CustomersDataModel customer = new()
     Id = Guid.NewGuid().ToByteArray(),
     Name = "John Three Sixteen",
     CreatedAt = DateTime.Now,
-    CreatedBy = "Diego",
+    CreatedBy = Environment.UserName,
 };
 
 OrdersDataModel order = new()
@@ -45,10 +43,15 @@ OrdersDataModel order = new()
     StatusId = 1,
     CustomerId = customer.Id,
     CreatedAt = DateTime.Now,
-    CreatedBy = "Diego",
+    CreatedBy = Environment.UserName,
 };
 
-var connection = new OracleConnection("user id=dbbroker;password=password;data source=//localhost:1529/xe;");
+OrderStatusDataModel orderStatusDataModel = new()
+{
+    Status = "YEY!"
+};
+
+var connection = customer.GetConnection("user id=dbbroker;password=dbbroker1!;data source=//localhost:1529/xe;");
 connection.Open();
 
 // using a transaction
@@ -57,6 +60,8 @@ try
 {
     connection.Insert(customer, transaction);
     connection.Insert(order, transaction);
+    connection.Insert(orderStatusDataModel, transaction);
+
     transaction.Commit();
 }
 catch (Exception ex)
@@ -65,13 +70,15 @@ catch (Exception ex)
     Console.WriteLine(ex.Message);
 }
 
-Console.WriteLine($"New customer and order inserted. ");
+Console.WriteLine(@"
+
+New customer and order inserted. ");
 
 order = new()
 {
     StatusId = 2,
-    ModifiedAt = DateTime.Now.AddMinutes(5),
-    ModifiedBy = "Diego"
+    ModifiedAt = DateTime.Now,
+    ModifiedBy = Environment.UserName
 };
 
 // Updating multiple records

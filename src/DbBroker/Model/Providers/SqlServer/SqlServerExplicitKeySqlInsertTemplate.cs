@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using DbBroker.Common.Model.Interfaces;
 
 namespace DbBroker.Model.Providers;
@@ -11,7 +11,13 @@ public class SqlServerExplicitKeySqlInsertTemplate : ISqlInsertTemplate
     INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
     VALUES ($$PARAMETERS$$);";
 
-    public string KeyOutputParameterName => string.Empty;
-
     public bool TryRetrieveKey => false;
+
+    public Dictionary<string, string> Parameters => [];
+
+    private static SqlServerExplicitKeySqlInsertTemplate _instance = new();
+
+    public ISqlInsertTemplate Instance => _instance;
+
+    public string ReplaceParameters(string sqlInsert) => sqlInsert;
 }

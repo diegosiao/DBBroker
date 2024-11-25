@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DbBroker.Attributes;
@@ -40,15 +39,15 @@ public abstract class DataModel<T> : IDataModel
     /// Meta column to represent '*' in SQL SELECT commands
     /// </summary>
     [DataModelMetaColumn]
-    public dynamic ALL { get; set; }
+    public dynamic ALL { get; }
 
     protected Dictionary<string, bool> _IsNotPristine { get; set; } = [];
 
     public bool IsNotPristine(string propertyName) => _IsNotPristine.ContainsKey(propertyName);
 
-    internal IEnumerable<PropertyInfo> GetCachedProperties() => Properties;
+    protected static string SqlInsertTemplateTypeFullName;
 
-    protected static string ISqlInsertTemplateTypeFullName;
+    protected static object[] SqlInsertTemplateTypeArguments;
 
     protected static SupportedDatabaseProviders Provider;
 
@@ -56,20 +55,14 @@ public abstract class DataModel<T> : IDataModel
 
     private DataModelMap GetDataModelMap()
     {
-        DbBroker.SqlInsertTemplates.TryGetValue(ISqlInsertTemplateTypeFullName, out ISqlInsertTemplate sqlInsertTemplate);
-
-        if (sqlInsertTemplate == null)
-        {
-            sqlInsertTemplate = Activator.CreateInstance(Type.GetType(ISqlInsertTemplateTypeFullName)) as ISqlInsertTemplate;
-            DbBroker.SqlInsertTemplates.Add(ISqlInsertTemplateTypeFullName, sqlInsertTemplate);
-        }
+        var sqlInsertTemplate = Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments);
 
         DataModelMap dataModelMap = new()
         {
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
             Provider = Provider,
-            SqlInsertTemplate = sqlInsertTemplate,
+            SqlInsertTemplate = sqlInsertTemplate as ISqlInsertTemplate,
         };
 
         var index = 0;

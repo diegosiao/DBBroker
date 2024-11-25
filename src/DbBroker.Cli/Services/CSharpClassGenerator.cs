@@ -104,6 +104,8 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                     }
                 }
 
+                var configContextTable = context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName));
+
                 File.WriteAllText(
                     Path.Combine(outputDirectory, $"{tableDescriptor.Value.TableName.ToCamelCase()}DataModel.cs"),
                     Constants.EDM_CLASS_TEMPLATE
@@ -116,9 +118,12 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         .Replace("$COLLECTIONS", collectionsString.ToString())
                         .Replace("$PROVIDER", context.Provider.ToString())
                         .Replace("$ISQLINSERTTEMPLATETYPEFULLNAME",
-                            context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName))?.SqlInsertTemplateTypeFullName
+                            configContextTable?.SqlInsertTemplateTypeFullName
                             ?? context.DefaultSqlInsertTemplateTypeFullName
-                            ?? providerDefaultConfig.ISqlInsertTemplateTypeFullName));
+                            ?? providerDefaultConfig.ISqlInsertTemplateTypeFullName)
+                        .Replace("$ISQLINSERTTEMPLATETYPEARGUMENTS", 
+                            string.Join(",", configContextTable?.SqlInsertTemplateArguments?.Values.Select(x => $"\"{x}\"") ?? [])
+                        ));
             }
         }
         catch (Exception ex)
