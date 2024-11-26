@@ -1,7 +1,7 @@
 <div align="center">
   <img src="/assets/logo-with-name.png" alt="DBBroker logo" />
   <br/>
-  A lightweight and user-friendly .NET tool and library for effortless database records manipulation.
+  A lightweight and easy to use .NET tool and library for effortless database records manipulation.
 </div>
 
 ## NuGet
