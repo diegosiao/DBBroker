@@ -46,11 +46,6 @@ OrdersDataModel order = new()
     CreatedBy = Environment.UserName,
 };
 
-OrderStatusDataModel orderStatusDataModel = new()
-{
-    Status = "YEY!"
-};
-
 var connection = customer.GetConnection("user id=dbbroker;password=dbbroker1!;data source=//localhost:1529/xe;");
 connection.Open();
 
@@ -60,8 +55,6 @@ try
 {
     connection.Insert(customer, transaction);
     connection.Insert(order, transaction);
-    connection.Insert(orderStatusDataModel, transaction);
-
     transaction.Commit();
 }
 catch (Exception ex)

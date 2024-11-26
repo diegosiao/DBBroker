@@ -1,0 +1,28 @@
+using System.Data.SqlClient;
+using DbBroker;
+using EShop.DataModels.SqlServer;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace DBBroker.Unit.Tests.Providers.SqlServer;
+
+public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
+{
+    private readonly SqlConnection _sqlConnection = fixture.ServiceProvider.GetService<SqlConnection>()!;
+
+    [Fact]
+    public void CanCreateCustomer()
+    {
+        CustomersDataModel customer = new()
+        {
+            Id = Guid.NewGuid(),
+            Name = "John Three Sixteen",
+            Birthday = DateTime.Now.AddYears(-30),
+            OrdersTotal = 20,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = Environment.UserName,
+        };
+
+        var row = _sqlConnection.Insert(customer);
+        Assert.True(row);
+    }
+}

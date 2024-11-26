@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Common", "DbBroker
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Showcase.Cli", "DbBroker.Showcase.Cli\DbBroker.Showcase.Cli.csproj", "{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBBroker.Unit.Tests", "DBBroker.Unit.Tests\DBBroker.Unit.Tests.csproj", "{476FFE7A-E11E-4515-8814-DDEFBA9361F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{476FFE7A-E11E-4515-8814-DDEFBA9361F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{476FFE7A-E11E-4515-8814-DDEFBA9361F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{476FFE7A-E11E-4515-8814-DDEFBA9361F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{476FFE7A-E11E-4515-8814-DDEFBA9361F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
