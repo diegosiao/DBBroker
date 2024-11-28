@@ -46,7 +46,7 @@ OrdersDataModel order = new()
     CreatedBy = Environment.UserName,
 };
 
-var connection = customer.GetConnection("user id=dbbroker;password=dbbroker1!;data source=//localhost:1529/xe;");
+var connection = customer.GetConnection("user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;");
 connection.Open();
 
 // using a transaction
@@ -88,12 +88,11 @@ rowsAffected = connection.Delete<OrderStatusDataModel>()
 
 Console.WriteLine($"{rowsAffected} row(s) deleted. ");
 
-// Retrieving complex data
+// Retrieving data
 var customers = connection
     .Select<CustomersDataModel>(
         include: [
-            (x => x.Id),
-            (x => x.Name),
+            (x => x.ALL),
             (x => x.CustomersNotesCustomerIdRefs)
         ],
         depth: 2)

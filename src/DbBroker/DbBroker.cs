@@ -89,16 +89,18 @@ public static class DbBroker
     /// <param name="orderByAsc"></param>
     /// <param name="orderByDesc"></param>
     /// <param name="transaction"></param>
-    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties are loaded.</param>
+    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(
         this DbConnection connection,
         IEnumerable<Expression<Func<TDataModel, object>>> include = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
         DbTransaction transaction = null,
-        int depth = 0) where TDataModel : DataModel<TDataModel>
+        int depth = 0,
+        int skip = 0,
+        int take = 0) where TDataModel : DataModel<TDataModel>
     {
-        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, include, orderByAsc, orderByDesc, transaction, depth);
+        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, include, orderByAsc, orderByDesc, transaction, depth, skip, take);
     }
 
     /// <summary>

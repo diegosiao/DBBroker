@@ -2,7 +2,7 @@ FROM postgres:latest
 
 # Set environment variables
 ENV POSTGRES_USER=admin
-ENV POSTGRES_PASSWORD=dbbroker1!
+ENV POSTGRES_PASSWORD=DBBroker_1
 ENV POSTGRES_DB=dbbroker
 
 # Copy the initialization script

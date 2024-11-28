@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using DbBroker.Model;
 
 namespace DbBroker.Model.Interfaces;
 

@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Common", "DbBroker
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Showcase.Cli", "DbBroker.Showcase.Cli\DbBroker.Showcase.Cli.csproj", "{C9575870-7543-4BC2-A3A8-2DFCA270ACA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBBroker.Unit.Tests", "DBBroker.Unit.Tests\DBBroker.Unit.Tests.csproj", "{476FFE7A-E11E-4515-8814-DDEFBA9361F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbBroker.Unit.Tests", "DBBroker.Unit.Tests\DbBroker.Unit.Tests.csproj", "{476FFE7A-E11E-4515-8814-DDEFBA9361F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

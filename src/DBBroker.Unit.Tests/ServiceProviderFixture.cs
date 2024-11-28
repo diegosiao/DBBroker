@@ -1,7 +1,6 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DBBroker.Unit.Tests;
+namespace DbBroker.Unit.Tests;
 
 public class ServiceProviderFixture : IDisposable
 {

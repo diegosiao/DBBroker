@@ -17,6 +17,12 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 {
     private readonly int _maxDepth;
 
+    private readonly int _skip;
+
+    private readonly int _take;
+
+    private string _offsetFetchSql => _take > 0 ? $"OFFSET {_skip} ROWS FETCH NEXT {_take} ROWS ONLY" : string.Empty;
+
     private List<SqlJoin> _joins;
 
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _include = [];
@@ -32,10 +38,14 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
         IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
         DbTransaction transaction = null,
-        int depth = 0) :
+        int depth = 0,
+        int skip = 0,
+        int take = 0) :
         base(dataModel, columns: [], parameters: [], connection, transaction, Constants.SqlSelectTemplate)
     {
         _maxDepth = depth;
+        _skip = skip;
+        _take = take;
         _joins = [];
         _include = include ?? [];
         _orderByAsc = orderByAsc ?? [];
@@ -125,7 +135,8 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$JOINS$$", _joins.RenderJoins())
             .Replace("$$FILTERS$$", Filters.Any() ? Filters.RenderWhereClause() : string.Empty)
-            .Replace("$$ORDERBYCOLUMNS$$", string.Empty);
+            .Replace("$$ORDERBYCOLUMNS$$", string.Empty)
+            .Replace("$$OFFSETFETCH$$", _offsetFetchSql);
     }
 
     public override IEnumerable<TDataModel> Execute()

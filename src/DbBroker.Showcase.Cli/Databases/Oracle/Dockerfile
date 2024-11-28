@@ -1,7 +1,7 @@
-FROM oracleinanutshell/oracle-xe-11g
+FROM container-registry.oracle.com/database/express:21.3.0-xe
 
-ADD init.sql /docker-entrypoint-initdb.d/
-ADD entrypoint.sh /docker-entrypoint-initdb.d/
+ADD init.sql /opt/oracle/scripts/startup/
+# ADD entrypoint.sh /opt/oracle/scripts/startup/
 
 # Copy the initialization script
 # COPY init.sql /docker-entrypoint-initdb.d/init.sql
@@ -11,12 +11,14 @@ ADD entrypoint.sh /docker-entrypoint-initdb.d/
 
 # Expose the default Oracle port
 EXPOSE 1521
+EXPOSE 5500
 
 # Set environment variables
-ENV ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe
-ENV PATH=$ORACLE_HOME/bin:$PATH
+# ENV ORACLE_HOME=/u01/app/oracle/product/18.4.0/xe
+# ENV PATH=$ORACLE_HOME/bin:$PATH
 ENV ORACLE_SID=XE
 ENV ORACLE_PDB=XE
+ENV ORACLE_PWD=DBBroker_1
 
 # hostname: localhost
 # port: 49161

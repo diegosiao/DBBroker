@@ -5,7 +5,7 @@ services:
       context: ./Databases/SqlServer
       dockerfile: Dockerfile
     environment:
-      SA_PASSWORD: "dbbroker1!"
+      SA_PASSWORD: "DBBroker_1"
       ACCEPT_EULA: "Y"
     ports:
       - "1439:1433"
@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: "dbbroker"
-      POSTGRES_PASSWORD: "dbbroker1!"
+      POSTGRES_PASSWORD: "DBBroker_1"
       POSTGRES_DB: "dbbroker"
     ports:
       - "5439:5432"
@@ -38,7 +38,7 @@ services:
       context: ./Databases/MySQL 
       dockerfile: Dockerfile 
     environment: 
-      MYSQL_ROOT_PASSWORD: "dbbroker1!" 
+      MYSQL_ROOT_PASSWORD: "DBBroker_1" 
       MYSQL_DATABASE: "dbbroker" 
       MYSQL_USER: "dbbroker" 
       MYSQL_PASSWORD: "dbroker1!" 

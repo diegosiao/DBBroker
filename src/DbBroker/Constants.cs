@@ -7,7 +7,8 @@ public class Constants
     FROM $$TABLEFULLNAME$$ d0
     $$JOINS$$
     WHERE 1=1 $$FILTERS$$
-    $$ORDERBYCOLUMNS$$";
+    $$ORDERBYCOLUMNS$$
+    $$OFFSETFETCH$$";
 
     public const string SqlUpdateTemplate = @"
     UPDATE $$TABLEFULLNAME$$

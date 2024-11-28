@@ -15,6 +15,9 @@ public class DataModelMap
 
     public PropertyInfo KeyProperty { get; set; }
 
+    /// <summary>
+    /// The Database provider or vendor for this Data Model and its context.
+    /// </summary>
     public SupportedDatabaseProviders Provider { get; set; }
     
     /// <summary>

@@ -12,7 +12,7 @@ public static class ResolversExtensions
     private static readonly DbBrokerConfig _dbBrokerConfig;
 
     /// <summary>
-    /// Creates and returns a <see cref="DbConnection" /> new instance acording to the Data Model provider.
+    /// Creates and returns a <see cref="DbConnection" /> new instance according to the Data Model provider.
     /// <para>Check the <see cref="SupportedDatabaseProviders" /> for details on the required database client library reference.</para>
     /// </summary>
     /// <typeparam name="TDataModel">The Data Model as argument type</typeparam>

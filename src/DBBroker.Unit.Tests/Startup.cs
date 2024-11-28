@@ -1,11 +1,11 @@
 using System.Data.SqlClient;
-using DBBroker.Unit.Tests.Config;
+using DbBroker.Unit.Tests.Config;
 using Oracle.ManagedDataAccess.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace DBBroker.Unit.Tests;
+namespace DbBroker.Unit.Tests;
 
 public class Startup
 {

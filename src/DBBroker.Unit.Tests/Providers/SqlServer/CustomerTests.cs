@@ -1,9 +1,8 @@
 using System.Data.SqlClient;
-using DbBroker;
 using EShop.DataModels.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DBBroker.Unit.Tests.Providers.SqlServer;
+namespace DbBroker.Unit.Tests.Providers.SqlServer;
 
 public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {
