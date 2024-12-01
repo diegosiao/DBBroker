@@ -33,7 +33,7 @@ public static class SqlRenderExtensions
         foreach (var join in joins)
         {
             joinsClause.Append(@$"{(join.ColumnAllowNulls ? "LEFT " : string.Empty)}JOIN {join.SchemaName}.{join.RefTableName} {join.RefTableNameAlias} ");
-            joinsClause.AppendLine(@$"ON {join.RefTableNameAlias}.{join.RefColumnName} = {join.TableAliasName}.{join.ColumnName}");
+            joinsClause.AppendLine(@$"ON {join.RefTableNameAlias}.{join.RefColumnName} = {join.ParentTableAliasName}.{join.ParentColumnName}");
         }
         return joinsClause.ToString();
     }

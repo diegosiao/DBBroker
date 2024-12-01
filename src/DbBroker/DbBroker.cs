@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
-using DbBroker.Common.Model.Interfaces;
 using DbBroker.Extensions;
 using DbBroker.Model;
 
@@ -77,19 +76,21 @@ public static class DbBroker
     }
 
     /// <summary>
-    /// 
+    /// Retrieves database record(s).
     /// </summary>
     /// <typeparam name="TDataModel"></typeparam>
     /// <param name="connection"></param>
     /// <param name="include">
-    ///     <para>The properties to be included in the SELECT command.</para>
-    ///     <para>Regardless of the depth being loaded, if no property of the Data Model is specified, all properties will be included.</para>
-    ///     <para>Collections are not loaded by default, it is necessary to explicitly include the collection property. Only collections on Data Model root properties are considered.</para>
+    ///     <para>Properties to be included in the SQL SELECT command as columns. Keys are implicitly included.</para>
+    ///     <para>PROPERTIES: Regardless of the depth being loaded, if no property of the Data Model is specified, all properties will be included.</para>
+    ///     <para>COLLECTIONS: Not loaded by default, it is necessary to explicitly include the collection property. Only collections on Data Model root properties can be included.</para>
     /// </param>
     /// <param name="orderByAsc"></param>
     /// <param name="orderByDesc"></param>
     /// <param name="transaction"></param>
-    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded.</param>
+    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded. Needs to be coherent with <paramref name="include"/>.</param>
+    /// <param name="skip">Number of records to skip at the begining of the result. Be careful including collections as you might get truncated results.</param>
+    /// <param name="take">Number of records to take from the result. Be careful including collections as you might get truncated results.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(
         this DbConnection connection,
         IEnumerable<Expression<Func<TDataModel, object>>> include = null,
@@ -105,8 +106,7 @@ public static class DbBroker
 
     /// <summary>
     /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
-    /// <para>Call <see cref="SqlUpdateCommand{TDataModel}.AddFilter{TProperty}(System.Linq.Expressions.Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
-    /// 
+    /// <para>Call <see cref="SqlUpdateCommand{TDataModel}.AddFilter{TProperty}(Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
     /// </summary>
     /// <typeparam name="TDataModel"></typeparam>
     /// <param name="connection"></param>
@@ -128,8 +128,8 @@ public static class DbBroker
     }
 
     /// <summary>
-    /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
-    /// <para>Call <see cref="SqlDeleteCommand{TDataModel}.AddFilter{TProperty}(System.Linq.Expressions.Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
+    /// <para>Deletes database record(s).</para>
+    /// CAUTION: Chain a call to <see cref="SqlCommand{TDataModel, TReturn}.AddFilter{TProperty}(Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify the record(s) to be deleted.
     /// </summary>
     /// <typeparam name="TDataModel">The data model instance that represents the database record to be deleted</typeparam>
     /// <param name="connection"></param>

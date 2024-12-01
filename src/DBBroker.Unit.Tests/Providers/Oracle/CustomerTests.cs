@@ -35,9 +35,20 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
         }
 
         var transaction = _oracleConnection.BeginTransaction();
+        AddressDataModel address = new()
+        {
+            Id = Guid.NewGuid().ToByteArray(),
+            Street = "Prudente De Morais, Av.",
+            Cit = "Natal",
+            State = "RN",
+            Country = "Brazil",
+            PostalCode = "59065878",
+        };
+
         CustomersDataModel customer = new()
         {
             Id = Guid.NewGuid().ToByteArray(),
+            AddressId = address.Id,
             Name = "John Three Sixteen",
             Birthday = DateTime.Now.AddYears(-30),
             OrdersTotal = 20,
@@ -54,11 +65,13 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
             CreatedBy = Environment.UserName,
         };
 
-        var customerInserted = _oracleConnection.Insert(customer, transaction);
-        var orderInserted = _oracleConnection.Insert(order, transaction);
+        Assert.True(
+            _oracleConnection.Insert(address, transaction) 
+            && _oracleConnection.Insert(customer, transaction) 
+            && _oracleConnection.Insert(order, transaction));
 
         transaction.Commit();
 
-        Assert.True(customerInserted && orderInserted);
+        // _oracleConnection.GetByKey(order.Id);
     }
 }

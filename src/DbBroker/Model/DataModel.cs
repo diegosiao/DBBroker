@@ -26,7 +26,7 @@ public abstract class DataModel<T> : IDataModel
 
     private static DataModelMap _dataModelMap;
 
-    public DataModelMap DataModelMap
+    internal DataModelMap DataModelMap
     {
         get
         {
@@ -35,11 +35,14 @@ public abstract class DataModel<T> : IDataModel
         }
     }
 
-    /// <summary>
-    /// Meta column to represent '*' in SQL SELECT commands
-    /// </summary>
-    [DataModelMetaColumn]
-    public dynamic ALL { get; }
+    DataModelMap IDataModel.DataModelMap => DataModelMap;
+
+    // TODO For now it does not make sense because loading all properties is the default behavior
+    // /// <summary>
+    // /// Meta column to represent '*' in SQL SELECT commands
+    // /// </summary>
+    // [DataModelMetaColumn]
+    // public dynamic All { get; }
 
     protected Dictionary<string, bool> _IsNotPristine { get; set; } = [];
 

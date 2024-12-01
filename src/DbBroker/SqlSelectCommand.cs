@@ -10,6 +10,7 @@ using DbBroker.Model.Interfaces;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Collections;
+using System.Reflection;
 
 namespace DbBroker;
 
@@ -25,13 +26,16 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
     private List<SqlJoin> _joins;
 
+    private List<string> _splitsOn;
+
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _include = [];
 
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _orderByAsc = [];
 
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _orderByDesc = [];
 
-    internal SqlSelectCommand(
+    internal
+    SqlSelectCommand(
         TDataModel dataModel,
         DbConnection connection,
         IEnumerable<Expression<Func<TDataModel, object>>> include = null,
@@ -52,37 +56,48 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         _orderByDesc = orderByDesc ?? [];
     }
 
-    private void LoadJoins(int depth, IDataModel dataModel, string parentAliasName)
+    int joinIndex = 0;
+    private void LoadJoins(int depth, IDataModel dataModel, bool parentIsCollection, string parentAliasName, string path)
     {
         if (depth >= _maxDepth)
         {
             return;
         }
 
-        int joinIndex = 0;
         foreach (var reference in dataModel.DataModelMap.MappedReferences)
         {
+            // Skip circular references
             if (typeof(TDataModel) == reference.Value.PropertyInfo.PropertyType)
             {
                 continue;
             }
 
+            var referenceInstance = (IDataModel)Activator.CreateInstance(reference.Value.PropertyInfo.PropertyType);
+            
             var join = new SqlJoin
             {
                 Depth = depth,
                 Index = ++joinIndex,
+                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join('.', [path, reference.Value.PropertyInfo.Name]),
+                DataModelMap = referenceInstance.DataModelMap,
                 SchemaName = reference.Value.SchemaName,
-                TableName = reference.Value.TableName,
-                ColumnName = reference.Value.ColumnName,
+                ParentTableName = reference.Value.TableName,
+                ParentColumnName = reference.Value.ColumnName,
                 ColumnAllowNulls = depth > 0 || reference.Value.ColumnAllowNulls,
-                TableAliasName = parentAliasName,
+                ParentTableAliasName = parentAliasName,
                 RefTableName = reference.Value.RefTableName,
                 RefColumnName = reference.Value.RefColumnName,
-                RefPropertyInfo = reference.Value.PropertyInfo
+                RefPropertyInfo = reference.Value.PropertyInfo,
+                ParentIsCollection = parentIsCollection,
             };
 
             _joins.Add(join);
-            LoadJoins(depth + 1, (IDataModel)Activator.CreateInstance(reference.Value.PropertyInfo.PropertyType), join.TableAliasName);
+            LoadJoins(
+                depth + 1,
+                referenceInstance,
+                parentIsCollection: false,
+                join.RefTableNameAlias,
+                join.Path);
         }
 
         if (depth != 0)
@@ -95,19 +110,31 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         {
             if (typeof(TDataModel) == reference.Value.DataModelCollectionType)
             {
+                // Skip circular references
                 continue;
             }
+
+            // TODO Skip not included or not in root collections 
+            if (!_include.Any(x => (x.Body as MemberExpression)?.Member?.Name?.Equals(reference.Value.PropertyInfo.Name) ?? false))
+            {
+                // Skip not explicitly included collections
+                continue;
+            }
+
+            var collectionReferenceDataModel = (IDataModel)Activator.CreateInstance(reference.Value.DataModelCollectionType);
 
             var join = new SqlJoin
             {
                 Depth = depth,
                 Index = ++joinIndex,
+                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join('.', [path, reference.Value.PropertyInfo.Name]),
+                DataModelMap = collectionReferenceDataModel.DataModelMap,
                 SchemaName = reference.Value.SchemaName,
-                TableName = reference.Value.TableName,
-                TablePrimaryKeyColumnName = reference.Value.RefTablePrimaryKeyColumnName,
-                ColumnName = reference.Value.ColumnName,
+                ParentTableName = reference.Value.TableName,
+                ParentTablePrimaryKeyColumnName = reference.Value.RefTablePrimaryKeyColumnName,
+                ParentColumnName = reference.Value.ColumnName,
                 ColumnAllowNulls = true,
-                TableAliasName = parentAliasName,
+                ParentTableAliasName = parentAliasName,
                 RefTableName = reference.Value.RefTableName,
                 RefColumnName = reference.Value.RefColumnName,
                 RefPropertyInfo = reference.Value.PropertyInfo,
@@ -115,7 +142,12 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             };
 
             _joins.Add(join);
-            LoadJoins(depth + 1, (IDataModel)Activator.CreateInstance(reference.Value.DataModelCollectionType), join.RefTableNameAlias);
+            LoadJoins(
+                depth + 1,
+                collectionReferenceDataModel,
+                parentIsCollection: true,
+                join.RefTableNameAlias,
+                path: string.Empty);
         }
     }
 
@@ -123,15 +155,15 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
     {
         if (_maxDepth > 0)
         {
-            LoadJoins(0, DataModel, "d0");
-            _joins = [.. _joins.OrderBy(x => x.TableAliasName)];
+            LoadJoins(0, DataModel, parentIsCollection: false, "d0", null);
+            _joins = [.. _joins.OrderBy(x => x.Index)];
         }
 
         // prepare filters for a select
         Filters.ForEach(x => x.Alias = "d0");
 
         return SqlTemplate
-            .Replace("$$COLUMNS$$", _joins.Any() ? string.Join(",", ["d0.*", .. _joins.Select(x => $"{x.RefTableNameAlias}.*")]) : "*")
+            .Replace("$$COLUMNS$$", RenderColumns())
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$JOINS$$", _joins.RenderJoins())
             .Replace("$$FILTERS$$", Filters.Any() ? Filters.RenderWhereClause() : string.Empty)
@@ -139,8 +171,52 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             .Replace("$$OFFSETFETCH$$", _offsetFetchSql);
     }
 
+    private string RenderColumns()
+    {
+        var sqlSelectColumns = new List<string>();
+
+        // Data model included columns
+        var includedRootProperties = _include
+            .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
+            .Where(x =>
+                x.Split('.').Length == 1
+                && !DataModel.DataModelMap.MappedCollections.ContainsKey(x)
+                && !DataModel.DataModelMap.MappedReferences.ContainsKey(x));
+
+        sqlSelectColumns.AddRange(
+            DataModel
+                .DataModelMap
+                .MappedProperties
+                .Where(
+                    x => x.Value.IsKey
+                    || includedRootProperties.Count() == 0
+                    || includedRootProperties.Any(p => p.Equals(x.Value.PropertyName)))
+                .Select(x => $"d0.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
+
+        // Joins
+        var includedReferences = _include
+            .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
+            .Where(x => x.Split('.').Length > 1);
+
+        foreach (var join in _joins)
+        {
+            // TODO Check if the depth and reference has included properties to restrict the columns, 
+            // ...
+
+            // load them all
+            sqlSelectColumns.AddRange(join
+                    .DataModelMap
+                    .MappedProperties
+                    .Select(x => $"{join.RefTableNameAlias}.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
+        }
+
+        return string.Join(',', sqlSelectColumns);
+    }
+
     public override IEnumerable<TDataModel> Execute()
     {
+        // TODO Check if there isn't invalid include expressions (duplicated, methods, collections not in root, etc.)
+
         if (Connection.State != ConnectionState.Open)
         {
             Connection.Open();
@@ -157,13 +233,11 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         Debug.WriteLine(sql);
 
         Type[] types = [
-            typeof(TDataModel), 
+            typeof(TDataModel),
             .. _joins.Select(x => x.RefPropertyCollectionType ?? x.RefPropertyInfo.PropertyType).ToArray(),
         ];
 
-        var splitOn = string.Join(",", _joins.Select(x => x.IsCollection ? x.TablePrimaryKeyColumnName : x.RefColumnName));
-
-        var dataModelResultDictionary = new Dictionary<object, TDataModel>();
+        var dataModelResultDictionary = new Dictionary<object, TDataModel>(comparer: new DataModelKeyComparer());
         return Connection.Query(
             sql: sql,
             types: types,
@@ -174,7 +248,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                 {
                     dataModelResultDictionary.Add(keyValue, rootDataModel = (TDataModel)objs[0]);
                 }
-                
+
                 // Load mapped joins
                 for (int i = 0; i < _joins.Count; ++i)
                 {
@@ -206,7 +280,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                         continue;
                     }
 
-                    var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(_joins[i].TableAliasName));
+                    var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(_joins[i].ParentTableAliasName));
                     _joins[i].RefPropertyInfo.SetValue(obj: _targetJoin?.TransientRef ?? rootDataModel, value: objs[i + 1]);
                 }
 
@@ -214,8 +288,8 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             },
             param: parameterDictionary,
             transaction: Transaction,
-            buffered: false,
-            splitOn: splitOn, // skip the first (TDataModel), second id, third id
+            buffered: true,
+            splitOn: string.Join(',', _joins.Select(x => x.DataModelMap.KeyProperty.Name)),
             commandTimeout: null,
             commandType: CommandType.Text)
             .Distinct();

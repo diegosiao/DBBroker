@@ -33,6 +33,7 @@ services:
       - "5439:5432"
     networks:
       - database-network
+      
   mysql: 
     build: 
       context: ./Databases/MySQL 

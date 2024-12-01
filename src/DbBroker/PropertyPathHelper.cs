@@ -16,9 +16,10 @@ internal static class PropertyPathHelper
 
     public static string GetNestedPropertyPath<T, TProperty>(Expression<Func<T, TProperty>> propertyLambda)
     {
-        var member = propertyLambda.Body as MemberExpression;
-        if (member == null)
-            throw new ArgumentException("Invalid expression", nameof(propertyLambda));
+        if (propertyLambda.Body is not MemberExpression member)
+        {
+            return ((propertyLambda.Body as UnaryExpression).Operand as MemberExpression).Member.Name;
+        }
 
         var path = member.Member.Name;
         while (member.Expression is MemberExpression innerMember)

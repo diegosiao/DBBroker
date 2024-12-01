@@ -1,8 +1,34 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using DbBroker.Model.Interfaces;
 
 namespace DbBroker;
+
+public class DataModelKeyComparer : IEqualityComparer<object>
+{
+    private static readonly IEqualityComparer structuralComparer = StructuralComparisons.StructuralEqualityComparer;
+
+    public new bool Equals(object x, object y)
+    {
+        if (x is byte[] bx && y is byte[] by)
+        {
+            return structuralComparer.Equals(bx, by);
+        }
+
+        return EqualityComparer<object>.Default.Equals(x, y);
+    }
+
+    public int GetHashCode(object obj)
+    {
+        if (obj is byte[] b)
+        {
+            return structuralComparer.GetHashCode(b);
+        }
+        return EqualityComparer<object>.Default.GetHashCode(obj);
+    }
+}
+
 
 public class DataModelKeyComparer<TDataModel> : IEqualityComparer<TDataModel> where TDataModel : IDataModel
 {

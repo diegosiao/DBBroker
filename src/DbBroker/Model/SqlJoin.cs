@@ -9,15 +9,19 @@ public class SqlJoin
 
     public int Index { get; set; }
 
+    public string Path { get; set; }
+
+    public DataModelMap DataModelMap { get; set; }
+
     public string SchemaName { get; set; }
 
-    public string TableName { get; set; }
+    public string ParentTableName { get; set; }
 
-    public string TablePrimaryKeyColumnName { get; set; }
+    public string ParentTablePrimaryKeyColumnName { get; set; }
 
-    public string TableAliasName { get; set; }
+    public string ParentTableAliasName { get; set; }
 
-    public string ColumnName { get; set; }
+    public string ParentColumnName { get; set; }
 
     public bool ColumnAllowNulls { get; set; }
 
@@ -25,9 +29,7 @@ public class SqlJoin
 
     public string RefColumnName { get; set; }
 
-    public string RefTableNameAlias => $"d{Depth}_j{Index}_{RefTableName}";
-
-    public string RefColumnNameAlias => $"{RefTableNameAlias}_{RefColumnName}";
+    public string RefTableNameAlias => $"d{Depth}_j{Index}";
 
     public PropertyInfo RefPropertyInfo { get; set; }
 
@@ -36,4 +38,6 @@ public class SqlJoin
     public object TransientRef { get; set; }
 
     public bool IsCollection => RefPropertyCollectionType is not null;
+
+    public bool ParentIsCollection { get; set; }
 }
