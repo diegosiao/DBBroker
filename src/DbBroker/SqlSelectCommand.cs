@@ -10,7 +10,6 @@ using DbBroker.Model.Interfaces;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Collections;
-using System.Reflection;
 
 namespace DbBroker;
 
@@ -25,8 +24,6 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
     private string _offsetFetchSql => _take > 0 ? $"OFFSET {_skip} ROWS FETCH NEXT {_take} ROWS ONLY" : string.Empty;
 
     private List<SqlJoin> _joins;
-
-    private List<string> _splitsOn;
 
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _include = [];
 
@@ -114,7 +111,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                 continue;
             }
 
-            // TODO Skip not included or not in root collections 
+            // TODO Skip not in root collections 
             if (!_include.Any(x => (x.Body as MemberExpression)?.Member?.Name?.Equals(reference.Value.PropertyInfo.Name) ?? false))
             {
                 // Skip not explicitly included collections
@@ -200,7 +197,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
         foreach (var join in _joins)
         {
-            // TODO Check if the depth and reference has included properties to restrict the columns, 
+            // TODO Check if the depth and reference has included properties to restrict the columns
             // ...
 
             // load them all

@@ -52,19 +52,18 @@ OrdersDataModel order = new()
 var connection = customer.GetConnection("user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;");
 connection.Open();
 
-// using a transaction
-// var transaction = connection.BeginTransaction();
-// try
-// {
-//     connection.Insert(customer, transaction);
-//     connection.Insert(order, transaction);
-//     transaction.Commit();
-// }
-// catch (Exception ex)
-// {
-//     transaction.Rollback();
-//     Console.WriteLine(ex.Message);
-// }
+using var transaction = connection.BeginTransaction();
+try
+{
+    connection.Insert(customer, transaction);
+    connection.Insert(order, transaction);
+    transaction.Commit();
+}
+catch (Exception ex)
+{
+    transaction.Rollback();
+    Console.WriteLine(ex.Message);
+}
 
 Console.WriteLine(@"
 
@@ -129,7 +128,7 @@ var orders = connection
             (x => x.OrdersProductsOrderIdRefs) // Explicitly loading a collection
         ],
         depth: 2)
-    //.AddFilter(x => x.Id, SqlEquals.To(customer.Id))
+    .AddFilter(x => x.Id, SqlEquals.To(customer.Id))
     .Execute();
 
 Console.WriteLine($"Orders retrieved: {orders.Count()}");

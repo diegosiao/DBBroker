@@ -22,9 +22,9 @@
       "tables": [
         {
           "name": "ORDER_STATUS",
-          "SqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleSequenceSqlInsertTemplate",
-          "SqlInsertTemplate": "OracleSequence",
-          "SqlInsertTemplateArguments": {
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleSequenceSqlInsertTemplate",
+          "sqlInsertTemplate": "OracleSequence",
+          "sqlInsertTemplateArguments": {
             "sequence": "ORDER_STATUS_SEQ"
           }
         }
