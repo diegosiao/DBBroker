@@ -41,11 +41,11 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         SqlTemplate = sqlTemplate;
     }
 
+    int paramIndex = 0;
     public IFilteredCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
     {
         var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
 
-        int paramIndex = 0;
         Filters.Add(new CommandFilter
         {
             DataModelMapProperty = DataModel.DataModelMap.MappedProperties[propertyName],

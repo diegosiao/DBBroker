@@ -20,7 +20,7 @@ public interface ISqlInsertTemplate
     string SqlTemplate { get; }
 
     /// <summary>
-    /// Specify if an attempt to retrieve the key value should be made after an INSERT. Explicit keys does not need this attempt.
+    /// Specifies if an attempt to retrieve the key value should be made after an INSERT. Explicit keys does not need this attempt.
     /// <para>The property <see cref="KeyOutputParameterName"/> will be used for that attempt if specified.</para>
     /// </summary>
     bool TryRetrieveKey { get; }
@@ -36,6 +36,11 @@ public interface ISqlInsertTemplate
     /// The instance value if the template can be shared with multiple Data Models, null if a new instance should be created for every reference.
     /// </summary>
     public ISqlInsertTemplate Instance { get; }
+
+    /// <summary>
+    /// Specifies if this template is compatible with SQL UPSERT command.
+    /// </summary>
+    public bool UpsertCompatible { get; }
 
     public string ReplaceParameters(string sqlInsert);
 }

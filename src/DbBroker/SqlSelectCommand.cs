@@ -23,40 +23,43 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
     private string _offsetFetchSql => _take > 0 ? $"OFFSET {_skip} ROWS FETCH NEXT {_take} ROWS ONLY" : string.Empty;
 
-    private List<SqlJoin> _joins;
+    private List<SqlJoin> _joins = [];
 
-    private readonly IEnumerable<Expression<Func<TDataModel, object>>> _include = [];
+    private readonly IEnumerable<Expression<Func<TDataModel, object>>> _load = [];
 
-    private readonly IEnumerable<Expression<Func<TDataModel, object>>> _orderByAsc = [];
+    private readonly IEnumerable<Expression<Func<TDataModel, object>>> _ignore = [];
 
-    private readonly IEnumerable<Expression<Func<TDataModel, object>>> _orderByDesc = [];
+    private readonly List<SqlOrderBy<TDataModel>> _orderBy = [];
 
     internal
     SqlSelectCommand(
         TDataModel dataModel,
         DbConnection connection,
-        IEnumerable<Expression<Func<TDataModel, object>>> include = null,
-        IEnumerable<Expression<Func<TDataModel, object>>> orderByAsc = null,
-        IEnumerable<Expression<Func<TDataModel, object>>> orderByDesc = null,
+        IEnumerable<Expression<Func<TDataModel, object>>> load = null,
+        IEnumerable<Expression<Func<TDataModel, object>>> ignore = null,
         DbTransaction transaction = null,
         int depth = 0,
         int skip = 0,
         int take = 0) :
         base(dataModel, columns: [], parameters: [], connection, transaction, Constants.SqlSelectTemplate)
     {
+        _load = load ?? [];
+        _ignore = ignore ?? [];
         _maxDepth = depth;
         _skip = skip;
         _take = take;
-        _joins = [];
-        _include = include ?? [];
-        _orderByAsc = orderByAsc ?? [];
-        _orderByDesc = orderByDesc ?? [];
+    }
+
+    public SqlSelectCommand<TDataModel> OrderBy(Expression<Func<TDataModel, object>> property, bool ascending = true)
+    {
+        _orderBy.Add(ascending ? SqlOrderBy<TDataModel>.Ascending(property) : SqlOrderBy<TDataModel>.Descending(property));
+        return this;
     }
 
     int joinIndex = 0;
     private void LoadJoins(int depth, IDataModel dataModel, bool parentIsCollection, string parentAliasName, string path)
     {
-        if (depth >= _maxDepth)
+        if (depth > _maxDepth)
         {
             return;
         }
@@ -70,7 +73,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             }
 
             var referenceInstance = (IDataModel)Activator.CreateInstance(reference.Value.PropertyInfo.PropertyType);
-            
+
             var join = new SqlJoin
             {
                 Depth = depth,
@@ -90,14 +93,14 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
             _joins.Add(join);
             LoadJoins(
-                depth + 1,
+                join.Depth + 1,
                 referenceInstance,
                 parentIsCollection: false,
                 join.RefTableNameAlias,
                 join.Path);
         }
 
-        if (depth != 0)
+        if (depth != 1)
         {
             // Only collections at the Data Model root can be included
             return;
@@ -112,7 +115,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             }
 
             // TODO Skip not in root collections 
-            if (!_include.Any(x => (x.Body as MemberExpression)?.Member?.Name?.Equals(reference.Value.PropertyInfo.Name) ?? false))
+            if (!_load.Any(x => (x.Body as MemberExpression)?.Member?.Name?.Equals(reference.Value.PropertyInfo.Name) ?? false))
             {
                 // Skip not explicitly included collections
                 continue;
@@ -152,7 +155,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
     {
         if (_maxDepth > 0)
         {
-            LoadJoins(0, DataModel, parentIsCollection: false, "d0", null);
+            LoadJoins(1, DataModel, parentIsCollection: false, "d0", null);
             _joins = [.. _joins.OrderBy(x => x.Index)];
         }
 
@@ -164,8 +167,49 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$JOINS$$", _joins.RenderJoins())
             .Replace("$$FILTERS$$", Filters.Any() ? Filters.RenderWhereClause() : string.Empty)
-            .Replace("$$ORDERBYCOLUMNS$$", string.Empty)
+            .Replace("$$ORDERBYCOLUMNS$$", RenderOrderByColumns())
             .Replace("$$OFFSETFETCH$$", _offsetFetchSql);
+    }
+
+    private string RenderOrderByColumns()
+    {
+        if (_orderBy.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var orderByColumns = new List<string>();
+
+        foreach (var column in _orderBy)
+        {
+            var propertyPath = PropertyPathHelper.GetNestedPropertyPath(column.Expression);
+            var propertyPathSplitted = propertyPath.Split('.');
+            if (propertyPathSplitted.Count() == 1)
+            {
+                orderByColumns.Add($"d0.{DataModel.DataModelMap.MappedProperties[propertyPath].ColumnName} {(IsOrderByAscending(propertyPath) ? "ASC" : "DESC")}");   
+                continue;
+            }
+
+            var join = _joins.FirstOrDefault(x => x.Path.Equals(string.Join('.', propertyPathSplitted.SkipLast(1))));
+
+            if (join == null)
+            {
+                continue;
+            }
+
+            var mappedProperty = join
+                .DataModelMap
+                .MappedProperties[propertyPathSplitted.TakeLast(1).First()];
+
+            orderByColumns.Add($"{join.RefTableNameAlias}.{mappedProperty.ColumnName} {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
+        }
+
+        return $"ORDER BY {string.Join(',', orderByColumns)}";
+    }
+
+    private bool IsOrderByAscending(string propertyPath)
+    {
+        return _orderBy.FirstOrDefault(c => PropertyPathHelper.GetNestedPropertyPath(c.Expression).Equals(propertyPath))?.Asc ?? true;
     }
 
     private string RenderColumns()
@@ -173,7 +217,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         var sqlSelectColumns = new List<string>();
 
         // Data model included columns
-        var includedRootProperties = _include
+        var includedRootProperties = _load
             .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
             .Where(x =>
                 x.Split('.').Length == 1
@@ -190,20 +234,24 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                     || includedRootProperties.Any(p => p.Equals(x.Value.PropertyName)))
                 .Select(x => $"d0.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
 
-        // Joins
-        var includedReferences = _include
+        // Only the ones affecting joins
+        var includedReferencesProperties = _load
             .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
             .Where(x => x.Split('.').Length > 1);
 
         foreach (var join in _joins)
         {
-            // TODO Check if the depth and reference has included properties to restrict the columns
-            // ...
+            var joinIncludedProperties = includedReferencesProperties
+                                    .Where(p => string.Join('.', p.Split('.').SkipLast(1)).Equals(join.Path));
 
-            // load them all
+            // Check if the depth and reference has load properties to restrict the columns
+            // or load them all
             sqlSelectColumns.AddRange(join
                     .DataModelMap
                     .MappedProperties
+                    .Where(x => joinIncludedProperties.Any() ?
+                                    joinIncludedProperties.Contains($"{join.Path}.{x.Value.PropertyName}") || x.Value.IsKey
+                                    : true)
                     .Select(x => $"{join.RefTableNameAlias}.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
         }
 
@@ -249,26 +297,34 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                 // Load mapped joins
                 for (int i = 0; i < _joins.Count; ++i)
                 {
-                    _joins[i].TransientRef = objs[i + 1];
+                    var join = _joins[i];
+                    join.TransientRef = objs[i + 1];
 
-                    if (_joins[i].IsCollection)
+                    if (join.IsCollection)
                     {
-                        var collectionValue = _joins[i].RefPropertyInfo.GetValue(rootDataModel, null);
+                        var collectionValue = join.RefPropertyInfo.GetValue(rootDataModel, null);
 
                         if (collectionValue == null)
                         {
-                            var collectionType = typeof(List<>).MakeGenericType(_joins[i].RefPropertyCollectionType);
+                            var collectionType = typeof(List<>).MakeGenericType(join.RefPropertyCollectionType);
                             collectionValue = Activator.CreateInstance(collectionType);
 
-                            _joins[i].RefPropertyInfo.SetValue(obj: rootDataModel, value: collectionValue);
+                            join.RefPropertyInfo.SetValue(obj: rootDataModel, value: collectionValue);
                         }
 
-                        if (_joins[i].TransientRef is null)
+                        if (join.TransientRef is null)
                         {
                             continue;
                         }
 
-                        ((IList)collectionValue).Add(objs[i + 1]);
+                        var joinTransientRefDataModel = (IDataModel)join.TransientRef;
+                        var transientRefKeyValue = joinTransientRefDataModel.DataModelMap.KeyProperty.GetValue(joinTransientRefDataModel, null);
+
+                        if (!join.MapBuffer.ContainsKey(transientRefKeyValue))
+                        {
+                            join.MapBuffer.Add(transientRefKeyValue, join.TransientRef);
+                            ((IList)collectionValue).Add(join.TransientRef);
+                        }
                         continue;
                     }
 
@@ -277,8 +333,8 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                         continue;
                     }
 
-                    var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(_joins[i].ParentTableAliasName));
-                    _joins[i].RefPropertyInfo.SetValue(obj: _targetJoin?.TransientRef ?? rootDataModel, value: objs[i + 1]);
+                    var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(join.ParentTableAliasName));
+                    join.RefPropertyInfo.SetValue(obj: _targetJoin?.TransientRef ?? rootDataModel, value: objs[i + 1]);
                 }
 
                 return rootDataModel;
@@ -292,58 +348,3 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             .Distinct();
     }
 }
-
-/*
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using Dapper;
-
-class Program
-{
-    static void Main()
-    {
-        string connectionString = "YourConnectionStringHere";
-        using (var connection = new SqlConnection(connectionString))
-        {
-            string sql = @"
-            SELECT 
-                o.OrderId, o.CustomerName, 
-                p.ProductId, p.ProductName, p.OrderId
-            FROM 
-                Orders o
-            INNER JOIN 
-                Products p ON o.OrderId = p.OrderId";
-
-            var orderDictionary = new Dictionary<int, Order>();
-
-            var orders = connection.Query<Order, Product, Order>(
-                sql,
-                (order, product) =>
-                {
-                    if (!orderDictionary.TryGetValue(order.OrderId, out var currentOrder))
-                    {
-                        currentOrder = order;
-                        orderDictionary.Add(currentOrder.OrderId, currentOrder);
-                    }
-                    currentOrder.Products.Add(product);
-                    return currentOrder;
-                },
-                splitOn: "ProductId"
-            ).Distinct().ToList();
-
-            foreach (var order in orders)
-            {
-                Console.WriteLine($"Order ID: {order.OrderId}, Customer: {order.CustomerName}");
-                foreach (var product in order.Products)
-                {
-                    Console.WriteLine($"    Product ID: {product.ProductId}, Name: {product.ProductName}");
-                }
-            }
-        }
-    }
-}
-
-
-*/

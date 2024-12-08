@@ -20,5 +20,7 @@ public class OracleExplicitKeySqlInsertTemplate : ISqlInsertTemplate
 
     public ISqlInsertTemplate Instance => _instance;
 
+    public bool UpsertCompatible => true;
+
     public string ReplaceParameters(string sqlInsert) => sqlInsert;
 }

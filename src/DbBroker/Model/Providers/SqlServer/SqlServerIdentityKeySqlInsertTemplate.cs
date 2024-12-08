@@ -22,5 +22,7 @@ public class SqlServerIdentityKeySqlInsertTemplate : ISqlInsertTemplate
     
     public ISqlInsertTemplate Instance => _instance;
 
+    public bool UpsertCompatible => false;
+
     public string ReplaceParameters(string sqlInsert) => sqlInsert;
 }

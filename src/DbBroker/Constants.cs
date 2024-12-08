@@ -5,8 +5,7 @@ public class Constants
     public const string SqlSelectTemplate = @"
 SELECT $$COLUMNS$$ 
 FROM $$TABLEFULLNAME$$ d0
-$$JOINS$$
-WHERE 1=1 $$FILTERS$$
+$$JOINS$$WHERE 1=1 $$FILTERS$$
 $$ORDERBYCOLUMNS$$
 $$OFFSETFETCH$$";
 

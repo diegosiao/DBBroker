@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/v3.0.0/docs/json-schema/dbbroker.config.schema.json",
   "contexts": [
     {
       "namespace": "EShop.DataModels.SqlServer",
@@ -26,6 +27,14 @@
           "sqlInsertTemplate": "OracleSequence",
           "sqlInsertTemplateArguments": {
             "sequence": "ORDER_STATUS_SEQ"
+          }
+        },
+        {
+          "name": "ORDERS_NOTES",
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleSequenceSqlInsertTemplate",
+          "sqlInsertTemplate": "OracleSequence",
+          "sqlInsertTemplateArguments": {
+            "sequence": "ORDERS_NOTES_SEQ"
           }
         }
       ],

@@ -5,12 +5,12 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace DbBroker.Unit.Tests.Providers.Oracle;
 
-public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
+public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {
     private readonly OracleConnection _oracleConnection = fixture.ServiceProvider.GetService<OracleConnection>()!;
 
     [Fact]
-    public void CanCreateCustomer()
+    public void CanInsertRecord()
     {
         CustomersDataModel customer = new()
         {
@@ -27,7 +27,7 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
     }
 
     [Fact]
-    public void CanUseTransactions()
+    public void CanInsertUsingTransaction()
     {
         if (_oracleConnection.State != ConnectionState.Open)
         {
@@ -39,7 +39,7 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
         {
             Id = Guid.NewGuid().ToByteArray(),
             Street = "Prudente De Morais, Av.",
-            Cit = "Natal",
+            City = "Natal",
             State = "RN",
             Country = "Brazil",
             PostalCode = "59065878",
@@ -71,7 +71,5 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
             && _oracleConnection.Insert(order, transaction));
 
         transaction.Commit();
-
-        // _oracleConnection.GetByKey(order.Id);
     }
 }

@@ -29,6 +29,8 @@ END;";
 
     public ISqlInsertTemplate Instance => null;
 
+    public bool UpsertCompatible => false;
+
     public string ReplaceParameters(string sqlInsert)
     {
         return sqlInsert.Replace($"$$SEQUENCENAME$$", SequenceName);

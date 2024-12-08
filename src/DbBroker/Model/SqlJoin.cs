@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace DbBroker.Model;
@@ -36,6 +37,8 @@ public class SqlJoin
     public Type RefPropertyCollectionType { get; set; }
 
     public object TransientRef { get; set; }
+
+    public Dictionary<object, object> MapBuffer { get; set; } = new Dictionary<object, object>(comparer: new DataModelKeyComparer());
 
     public bool IsCollection => RefPropertyCollectionType is not null;
 

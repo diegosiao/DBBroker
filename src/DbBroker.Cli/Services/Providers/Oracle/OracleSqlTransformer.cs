@@ -25,7 +25,7 @@ public class OracleSqlTransformer : ISqlTransformer
             case "timestamp(6)":
                 return isNullable ? "DateTime?" : "DateTime";
             case "raw":
-                return isNullable ? "byte[]?" : "byte[]";
+                return "byte[]?";
             case "decimal":
             case "money":
                 return isNullable ? "decimal?" : "decimal";
