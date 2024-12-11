@@ -6,11 +6,10 @@ namespace DbBroker.Model.Providers;
 public class SqlServerIdentityKeySqlInsertTemplate : ISqlInsertTemplate
 {
     public string SqlTemplate =>
-    @$"
-    INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
-    VALUES ($$PARAMETERS$$);
-    
-    SELECT SCOPE_IDENTITY();";
+@$"INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
+VALUES ($$PARAMETERS$$);
+
+SELECT SCOPE_IDENTITY();";
 
     public bool IncludeKeyColumn => false;
 

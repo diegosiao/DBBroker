@@ -46,13 +46,13 @@ dotnet nuget add DBBroker
 **Step 3:** Create a `dbbroker.config.json` file at the root of your project.
 
 ```bash
-dotnet dbbroker init --namespace="EShop.DataModels" --connection-string "[database-connection-string]" --provider Oracle
+dbbroker init --namespace="EShop.DataModels" --connection-string "[database-connection-string]" --provider Oracle
 ```
 
 **Step 4:** Synchronize your project with your database to generate the Data Models.
 
 ```bash
-dotnet dbbroker sync
+dbbroker sync
 ```
 
 ## Examples
@@ -126,14 +126,14 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 | Database | Status |
 |----------|--------|
 | SQL Server | ✅ |
-| Oracle | ⚒️ |
-| Postgres | 🛣️ |
+| Oracle | ✅ |
+| Postgres | ⚒️ |
 | MySQL | 🛣️ |
 
 ## Contribute
 
 We appreciate all contributions, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
 
-Financial support is also welcome, financial contributions will help to keep this project moving and always secure.
+Financial support is also welcome, large or small contributions will help to keep this project moving and always secure.
 
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/diegosiao)

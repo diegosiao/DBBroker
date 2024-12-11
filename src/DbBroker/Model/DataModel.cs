@@ -37,7 +37,7 @@ public abstract class DataModel<T> : IDataModel
 
     DataModelMap IDataModel.DataModelMap => DataModelMap;
 
-    // TODO For now it does not make sense because loading all properties is the default behavior
+    // TODO Still makes sense? loading all properties is the default behavior
     // /// <summary>
     // /// Meta column to represent '*' in SQL SELECT commands
     // /// </summary>

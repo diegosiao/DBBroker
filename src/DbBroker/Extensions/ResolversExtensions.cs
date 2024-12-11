@@ -1,8 +1,6 @@
 using System;
 using System.Data.Common;
 using DbBroker.Common;
-using DbBroker.Common.Model;
-using DbBroker.Common.Model.Interfaces;
 using DbBroker.Model;
 using DbBroker.Model.Interfaces;
 
@@ -10,8 +8,6 @@ namespace DbBroker.Extensions;
 
 public static class ResolversExtensions
 {
-    private static readonly DbBrokerConfig _dbBrokerConfig;
-
     /// <summary>
     /// Creates and returns a <see cref="DbConnection" /> new instance according to the Data Model type provider.
     /// <para>Check the <see cref="SupportedDatabaseProviders" /> for details on the required database client library reference.</para>

@@ -7,9 +7,9 @@ public class SqlServerExplicitKeySqlInsertTemplate : ISqlInsertTemplate
 {
     public bool IncludeKeyColumn => true;
 
-    public string SqlTemplate => @$"
-    INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
-    VALUES ($$PARAMETERS$$);";
+    public string SqlTemplate => 
+@$"INSERT INTO $$TABLEFULLNAME$$($$COLUMNS$$)
+VALUES ($$PARAMETERS$$);";
 
     public bool TryRetrieveKey => false;
 

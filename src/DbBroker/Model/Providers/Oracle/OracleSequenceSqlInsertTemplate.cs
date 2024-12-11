@@ -6,8 +6,7 @@ namespace DbBroker.Model.Providers.Oracle;
 public class OracleSequenceSqlInsertTemplate : ISqlInsertTemplate
 {
     public string SqlTemplate =>
-        @$"
-BEGIN
+@$"BEGIN
     INSERT INTO $$TABLEFULLNAME$$($$KEY_COLUMN$$, $$COLUMNS$$)
     VALUES ($$SEQUENCENAME$$.NEXTVAL, $$PARAMETERS$$);
 

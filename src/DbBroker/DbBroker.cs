@@ -13,7 +13,7 @@ public static class DbBroker
 {
     private static void ValidateDataModelContext<TDataModel>(DbConnection connection, TDataModel dataModel)
     {
-        // 
+        // TODO Validate if the 
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class DbBroker
         {
             keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
 
-            // TODO Improve the key data type handling
+            // TODO Improve the key data type handling: determine based on the mapped property type
             keyParameter.DbType = DbType.Int32;
             keyParameter.Direction = ParameterDirection.Output;
             parameters.Add(keyParameter);
@@ -85,7 +85,20 @@ public static class DbBroker
 
     public static bool Upsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
-        throw new NotImplementedException();
+        var upsertColumns = dataModel
+            .DataModelMap
+            .MappedProperties
+            .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
+            .Select(x => x.Value);
+
+        var parameters = upsertColumns
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
+            .ToList();
+
+        var sqlUpsertCommand = new SqlUpsertCommand<TDataModel>(dataModel, upsertColumns, parameters, connection, transaction);
+
+        sqlUpsertCommand.Execute();
+        return true;
     }
 
     /// <summary>

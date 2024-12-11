@@ -10,7 +10,7 @@ public interface ISqlInsertTemplate
     bool IncludeKeyColumn { get; }
 
     /// <summary>
-    /// The template should include:
+    /// The template should include the following placeholders:
     /// <para>$$TABLEFULLNAME$$ - The schema and table name</para>
     /// <para>$$COLUMNS$$ - The CSV list of columns</para>
     /// <para>$$PARAMETERS$$ - The CSV parameters names to be inserted</para>
