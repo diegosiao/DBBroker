@@ -1,5 +1,5 @@
 using DbBroker.Cli.Extensions;
-using DbBroker.Cli.Services.Providers.SqlServer;
+using DbBroker.Cli.Services;
 using DbBroker.Common.Model;
 using Newtonsoft.Json;
 

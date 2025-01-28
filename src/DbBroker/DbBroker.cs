@@ -59,7 +59,7 @@ public static class DbBroker
             keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
 
             // TODO Improve the key data type handling: determine based on the mapped property type
-            keyParameter.DbType = DbType.Int32;
+            keyParameter.DbType = dataModel.DataModelMap.Provider.GetDbType(dataModel.DataModelMap.KeyProperty);
             keyParameter.Direction = ParameterDirection.Output;
             parameters.Add(keyParameter);
         }

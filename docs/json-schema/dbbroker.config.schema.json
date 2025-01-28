@@ -29,11 +29,11 @@
             "type": "string"
           },
           "modelsPrefix": {
-            "description": "The sufix that Entity Data Models will receive when generated. The default value is empty.",
+            "description": "The name prefix that Entity Data Models classes will receive when generated. The default value is empty.",
             "type": "string"
           },
           "modelsSufix": {
-            "description": "The sufix that Entity Data Models will receive when generated. The default value is 'DataModel'.",
+            "description": "The name sufix that Entity Data Models classes will receive when generated. The default value is 'DataModel'.",
             "type": "string"
           },
           "tables": {

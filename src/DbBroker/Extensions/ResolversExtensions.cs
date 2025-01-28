@@ -1,5 +1,8 @@
 using System;
+using System.Data;
 using System.Data.Common;
+using System.Linq;
+using System.Reflection;
 using DbBroker.Common;
 using DbBroker.Model;
 using DbBroker.Model.Interfaces;
@@ -67,5 +70,46 @@ public static class ResolversExtensions
             SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter,
             _ => throw new ArgumentException($"Not supported database provider: {provider}"),
         };
+    }
+
+    public static DbType GetDbType(this SupportedDatabaseProviders provider, PropertyInfo propertyInfo)
+    {
+        // TODO WIP https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/data-type-mappings-in-ado-net
+        return provider switch
+        {
+            SupportedDatabaseProviders.Oracle => GetOracleDbType(propertyInfo),
+            SupportedDatabaseProviders.SqlServer => GetSqlServerDbType(propertyInfo),
+            _ => throw new ArgumentException($"Not supported database provider: {provider}"),
+        };
+    }
+
+    private static DbType GetSqlServerDbType(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.PropertyType == typeof(decimal))
+        {
+            return DbType.Decimal;
+        }
+
+        if (new Type[]{ typeof(int), typeof(byte) }.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        return DbType.String;
+    }
+
+    private static DbType GetOracleDbType(PropertyInfo propertyInfo)
+    {
+        if (new Type[] { typeof(int), typeof(byte) }.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        if (propertyInfo.PropertyType == typeof(decimal))
+        {
+            return DbType.Decimal;
+        }
+
+        return DbType.String;
     }
 }

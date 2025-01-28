@@ -1,6 +1,6 @@
-namespace DbBroker.Cli.Services.Providers;
-
 using DbBroker.Cli.Services.Interfaces;
+
+namespace DbBroker.Cli.Services.Providers.SqlServer;
 
 public class SqlServerSqlTransformer : ISqlTransformer
 {
@@ -9,7 +9,7 @@ public class SqlServerSqlTransformer : ISqlTransformer
         return databaseType.ToLower() switch
         {
             "uniqueidentifier" => isNullable ? "Guid?" : "Guid",
-            "varchar" => "string?",
+            "varchar" or "char" => "string?",
             "date" or "datetime" => isNullable ? "DateTime?" : "DateTime",
             "decimal" or "money" => isNullable ? "decimal?" : "decimal",
             "int" => isNullable ? "int?" : "int",

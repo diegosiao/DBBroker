@@ -78,4 +78,4 @@ var orders = connection
 Console.WriteLine($"Orders retrieved: {orders.Count()}");
 Console.WriteLine($"Customers: {string.Join(',', orders.Select(x => x.CustomerIdRef!.Name))}");
 Console.WriteLine($"Press any key to finish...");
-// Console.Read();
+Console.Read();

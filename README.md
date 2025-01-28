@@ -6,14 +6,16 @@
 
 ## NuGet
 
-| Package | Latest |
-|----|----|
-| DBBroker | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) |
-| DBBroker.Cli | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) |
+| Package | Latest | |
+|----|----|----|
+| DBBroker | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
+| DBBroker.Cli | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
+
+**IMPORTANT:** This version has no backward compatibility with DBBroker 1.x and 2.x.
 
 ## What It Does?
 
-Differently from another popular ORM packages, DBBroker approach associates a [CLI](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
+Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
 
 ## Philosophy
 
@@ -25,7 +27,7 @@ DBBroker offers features that benefit any kind of application, from the simplest
 
 - [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) are not an option due to a development process led by **Database Administrators**.
 
-These are common requirements for many organizations or database-centered solutions.
+These are common requirements for many organizations or database-centered solutions, and, arguably, by everyone who likes to keep things simple.
 
 ## Quick Start
 
@@ -46,7 +48,7 @@ dotnet nuget add DBBroker
 **Step 3:** Create a `dbbroker.config.json` file at the root of your project.
 
 ```bash
-dbbroker init --namespace="EShop.DataModels" --connection-string "[database-connection-string]" --provider Oracle
+dbbroker init --namespace="MyApp.DataModels" --connection-string "[database-connection-string]" --provider Oracle
 ```
 
 **Step 4:** Synchronize your project with your database schemas to generate the Data Models.
@@ -134,6 +136,6 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 
 We appreciate all contributions, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
 
-Financial support is also welcome, large or small contributions will help to keep this project moving and always secure.
+Financial support is also welcome, whether large or small contributions will help to keep this project moving and always secure.
 
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/diegosiao)

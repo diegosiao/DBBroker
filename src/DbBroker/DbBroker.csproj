@@ -7,7 +7,7 @@
 
   <!-- https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- <TargetFramework>net8.0</TargetFramework> -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DBBroker</PackageId>
     <Version>3.0.0-alpha</Version>

@@ -4,7 +4,7 @@ using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Services.Interfaces;
 using DbBroker.Common.Model;
 
-namespace DbBroker.Cli.Services.Providers.SqlServer;
+namespace DbBroker.Cli.Services;
 
 public class CSharpClassGenerator : ICSharpClassGenerator
 {
@@ -61,7 +61,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                                     .Replace("$$REFSCHEMANAME$$", reference.SchemaName)
                                     .Replace("$$REFTABLENAME$$", reference.TableName)
                                     .Replace("$$PKCOLUMNNAME$$", primaryKeyColumnName)
-                                    .Replace("$$REFTYPENAME$$", $"{reference.TableName.ToCamelCase()}DataModel")
+                                    .Replace("$$REFTYPENAME$$", $"{context.ModelsPrefix}{reference.TableName.ToCamelCase()}{context.ModelsSufix}")
                             );
                         }
                     }
@@ -99,7 +99,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                                 .Replace("$$REFSCHEMANAME$$", foreignKey.SchemaName)
                                 .Replace("$$REFTABLENAME$$", foreignKey.ReferencedTable)
                                 .Replace("$$PKCOLUMNNAME$$", foreignKey.ReferencedColumn)
-                                .Replace("$$REFTYPENAME$$", $"{tableDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName.ToCamelCase()}DataModel")
+                                .Replace("$$REFTYPENAME$$", $"{context.ModelsPrefix}{tableDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName.ToCamelCase()}{context.ModelsSufix}")
                         );
                     }
                 }
@@ -107,10 +107,10 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                 var configContextTable = context.Tables.FirstOrDefault(x => x.Name.Equals(tableDescriptor.Value.TableName));
 
                 File.WriteAllText(
-                    Path.Combine(outputDirectory, $"{tableDescriptor.Value.TableName.ToCamelCase()}DataModel.cs"),
+                    Path.Combine(outputDirectory, $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}.cs"),
                     Constants.EDM_CLASS_TEMPLATE
                         .Replace("$NAMESPACE", context.Namespace ?? "-")
-                        .Replace("$CLASSNAME", $"{tableDescriptor.Value.TableName.ToCamelCase()}DataModel")
+                        .Replace("$CLASSNAME", $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}")
                         .Replace("$TABLE", tableDescriptor.Value.TableName)
                         .Replace("$SCHEMA", tableDescriptor.Value.SchemaName)
                         .Replace("$PROPERTIES", propsString.ToString())

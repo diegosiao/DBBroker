@@ -27,5 +27,15 @@ public class DbBrokerConfigContext
     /// </summary>
     public string DefaultSqlInsertTemplateTypeFullName { get; set; }
 
+    /// <summary>
+    /// The name prefix that Entity Data Models classes will receive when generated. The default value is empty.
+    /// </summary>
+    public string ModelsPrefix { get; set; }
+
+    /// <summary>
+    /// The name sufix that Entity Data Models classes will receive when generated. The default value is 'DataModel'.
+    /// </summary>
+    public string ModelsSufix { get; set; } = "DataModel";
+
     public IEnumerable<DbBrokerConfigContextTable> Tables { get; set; } = [];
 }

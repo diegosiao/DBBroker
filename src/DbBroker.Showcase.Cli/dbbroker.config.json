@@ -6,7 +6,6 @@
       "provider": "SqlServer",
       "connectionString": "Server=127.0.0.1,1439;Database=DbBroker;User Id=sa;Password=DBBroker_1;",
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
-      "modelsPrefix": "Db",
       "tables": [
         {
           "name": "",

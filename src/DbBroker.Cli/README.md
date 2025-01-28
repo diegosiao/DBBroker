@@ -1,6 +1,6 @@
 # DBBroker CLI
 
-Generate your Data Models easily and work seamelessly wiht [DBBroker](https://www.nuget.org/packages/DBBroker) Micro ORM Library.
+Generate your Data Models easily and work seamelessly with [DBBroker](https://www.nuget.org/packages/DBBroker) Micro ORM Library.
 
 ```bash
 dotnet tool install --global DbBroker.Cli
