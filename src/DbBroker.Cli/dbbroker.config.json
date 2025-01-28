@@ -12,6 +12,8 @@
       "provider": "Oracle",
       "connectionString": "user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;",
       "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleExplicitKeySqlInsertTemplate",
+      "modelsPrefix": "",
+      "modelsSufix": "DataModel",
       "tables": [
         {
           "name": "ORDER_STATUS",

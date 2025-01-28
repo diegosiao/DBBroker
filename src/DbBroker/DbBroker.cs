@@ -83,6 +83,14 @@ public static class DbBroker
         return true;
     }
 
+    /// <summary>
+    /// Inserts or updates a database record for the specified <typeparamref name="TDataModel"/>.
+    /// </summary>
+    /// <typeparam name="TDataModel">The Data Model type to insert the record for.</typeparam>
+    /// <param name="connection">The database connection to execute the SQL MERGE command.</param>
+    /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
+    /// <param name="transaction">The database transaction to use to execute the SQL MERGE command.</param>
+    /// <returns>Returns true if the command was executed without errors, false otherwise. </returns>
     public static bool Upsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
         var upsertColumns = dataModel

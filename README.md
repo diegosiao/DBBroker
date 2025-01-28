@@ -25,7 +25,7 @@ DBBroker offers features that benefit any kind of application, from the simplest
 
 - [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) are not an option due to a development process led by **Database Administrators**.
 
-These are common needs for many organizations with database-centered solutions, such as the one where this tool was initially developed.
+These are common requirements for many organizations or database-centered solutions.
 
 ## Quick Start
 
@@ -34,7 +34,7 @@ Open your terminal and navigate to your application's *.csproj directory. Then f
 **Step 1:** Install `DBBroker.Cli` .NET tool globally.
 
 ```bash
-dotnet install DBBroker.Cli -g
+dotnet tool install DBBroker.Cli --global
 ```
 
 **Step 2:** Add `DBBroker` package to your project.
@@ -49,7 +49,7 @@ dotnet nuget add DBBroker
 dbbroker init --namespace="EShop.DataModels" --connection-string "[database-connection-string]" --provider Oracle
 ```
 
-**Step 4:** Synchronize your project with your database to generate the Data Models.
+**Step 4:** Synchronize your project with your database schemas to generate the Data Models.
 
 ```bash
 dbbroker sync
@@ -109,7 +109,7 @@ Retrieving multiple and filtered records.
 ```C#
 var inactiveCustomers = await connection.Select<CustomersDataModel>()
   .AddFilter(x => x.StatusId, SqlEquals.To(3))
-  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' strategy
+  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' or pagination strategy
   .ExecuteAsync();
 ```
 
@@ -123,12 +123,12 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 
 ## Supported Databases
 
-| Database | Status |
-|----------|--------|
-| SQL Server | ✅ |
-| Oracle | ✅ |
-| Postgres | ⚒️ |
-| MySQL | 🛣️ |
+| Database | Status | --provider |
+|----------|--------|--------|
+| SQL Server | ✅ | SqlServer |
+| Oracle | ✅ | Oracle |
+| Postgres | ⚒️ | Postgres |
+| MySQL | 🛣️ | MySql |
 
 ## Contribute
 

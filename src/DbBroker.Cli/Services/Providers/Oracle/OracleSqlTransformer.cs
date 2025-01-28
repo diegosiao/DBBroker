@@ -1,4 +1,3 @@
-using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Services.Interfaces;
 
 namespace DbBroker.Cli.Services.Providers.Oracle;
@@ -6,8 +5,8 @@ namespace DbBroker.Cli.Services.Providers.Oracle;
 public class OracleSqlTransformer : ISqlTransformer
 {
     /// <summary>
-    /// Tries to map an Oracle database type to a compatible .NET type.
-    /// <a href='https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/oracle-data-type-mappings'>More information</a>
+    /// Tries to map an Oracle database type to a compatible .NET type. See 
+    /// <a href='https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/oracle-data-type-mappings'>More information.</a>
     /// </summary>
     /// <param name="databaseType">The database type name</param>
     /// <param name="databaseTypeLength">The database type length</param>
@@ -19,17 +18,24 @@ public class OracleSqlTransformer : ISqlTransformer
         {
             case "varchar":
             case "varchar2":
+            case "nvarchar2":
+            case "char":
+            case "clob":
+            case "rowid":
                 return "string?";
             case "date":
             case "datetime":
             case "timestamp(6)":
                 return isNullable ? "DateTime?" : "DateTime";
             case "raw":
+            case "bfile":
+            case "blob":
                 return "byte[]?";
+            case "float":
             case "decimal":
             case "money":
-                return isNullable ? "decimal?" : "decimal";
             case "number":
+                return isNullable ? "decimal?" : "decimal";
             case "integer":
                 return isNullable ? "int?" : "int";
             default:
