@@ -12,10 +12,17 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DBBroker.Cli</PackageId>
     <Version>1.0.0-beta</Version>
+    <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
+    <Company></Company>
+    <Copyright></Copyright>
+    <Description>CLI to generate Entity Data Models</Description>
+    <PackageTags>orm, data, mapping, sql server, oracle, mysql</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dbbroker</ToolCommandName>
-    <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
-    <Description>CLI to generate Entity Data Models</Description>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIconUrl>https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-100x100.png</PackageIconUrl>

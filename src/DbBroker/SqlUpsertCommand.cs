@@ -55,10 +55,10 @@ WHEN NOT MATCHED THEN
 
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
-            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join(',' , Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
+            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join("," , Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
             .Replace("$$KEYCOLUMN$$", keyPropertyMap.Value.ColumnName)
             .Replace("$$KEYCOLUMNPARAM$$", keyPropertyMap.Value.ColumnName)
-            .Replace("$$UPDATE$$", string.Join(',', $"UPDATE SET {string.Join(',', Columns.Where(c => !c.IsKey).Select(x => $"t.{x.ColumnName} = s.{x.ColumnName}"))}"))
-            .Replace("$$INSERT$$", $"INSERT ({string.Join(',', Columns.Select(x => x.ColumnName))}) VALUES ({string.Join(',', Columns.Select(x => $"s.{x.ColumnName}"))})");
+            .Replace("$$UPDATE$$", string.Join(",", $"UPDATE SET {string.Join(",", Columns.Where(c => !c.IsKey).Select(x => $"t.{x.ColumnName} = s.{x.ColumnName}"))}"))
+            .Replace("$$INSERT$$", $"INSERT ({string.Join(",", Columns.Select(x => x.ColumnName))}) VALUES ({string.Join(",", Columns.Select(x => $"s.{x.ColumnName}"))})");
     }
 }

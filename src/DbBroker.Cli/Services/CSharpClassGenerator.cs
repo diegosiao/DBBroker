@@ -30,7 +30,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
             foreach (var tableDescriptor in tableDescriptors)
             {
-                var outputDirectory = (context.Namespace?.Split('.')?.Length > 1 ? string.Join('/', context.Namespace.Split('.').Skip(1)) : context.Namespace) ?? string.Empty;
+                var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join('/', context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
                 outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
 
                 Directory.CreateDirectory(context.OutputDirectory ?? outputDirectory);

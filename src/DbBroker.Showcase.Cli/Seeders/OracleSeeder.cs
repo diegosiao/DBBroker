@@ -262,15 +262,12 @@ public static class OracleSeeder
             transaction.Rollback();
             Console.WriteLine(ex.Message);
         }
-
-        products.TakeLast(1).ToList().ForEach(product =>
+        
+        connection.Insert(new OrdersProductsDataModel
         {
-            connection.Insert(new OrdersProductsDataModel
-            {
-                Id = Guid.NewGuid().ToByteArray(),
-                OrderId = order.Id,
-                ProductId = product.Id,
-            });
+            Id = Guid.NewGuid().ToByteArray(),
+            OrderId = order.Id,
+            ProductId = products.Last().Id,
         });
 
         var orderNotes = new List<OrdersNotesDataModel>{

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using DbBroker.Model.Interfaces;
 
 namespace DbBroker;
@@ -47,7 +46,7 @@ public class DataModelKeyComparer<TDataModel> : IEqualityComparer<TDataModel> wh
         return x.GetHashCode().Equals(y.GetHashCode());
     }
 
-    public int GetHashCode([DisallowNull] TDataModel obj)
+    public int GetHashCode(TDataModel obj)
     {
         var hashCode = obj.DataModelMap.KeyProperty.GetValue(obj)?.GetHashCode() ?? -1;
         return hashCode;

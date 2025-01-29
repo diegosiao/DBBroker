@@ -7,10 +7,10 @@
 
   <!-- https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <PropertyGroup>
-    <!-- <TargetFramework>net8.0</TargetFramework> -->
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DBBroker</PackageId>
-    <Version>3.0.0-alpha</Version>
+    <Version>3.0.0-beta</Version>
     <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>
@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Contrib.Bcl.Ranges" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>

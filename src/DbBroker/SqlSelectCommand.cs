@@ -78,7 +78,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             {
                 Depth = depth,
                 Index = ++joinIndex,
-                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join('.', [path, reference.Value.PropertyInfo.Name]),
+                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join(".", [path, reference.Value.PropertyInfo.Name]),
                 DataModelMap = referenceInstance.DataModelMap,
                 SchemaName = reference.Value.SchemaName,
                 ParentTableName = reference.Value.TableName,
@@ -127,7 +127,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             {
                 Depth = depth,
                 Index = ++joinIndex,
-                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join('.', [path, reference.Value.PropertyInfo.Name]),
+                Path = string.IsNullOrEmpty(path) ? reference.Value.PropertyInfo.Name : string.Join(".", [path, reference.Value.PropertyInfo.Name]),
                 DataModelMap = collectionReferenceDataModel.DataModelMap,
                 SchemaName = reference.Value.SchemaName,
                 ParentTableName = reference.Value.TableName,
@@ -190,7 +190,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                 continue;
             }
 
-            var join = _joins.FirstOrDefault(x => x.Path.Equals(string.Join('.', propertyPathSplitted.SkipLast(1))));
+            var join = _joins.FirstOrDefault(x => x.Path.Equals(string.Join(".", propertyPathSplitted.SkipLast(1))));
 
             if (join == null)
             {
@@ -204,7 +204,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             orderByColumns.Add($"{join.RefTableNameAlias}.{mappedProperty.ColumnName} {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
         }
 
-        return $"ORDER BY {string.Join(',', orderByColumns)}";
+        return $"ORDER BY {string.Join(",", orderByColumns)}";
     }
 
     private bool IsOrderByAscending(string propertyPath)
@@ -242,7 +242,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         foreach (var join in _joins)
         {
             var joinIncludedProperties = includedReferencesProperties
-                                    .Where(p => string.Join('.', p.Split('.').SkipLast(1)).Equals(join.Path));
+                                    .Where(p => string.Join(".", p.Split('.').SkipLast(1)).Equals(join.Path));
 
             // Check if the depth and reference has load properties to restrict the columns
             // or load them all
@@ -255,7 +255,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
                     .Select(x => $"{join.RefTableNameAlias}.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
         }
 
-        return string.Join(',', sqlSelectColumns);
+        return string.Join(",", sqlSelectColumns);
     }
 
     public override IEnumerable<TDataModel> Execute()
@@ -342,7 +342,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             param: parameterDictionary,
             transaction: Transaction,
             buffered: true,
-            splitOn: string.Join(',', _joins.Select(x => x.DataModelMap.KeyProperty.Name)),
+            splitOn: string.Join(",", _joins.Select(x => x.DataModelMap.KeyProperty.Name)),
             commandTimeout: null,
             commandType: CommandType.Text)
             .Distinct();
