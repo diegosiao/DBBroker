@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/v3.0.0/docs/json-schema/dbbroker.config.schema.json",
+  "contexts": [
+    {
+      "namespace": "EShop.DataModels.SqlServer",
+      "provider": "SqlServer",
+      "connectionString": "Server=127.0.0.1,1439;Database=DbBroker;User Id=sa;Password=DBBroker_1;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate",
+      "tables": [
+        {
+          "name": "",
+          "schema": "",
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.SqlServerExplicitKeySqlInsertTemplate"
+        }
+      ],
+      "views": []
+    },
+    {
+      "namespace": "EShop.DataModels.Oracle",
+      "provider": "Oracle",
+      "connectionString": "user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;",
+      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleExplicitKeySqlInsertTemplate",
+      "tables": [
+        {
+          "name": "ORDER_STATUS",
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleSequenceSqlInsertTemplate",
+          "sqlInsertTemplate": "OracleSequence",
+          "sqlInsertTemplateArguments": {
+            "sequence": "ORDER_STATUS_SEQ"
+          }
+        },
+        {
+          "name": "ORDERS_NOTES",
+          "sqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleSequenceSqlInsertTemplate",
+          "sqlInsertTemplate": "OracleSequence",
+          "sqlInsertTemplateArguments": {
+            "sequence": "ORDERS_NOTES_SEQ"
+          }
+        }
+      ],
+      "views": []
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets -->
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>DBBroker.Cli</PackageId>
+    <Version>1.0.0-beta</Version>
+    <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
+    <Company></Company>
+    <Copyright></Copyright>
+    <Description>CLI to generate Entity Data Models</Description>
+    <PackageTags>orm, data, mapping, sql server, oracle, mysql</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dbbroker</ToolCommandName>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIconUrl>https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-100x100.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Images\logo.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="Dapper" Version="2.1.44" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.6.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DbBroker.Common\DbBroker.Common.csproj" />
+  </ItemGroup>
+
+</Project>

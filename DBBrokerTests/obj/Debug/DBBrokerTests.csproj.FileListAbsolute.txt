@@ -1,7 +1,0 @@
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\bin\Debug\DBBrokerTests.dll
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\bin\Debug\DBBrokerTests.pdb
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\obj\Debug\DBBrokerTests.csproj.CoreCompileInputs.cache
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\obj\Debug\DBBrokerTests.csproj.CopyComplete
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\obj\Debug\DBBrokerTests.dll
-C:\Users\Diego\Documents\git\DBBroker\DBBrokerTests\obj\Debug\DBBrokerTests.pdb

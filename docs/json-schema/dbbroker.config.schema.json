@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegosiao/dbbroker/docs/dbbroker.config.schema.json",
+  "title": "DBBroker Configuration File",
+  "description": "Configuration file to describe database contexts",
+  "type": "object",
+  "properties": {
+    "contexts": {
+      "description": "Database contexts",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "description": "The namespace where Data Models should be placed in",
+            "type": "string"
+          },
+          "provider": {
+            "description": "The database provider",
+            "type": "string",
+            "enum": ["SqlServer", "Oracle"]
+          },
+          "connectionString": {
+            "description": "The connection string DBBroker is going to use to prospect database metadata",
+            "type": "string"
+          },
+          "defaultSqlInsertTemplateTypeFullName": {
+            "description": "The full name of an ISqlInsertTemplate implementation to use during INSERT commands against tables where this same configuration is omitted",
+            "type": "string"
+          },
+          "modelsPrefix": {
+            "description": "The name prefix that Entity Data Models classes will receive when generated. The default value is empty.",
+            "type": "string"
+          },
+          "modelsSufix": {
+            "description": "The name sufix that Entity Data Models classes will receive when generated. The default value is 'DataModel'.",
+            "type": "string"
+          },
+          "tables": {
+            "description": "Array of tables DBBroker will use to generate the Data Models",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "The table name",
+                  "type": "string"
+                },
+                "schema": {
+                  "description": "The table schema name",
+                  "type": "string"
+                },
+                "sqlInsertTemplateTypeFullName": {
+                  "description": "The full name of an ISqlInsertTemplate implementation to use during INSERT commands against this table",
+                  "type": "string"
+                },
+                "sqlInsertTemplate": {
+                  "description": "The ISqlInsertTemplate implementation to use during INSERT commands against this table",
+                  "type": "string",
+                  "enum": [
+                    "OracleSequence",
+                    "OracleExplicityKey",
+                    "SqlServerIdentity",
+                    "Custom"
+                  ]
+                },
+                "sqlInsertTemplateArguments": {
+                  "description": "Arguments the ISqlInsertTemplate specified might be expecting",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "required": ["namespace", "provider", "connectionString"]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["contexts"]
+}
