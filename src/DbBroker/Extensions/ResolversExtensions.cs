@@ -95,7 +95,7 @@ public static class ResolversExtensions
             return DbType.Int32;
         }
 
-        return DbType.String;
+        throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
     }
 
     private static DbType GetOracleDbType(PropertyInfo propertyInfo)
@@ -110,6 +110,6 @@ public static class ResolversExtensions
             return DbType.Decimal;
         }
 
-        return DbType.String;
+        throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
     }
 }

@@ -27,6 +27,8 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             var allKeys = tableDescriptors
                 .Select(tableDescriptor => tableDescriptor.Value.Keys)
                 .SelectMany(x => x);
+            
+            $"{tableDescriptors.Count} tables found. Generating Data Model classes.".Log();
 
             foreach (var tableDescriptor in tableDescriptors)
             {

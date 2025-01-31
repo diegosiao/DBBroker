@@ -26,4 +26,10 @@ public class InitOptions
         HelpText = "The database provider connection string. Required.", 
         Required = true)]
     public required string ConnectionString { get; init; }
+
+    [Option(
+        'f',
+        "force",
+        HelpText = "Overrides the dbbroker.config.json file if it exists. Default is false.")]
+    public bool Force { get; set; }
 }
