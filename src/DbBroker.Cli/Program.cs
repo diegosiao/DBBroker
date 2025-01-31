@@ -12,11 +12,11 @@ class Program
 {
     static void Main(string[] args) 
     {
-        $"Running DBBroker v1.0.1-alpha...".Log();
+        $"Running DBBroker CLI v1.0.1-beta...".Log();
 
         Parser.Default.ParseArguments<InitOptions, SyncOptions>(args)
                       .MapResult(
-                          (InitOptions opts) => InitOptions.Execute(opts),
+                          (InitOptions opts) => InitCommand.Execute(opts),
                           (SyncOptions opts) => SyncCommand.Execute(opts),
                           errs => 1);
     }

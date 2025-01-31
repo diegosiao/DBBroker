@@ -37,7 +37,7 @@
             "type": "string"
           },
           "tables": {
-            "description": "Array of tables DBBroker will use to generate the Data Models",
+            "description": "Array of tables DBBroker will use to generate the Data Models. If empty, all tables will be included.",
             "type": "array",
             "items": {
               "type": "object",

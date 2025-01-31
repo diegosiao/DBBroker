@@ -1,27 +1,29 @@
-using System;
 using CommandLine;
-using DbBroker.Cli.Extensions;
 using DbBroker.Common;
-using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Commands.Init;
 
-[Verb("init", HelpText = "Initializes the 'dbbroker.config.json' file")]
+[Verb("init", HelpText = "Initializes and outputs a 'dbbroker.config.json' with the parameters specified.")]
 public class InitOptions
 {
     [Option(
-        'v', 
-        "vendor", 
-        HelpText = "Database vendor <SqlServer|Oracle>", 
+        'n', 
+        "namespace", 
+        HelpText = "The namespace the classes generated should be put in. Required.", 
+        Required = true)]
+    public required string Namespace { get; init; }
+
+    [Option(
+        'p', 
+        "provider", 
+        HelpText = "The database provider name <SqlServer|Oracle>. Default is 'SqlServer'.", 
         Default = SupportedDatabaseProviders.SqlServer)]
-    public SupportedDatabaseProviders Vendor { get; init; }
+    public SupportedDatabaseProviders Provider { get; init; }
 
-    [Option('c', "connectionString", HelpText = "Database vendor connection string", Required = true)]
+    [Option(
+        'c', 
+        "connectionString", 
+        HelpText = "The database provider connection string. Required.", 
+        Required = true)]
     public required string ConnectionString { get; init; }
-
-    internal static int Execute(InitOptions opts)
-    {
-        $"Initializing '{opts.Vendor}'".Log();
-        return 0;
-    }
 }
