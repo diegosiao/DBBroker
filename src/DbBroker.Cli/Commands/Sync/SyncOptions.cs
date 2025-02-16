@@ -6,9 +6,9 @@ namespace DbBroker.Cli.Commands.Sync;
 public class SyncOptions
 {
     [Option(
-        'd', 
-        "database", 
-        HelpText = "The specific database you want to update")]
+        'n', 
+        "namespace", 
+        HelpText = "The specific context namespace you want to update. You can use the namespace or context name.")]
     public string? Context { get; init; }
 
     [Option(

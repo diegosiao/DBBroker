@@ -9,9 +9,14 @@ public class SyncCommand
 {
     internal static Dictionary<string, int> Results = [];
 
+    internal static SyncOptions Options { get; private set; } = new SyncOptions();
+
     public static int Execute(SyncOptions options)
     {
-        "Synchronizing...".Log();
+        Options = options;
+
+        var startTime = DateTime.Now;
+        $"Synchronizing... Started at {startTime}.".Log();
         var configFilesDirectory = options.ConfigFilesDirectory ?? Directory.GetCurrentDirectory();
         var configFiles = Directory.EnumerateFiles(configFilesDirectory, "dbbroker.config.*");
 
@@ -33,6 +38,8 @@ public class SyncCommand
             }
         }
 
+        "".Log(); // empty line
+
         var tasks = contexts
             .Select(x => new CSharpClassGenerator().GenerateAsync(x));
 
@@ -40,7 +47,7 @@ public class SyncCommand
 
         if (Results.Sum(x => x.Value) == 0)
         {
-            "Data Models synchronized.".Success();
+            $"Synchronization finished at '{DateTime.Now}' ({(DateTime.Now - startTime).TotalSeconds} seconds).".Success();
             return ExitCodes.SUCCESS;
         }
 

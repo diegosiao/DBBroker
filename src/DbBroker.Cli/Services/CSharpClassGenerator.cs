@@ -10,6 +10,12 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 {
     public async Task<int> GenerateAsync(DbBrokerConfigContext context)
     {
+        if (!string.IsNullOrEmpty(SyncCommand.Options.Context) && !SyncCommand.Options.Context.Equals(context.Name, StringComparison.InvariantCultureIgnoreCase))
+        {
+            "Context ignored.".Warning(context.Namespace);
+            return 0;
+        }
+
         "Retrieving database metadata...".Log(context.Namespace);
 
         try
@@ -27,15 +33,23 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             var allKeys = tableDescriptors
                 .Select(tableDescriptor => tableDescriptor.Value.Keys)
                 .SelectMany(x => x);
-            
-            $"{tableDescriptors.Count} tables found. Generating Data Model classes.".Log();
+
+            $"{tableDescriptors.Count} tables found.".Log(context.Namespace);
+
+            if (tableDescriptors.Count == 0)
+            {
+                "Make sure the user provided has SELECT permission on metadata tables.".Warning(context.Namespace, 0);
+            }
+
+            var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join('/', context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
+            outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
+
+            Directory.CreateDirectory(context.OutputDirectory ?? outputDirectory);
+
+            $"Output directory: {context.OutputDirectory ?? outputDirectory}".Log(context.Namespace);
 
             foreach (var tableDescriptor in tableDescriptors)
             {
-                var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join('/', context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
-                outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
-
-                Directory.CreateDirectory(context.OutputDirectory ?? outputDirectory);
 
                 StringBuilder propsString = new();
                 StringBuilder refsString = new();
@@ -123,7 +137,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                             configContextTable?.SqlInsertTemplateTypeFullName
                             ?? context.DefaultSqlInsertTemplateTypeFullName
                             ?? providerDefaultConfig.ISqlInsertTemplateTypeFullName)
-                        .Replace("$ISQLINSERTTEMPLATETYPEARGUMENTS", 
+                        .Replace("$ISQLINSERTTEMPLATETYPEARGUMENTS",
                             string.Join(",", configContextTable?.SqlInsertTemplateArguments?.Values.Select(x => $"\"{x}\"") ?? [])
                         ));
             }

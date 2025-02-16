@@ -6,6 +6,8 @@ public class DbBrokerConfigContext
 {
     public string Namespace { get; set; }
 
+    public string Name { get; set; }
+
     public SupportedDatabaseProviders Provider { get; set; }
 
     public string ConnectionString { get; set; }

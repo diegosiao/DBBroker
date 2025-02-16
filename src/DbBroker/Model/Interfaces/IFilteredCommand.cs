@@ -7,5 +7,5 @@ public interface IFilteredCommand<TDataModel, TReturn> where TDataModel : DataMo
 {
     IFilteredCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
 
-    TReturn Execute();
+    TReturn Execute(int commandTimeout = 0);
 }

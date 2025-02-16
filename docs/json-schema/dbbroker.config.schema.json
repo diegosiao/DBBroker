@@ -15,6 +15,14 @@
             "description": "The namespace where Data Models should be placed in",
             "type": "string"
           },
+          "name": {
+            "description": "The context name. Can be used to selectively synchronize a context in a dbbroker.config.json file.",
+            "type": "string"
+          },
+          "outputDirectory": {
+            "description": "The relative directory where Data Models should be placed in. If omitted a folder structure based on the namespace will be created skipping the first part (generaly the application name).",
+            "type": "string"
+          },
           "provider": {
             "description": "The database provider",
             "type": "string",

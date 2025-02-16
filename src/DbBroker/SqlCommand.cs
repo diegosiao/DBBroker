@@ -68,7 +68,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
             .Replace("$$FILTERS$$", Filters.RenderWhereClause()); // TODO: Expose a configuration flag to avoid not filtered UPDATE or DELETE by default
     }
 
-    public virtual TReturn Execute()
+    public virtual TReturn Execute(int commandTimeout = 0)
     {
         if (Connection.State != ConnectionState.Open)
         {
@@ -86,7 +86,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         command.Parameters.AddRange(Parameters.ToArray());
         command.Parameters.AddRange(filterParameters.ToArray());
         command.Transaction = Transaction;
-        // command.CommandTimeout
+        command.CommandTimeout = commandTimeout;
 
         return (TReturn)(object)command.ExecuteNonQuery();
     }

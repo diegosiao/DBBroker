@@ -11,23 +11,16 @@ namespace DbBroker;
 
 public static class DbBroker
 {
-    private static void ValidateDataModelContext<TDataModel>(DbConnection connection, TDataModel dataModel)
-    {
-        // TODO Validate if the 
-    }
-
     /// <summary>
     /// Inserts a database record for the specified <typeparamref name="TDataModel"/>.
     /// </summary>
-    /// <typeparam name="TDataModel">The Data Model type to insert the record for.</typeparam>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database record to be inserted</typeparam>
     /// <param name="connection">The database connection to execute the SQL INSERT command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL INSERT command.</param>
     /// <returns>Returns true if the insertion was executed without errors, false otherwise. </returns>
     public static bool Insert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
-        ValidateDataModelContext(connection, dataModel);
-
         var insertColumns = dataModel
             .DataModelMap
             .MappedProperties
@@ -86,7 +79,7 @@ public static class DbBroker
     /// <summary>
     /// Inserts or updates a database record for the specified <typeparamref name="TDataModel"/>.
     /// </summary>
-    /// <typeparam name="TDataModel">The Data Model type to insert the record for.</typeparam>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database record to be inserted or updated</typeparam>
     /// <param name="connection">The database connection to execute the SQL MERGE command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL MERGE command.</param>
@@ -112,7 +105,7 @@ public static class DbBroker
     /// <summary>
     /// Retrieves database record(s) for <typeparamref name="TDataModel"/>.
     /// </summary>
-    /// <typeparam name="TDataModel"></typeparam>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database records to be selected</typeparam>
     /// <param name="connection"></param>
     /// <param name="load">
     ///     <para>Properties to be included in the SQL SELECT command as columns. Keys are implicitly included.</para>
@@ -141,7 +134,7 @@ public static class DbBroker
     /// CAUTION: The Key property is always ignored, no matter if it is in pristine state or not.
     /// <para>Call <see cref="SqlUpdateCommand{TDataModel}.AddFilter{TProperty}(Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify explicitly the record to be updated.</para>
     /// </summary>
-    /// <typeparam name="TDataModel"></typeparam>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database record to be updated</typeparam>
     /// <param name="connection"></param>
     /// <param name="dataModel"></param>
     /// <param name="transaction">The database transaction to use to execute this command.</param>
@@ -164,7 +157,7 @@ public static class DbBroker
     /// <para>Deletes database record(s).</para>
     /// CAUTION: Chain a call to <see cref="SqlCommand{TDataModel, TReturn}.AddFilter{TProperty}(Expression{Func{TDataModel, TProperty}}, SqlExpression)"/> to specify the record(s) to be deleted.
     /// </summary>
-    /// <typeparam name="TDataModel">The data model instance that represents the database record to be deleted</typeparam>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database record to be deleted</typeparam>
     /// <param name="connection"></param>
     /// <param name="dataModel"></param>
     /// <param name="transaction">The database transaction to use to execute this command.</param>
@@ -175,5 +168,81 @@ public static class DbBroker
             Activator.CreateInstance<TDataModel>(),
             connection,
             transaction);
+    }
+
+    /// <summary>
+    /// <para>Scalar aggregation count over the table represented by the <typeparamref name="TDataModel"/>.</para>
+    /// <para>Why there is no more options to this aggregation? Database Aggregations create columns at execution time, DBBroker's philosophy is based on reflecting database structure state.</para>
+    /// <para>If you need a grouped list with multiple counts, create a database View then run `dbbroker sync` to consume it through the Data Model generated.</para>
+    /// </summary>
+    /// <typeparam name="TDataModel">The Data Model type that represents the database table the SQL COUNT(*) function will run against.</typeparam>
+    /// <param name="connection"></param>
+    /// <param name="groupBy"></param>
+    /// <param name="dbTransaction"></param>
+    /// <returns></returns>
+    public static SqlSelectCountCommand<TDataModel> Count<TDataModel>(this DbConnection connection, DbTransaction dbTransaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        return new SqlSelectCountCommand<TDataModel>(
+            Activator.CreateInstance<TDataModel>(),
+            connection,
+            dbTransaction);
+    }
+
+    public static SqlSelectSumCommand<TDataModel, TResult> Sum<TDataModel, TResult>(this DbConnection connection, Expression<Func<TDataModel, object>> property, DbTransaction dbTransaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        if (!PropertyPathHelper.IsRootProperty(property))
+        {
+            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+        }
+
+        return new SqlSelectSumCommand<TDataModel, TResult>(
+            Activator.CreateInstance<TDataModel>(),
+            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            connection,
+            dbTransaction);
+    }
+
+    public static SqlSelectAvgCommand<TDataModel, TResult> Avg<TDataModel, TResult>(this DbConnection connection, Expression<Func<TDataModel, object>> property, DbTransaction dbTransaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        if (!PropertyPathHelper.IsRootProperty(property))
+        {
+            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+        }
+
+        return new SqlSelectAvgCommand<TDataModel, TResult>(
+            Activator.CreateInstance<TDataModel>(),
+            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            connection,
+            dbTransaction);
+    }
+
+
+    public static SqlSelectMinCommand<TDataModel, TResult> Min<TDataModel, TResult>(this DbConnection connection, Expression<Func<TDataModel, object>> property, DbTransaction dbTransaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        if (!PropertyPathHelper.IsRootProperty(property))
+        {
+            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+        }
+
+        return new SqlSelectMinCommand<TDataModel, TResult>(
+            Activator.CreateInstance<TDataModel>(),
+            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            connection,
+            dbTransaction);
+    }
+
+
+    public static SqlSelectMaxCommand<TDataModel, TResult> Max<TDataModel, TResult>(this DbConnection connection, Expression<Func<TDataModel, object>> property, DbTransaction dbTransaction = null) where TDataModel : DataModel<TDataModel>
+    {
+        if (!PropertyPathHelper.IsRootProperty(property))
+        {
+            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+        }
+
+        return new SqlSelectMaxCommand<TDataModel, TResult>(
+            Activator.CreateInstance<TDataModel>(),
+            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            connection,
+            dbTransaction);
     }
 }

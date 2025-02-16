@@ -11,7 +11,7 @@ public static class SqlRenderExtensions
     {
         if (filters is null || !filters.Any())
         {
-            return "1=1";
+            return string.Empty;
         }
 
         var whereClause = new StringBuilder();

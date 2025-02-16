@@ -7,6 +7,7 @@ using System.Reflection;
 using DbBroker.Attributes;
 using DbBroker.Common;
 using DbBroker.Common.Model.Interfaces;
+using DbBroker.Extensions;
 using DbBroker.Model.Interfaces;
 
 namespace DbBroker.Model;
@@ -54,7 +55,7 @@ public abstract class DataModel<T> : IDataModel
 
     protected static SupportedDatabaseProviders Provider;
 
-    readonly string[] _internalProperties = ["ALL", "DataModelMap"];
+    readonly string[] _ignoreProperties = ["ALL", "DataModelMap"];
 
     private DataModelMap GetDataModelMap()
     {
@@ -71,7 +72,7 @@ public abstract class DataModel<T> : IDataModel
         var index = 0;
         foreach (var property in Properties)
         {
-            if (_internalProperties.Contains(property.Name))
+            if (_ignoreProperties.Contains(property.Name))
             {
                 continue;
             }

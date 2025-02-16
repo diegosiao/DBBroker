@@ -3,6 +3,7 @@ using DbBroker;
 using System.Diagnostics;
 using DbBroker.Extensions;
 using DbBroker.Showcase.Cli.Seeders;
+using DbBroker.Model;
 
 Console.Write(
 @"
@@ -60,7 +61,7 @@ var orders = connection
             (x => x.CustomerIdRef!.Name), 
             
             // Just 'Country' and 'State' for Address (depth 2)
-            (x => x.CustomerIdRef!.AddressIdRef!.Country), 
+            (x => x.CustomerIdRef!.AddressIdRef!.Country),
             (x => x.CustomerIdRef!.AddressIdRef!.State),
             
             // Explicitly loading collections
@@ -75,7 +76,35 @@ var orders = connection
     //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
     .Execute();
 
-Console.WriteLine($"Orders retrieved: {orders.Count()}");
+try
+{
+    var count = connection
+            .Count<OrdersDataModel>()
+            .AddFilter(x => x.Id, SqlEquals.To(new Guid("5a0642ca-1710-48b6-9381-93f4072fee9d").ToByteArray()))
+            .Execute();
+
+    var sum = connection
+            .Sum<OrdersDataModel, decimal>(x => x.StatusId)
+            .Execute();
+
+    var avg = connection
+            .Avg<OrdersDataModel, decimal>(x => x.StatusId)
+            .Execute();
+
+    var min = connection
+            .Min<OrdersDataModel, decimal>(x => x.StatusId)
+            .Execute();
+
+    var max = connection
+        .Max<OrdersDataModel, decimal>(x => x.StatusId)
+        .Execute();
+
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.ToString());
+}
+
 Console.WriteLine($"Customers: {string.Join(",", orders.Select(x => x.CustomerIdRef!.Name))}");
 Console.WriteLine($"Press any key to finish...");
 Console.Read();

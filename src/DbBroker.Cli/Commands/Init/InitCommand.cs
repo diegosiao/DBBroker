@@ -12,6 +12,7 @@ public class InitCommand
   "contexts": [
     {
       "namespace": "$NAMESPACE$",
+      "outputDirectory": null,
       "provider": "$PROVIDER$",
       "connectionString": "$CONNECTIONSTRING$",
       "tables": [],

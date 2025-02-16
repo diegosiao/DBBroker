@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace DbBroker;
 
-public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
+public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
 {
     private readonly int _maxDepth;
 
@@ -31,8 +31,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
     private readonly List<SqlOrderBy<TDataModel>> _orderBy = [];
 
-    internal
-    SqlSelectCommand(
+    internal SqlSelectCommand(
         TDataModel dataModel,
         DbConnection connection,
         IEnumerable<Expression<Func<TDataModel, object>>> load = null,
@@ -166,7 +165,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             .Replace("$$COLUMNS$$", RenderColumns())
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$JOINS$$", _joins.RenderJoins())
-            .Replace("$$FILTERS$$", Filters.Any() ? Filters.RenderWhereClause() : string.Empty)
+            .Replace("$$FILTERS$$", Filters.RenderWhereClause())
             .Replace("$$ORDERBYCOLUMNS$$", RenderOrderByColumns())
             .Replace("$$OFFSETFETCH$$", _offsetFetchSql);
     }
@@ -258,7 +257,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         return string.Join(",", sqlSelectColumns);
     }
 
-    public override IEnumerable<TDataModel> Execute()
+    public override IEnumerable<TDataModel> Execute(int commandTimeout = 0)
     {
         // TODO Check if there isn't invalid include expressions (duplicated, methods, collections not in root, etc.)
 
@@ -343,7 +342,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
             transaction: Transaction,
             buffered: true,
             splitOn: string.Join(",", _joins.Select(x => x.DataModelMap.KeyProperty.Name)),
-            commandTimeout: null,
+            commandTimeout: commandTimeout,
             commandType: CommandType.Text)
             .Distinct();
     }

@@ -19,6 +19,23 @@ public static class ConsoleExtensions
         Console.ResetColor();
     }
 
+    public static void Warning(this string console, string? contextNamespace = null, int linesAbove = 1)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+
+        for (int i = 0; i < linesAbove; i++)
+        {
+            Console.WriteLine();
+        }
+
+        if (!string.IsNullOrEmpty(contextNamespace))
+        {
+            Console.Write($"{contextNamespace} | ");
+        }
+        Console.WriteLine(console);
+        Console.ResetColor();
+    }
+
     public static void Log(this string console, string? contextNamespace = null)
     {
         if (!string.IsNullOrEmpty(contextNamespace))
