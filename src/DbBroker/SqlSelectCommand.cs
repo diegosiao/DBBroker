@@ -10,10 +10,11 @@ using DbBroker.Model.Interfaces;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Collections;
+using DbBroker.Common.Model;
 
 namespace DbBroker;
 
-public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
+public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
 {
     private readonly int _maxDepth;
 
@@ -25,11 +26,15 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
 
     private List<SqlJoin> _joins = [];
 
+    private List<ViewSplitOnItem> _viewSplits = [];
+
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _load = [];
 
     private readonly IEnumerable<Expression<Func<TDataModel, object>>> _ignore = [];
 
     private readonly List<SqlOrderBy<TDataModel>> _orderBy = [];
+
+    private Dictionary<object, TDataModel> _dataModelResultDictionary;
 
     internal SqlSelectCommand(
         TDataModel dataModel,
@@ -58,7 +63,7 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
     int joinIndex = 0;
     private void LoadJoins(int depth, IDataModel dataModel, bool parentIsCollection, string parentAliasName, string path)
     {
-        if (depth > _maxDepth)
+        if (depth > _maxDepth || DataModel is IViewDataModel)
         {
             return;
         }
@@ -158,6 +163,23 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
             _joins = [.. _joins.OrderBy(x => x.Index)];
         }
 
+        if (DataModel is IViewDataModel)
+        {
+            _viewSplits.AddRange(DataModel
+                .DataModelMap
+                .MappedReferences
+                .Values
+                .Select(x => new ViewSplitOnItem { SplitOnColumn = x.ColumnName, Type = x.PropertyInfo.PropertyType, PropertyInfo = x.PropertyInfo, Index = x.Index }));
+
+            _viewSplits.AddRange(DataModel
+                .DataModelMap
+                .MappedCollections
+                .Values
+                .Select(x => new ViewSplitOnItem { SplitOnColumn = x.ColumnName, Type = x.DataModelCollectionType, PropertyInfo = x.PropertyInfo, IsCollection = true, Index = x.Index }));
+
+            _viewSplits = [.. _viewSplits.OrderBy(x => x.Index)];
+        }
+
         // prepare filters for a select
         Filters.ForEach(x => x.Alias = "d0");
 
@@ -185,22 +207,27 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
             var propertyPathSplitted = propertyPath.Split('.');
             if (propertyPathSplitted.Count() == 1)
             {
-                orderByColumns.Add($"d0.{DataModel.DataModelMap.MappedProperties[propertyPath].ColumnName} {(IsOrderByAscending(propertyPath) ? "ASC" : "DESC")}");   
+                orderByColumns.Add($"d0.{DataModel.DataModelMap.MappedProperties[propertyPath].ColumnName} {(IsOrderByAscending(propertyPath) ? "ASC" : "DESC")}");
                 continue;
             }
 
             var join = _joins.FirstOrDefault(x => x.Path.Equals(string.Join(".", propertyPathSplitted.SkipLast(1))));
 
-            if (join == null)
+            if (join is not null)
             {
+                var mappedProperty = join
+                    .DataModelMap
+                    .MappedProperties[propertyPathSplitted.TakeLast(1).First()];
+
+                orderByColumns.Add($"{join.RefTableNameAlias}.{mappedProperty.ColumnName} {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
                 continue;
             }
 
-            var mappedProperty = join
-                .DataModelMap
-                .MappedProperties[propertyPathSplitted.TakeLast(1).First()];
-
-            orderByColumns.Add($"{join.RefTableNameAlias}.{mappedProperty.ColumnName} {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
+            if (DataModel is IViewDataModel)
+            {
+                // TODO check if all providers do not accept duplicated columns on views like Oracle
+                orderByColumns.Add($"d0.{propertyPathSplitted.Last()} {(column.Asc ? "ASC" : "DESC")}");
+            }
         }
 
         return $"ORDER BY {string.Join(",", orderByColumns)}";
@@ -254,6 +281,15 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
                     .Select(x => $"{join.RefTableNameAlias}.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
         }
 
+        // Views: The split columns are required
+        if (DataModel is IViewDataModel)
+        {
+            foreach (var splitItem in _viewSplits)
+            {
+                sqlSelectColumns.AddRange(splitItem.Type.GetSelectColumnsFromType());
+            }
+        }
+
         return string.Join(",", sqlSelectColumns);
     }
 
@@ -279,71 +315,133 @@ public partial class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnum
         Type[] types = [
             typeof(TDataModel),
             .. _joins.Select(x => x.RefPropertyCollectionType ?? x.RefPropertyInfo.PropertyType).ToArray(),
+            .. _viewSplits.Select(x => x.Type)
         ];
 
-        var dataModelResultDictionary = new Dictionary<object, TDataModel>(comparer: new DataModelKeyComparer());
+        _dataModelResultDictionary = new(comparer: new DataModelKeyComparer());
         return Connection.Query(
             sql: sql,
             types: types,
-            map: (objs) =>
-            {
-                var keyValue = ((TDataModel)objs[0]).DataModelMap.KeyProperty.GetValue(objs[0], null);
-                if (!dataModelResultDictionary.TryGetValue(keyValue, out TDataModel rootDataModel))
-                {
-                    dataModelResultDictionary.Add(keyValue, rootDataModel = (TDataModel)objs[0]);
-                }
-
-                // Load mapped joins
-                for (int i = 0; i < _joins.Count; ++i)
-                {
-                    var join = _joins[i];
-                    join.TransientRef = objs[i + 1];
-
-                    if (join.IsCollection)
-                    {
-                        var collectionValue = join.RefPropertyInfo.GetValue(rootDataModel, null);
-
-                        if (collectionValue == null)
-                        {
-                            var collectionType = typeof(List<>).MakeGenericType(join.RefPropertyCollectionType);
-                            collectionValue = Activator.CreateInstance(collectionType);
-
-                            join.RefPropertyInfo.SetValue(obj: rootDataModel, value: collectionValue);
-                        }
-
-                        if (join.TransientRef is null)
-                        {
-                            continue;
-                        }
-
-                        var joinTransientRefDataModel = (IDataModel)join.TransientRef;
-                        var transientRefKeyValue = joinTransientRefDataModel.DataModelMap.KeyProperty.GetValue(joinTransientRefDataModel, null);
-
-                        if (!join.MapBuffer.ContainsKey(transientRefKeyValue))
-                        {
-                            join.MapBuffer.Add(transientRefKeyValue, join.TransientRef);
-                            ((IList)collectionValue).Add(join.TransientRef);
-                        }
-                        continue;
-                    }
-
-                    if (objs[i + 1] == null)
-                    {
-                        continue;
-                    }
-
-                    var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(join.ParentTableAliasName));
-                    join.RefPropertyInfo.SetValue(obj: _targetJoin?.TransientRef ?? rootDataModel, value: objs[i + 1]);
-                }
-
-                return rootDataModel;
-            },
+            map: MapResult,
             param: parameterDictionary,
             transaction: Transaction,
             buffered: true,
-            splitOn: string.Join(",", _joins.Select(x => x.DataModelMap.KeyProperty.Name)),
+            splitOn: string.Join(",", [.. _joins.Select(x => x.DataModelMap.KeyProperty.Name), .. _viewSplits.Select(x => x.SplitOnColumn)]),
             commandTimeout: commandTimeout,
             commandType: CommandType.Text)
             .Distinct();
+    }
+
+    private TDataModel MapResult(params object[] objs)
+    {
+        return DataModel is IViewDataModel ? MapSelectViewResult(objs) : MapSelectTableResult(objs);
+    }
+
+    private TDataModel MapSelectViewResult(params object[] objs)
+    {
+        var keyValue = ((TDataModel)objs[0]).DataModelMap.KeyProperty.GetValue(objs[0], null);
+        if (!_dataModelResultDictionary.TryGetValue(keyValue, out TDataModel rootDataModel))
+        {
+            _dataModelResultDictionary.Add(keyValue, rootDataModel = (TDataModel)objs[0]);
+        }
+
+        for (int i = 0; i < _viewSplits.Count; ++i)
+        {
+            var splitItem = _viewSplits[i];
+            splitItem.TransientRef = objs[i + 1];
+
+            if (splitItem.IsCollection)
+            {
+                var collectionValue = splitItem.PropertyInfo.GetValue(rootDataModel, null);
+
+                // Initialize the collection property
+                if (collectionValue is null)
+                {
+                    var collectionType = typeof(List<>).MakeGenericType(splitItem.Type);
+                    collectionValue = Activator.CreateInstance(collectionType);
+
+                    splitItem.PropertyInfo.SetValue(obj: rootDataModel, value: collectionValue);
+                }
+
+                if (splitItem.TransientRef is null)
+                {
+                    continue;
+                }
+
+                ((IList)collectionValue).Add(splitItem.TransientRef);
+
+                // var transientRefKeyValue = splitItem.TransientRef.GetKeyValue();
+                // if (!splitItem.MapBuffer.ContainsKey(transientRefKeyValue))
+                // {
+                //     splitItem.MapBuffer.Add(transientRefKeyValue, splitItem.TransientRef);
+                // }
+                continue;
+            }
+
+            if (objs[i + 1] == null)
+            {
+                continue;
+            }
+
+            splitItem.PropertyInfo.SetValue(rootDataModel, objs[i + 1]);
+        }
+
+        return rootDataModel;
+    }
+
+    private TDataModel MapSelectTableResult(params object[] objs)
+    {
+        var keyValue = ((TDataModel)objs[0]).DataModelMap.KeyProperty.GetValue(objs[0], null);
+        if (!_dataModelResultDictionary.TryGetValue(keyValue, out TDataModel rootDataModel))
+        {
+            _dataModelResultDictionary.Add(keyValue, rootDataModel = (TDataModel)objs[0]);
+        }
+
+        // Load mapped joins
+        for (int i = 0; i < _joins.Count; ++i)
+        {
+            var join = _joins[i];
+            join.TransientRef = objs[i + 1];
+
+            if (join.IsCollection)
+            {
+                var collectionValue = join.RefPropertyInfo.GetValue(rootDataModel, null);
+
+                // Initialize the collection property
+                if (collectionValue is null)
+                {
+                    var collectionType = typeof(List<>).MakeGenericType(join.RefPropertyCollectionType);
+                    collectionValue = Activator.CreateInstance(collectionType);
+
+                    join.RefPropertyInfo.SetValue(obj: rootDataModel, value: collectionValue);
+                }
+
+                if (join.TransientRef is null)
+                {
+                    continue;
+                }
+
+                var joinTransientRefDataModel = (IDataModel)join.TransientRef;
+                var transientRefKeyValue = joinTransientRefDataModel.DataModelMap.KeyProperty.GetValue(joinTransientRefDataModel, null);
+
+                if (!join.MapBuffer.ContainsKey(transientRefKeyValue))
+                {
+                    join.MapBuffer.Add(transientRefKeyValue, join.TransientRef);
+                    ((IList)collectionValue).Add(join.TransientRef);
+                }
+
+                continue;
+            }
+
+            if (objs[i + 1] == null)
+            {
+                continue;
+            }
+
+            var _targetJoin = _joins.Find(x => x.RefTableNameAlias.Equals(join.ParentTableAliasName));
+            join.RefPropertyInfo.SetValue(obj: _targetJoin?.TransientRef ?? rootDataModel, value: objs[i + 1]);
+        }
+
+        return rootDataModel;
     }
 }

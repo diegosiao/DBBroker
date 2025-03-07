@@ -8,6 +8,12 @@ public class DataModelCollectionReferenceAttribute : DataModelReferenceBaseAttri
 
     public string RefTablePrimaryKeyColumnName { get; set; }
 
+    public DataModelCollectionReferenceAttribute(string splitOnColumnName, Type dataModelType)
+    {
+        DataModelType = dataModelType;
+        ColumnName = splitOnColumnName;
+    }
+
     public DataModelCollectionReferenceAttribute(
         string schemaName,
         string tableName,

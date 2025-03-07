@@ -15,19 +15,21 @@
 
 ## What It Does?
 
-Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
+Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to generate **Entity Data Models** and a [library](https://nuget.org/dbbroker) that uses those Entity Data Models at runtime to manipulate database records.
 
 ## Philosophy
 
-DBBroker offers features that benefit any kind of application, from the simplest to the most complex, particularly in security-restricted scenarios. Here are some key requirements it addresses:
+DBBroker's philosophy is based on the idea of reflecting database tables and views structure state into C# Entity Data Models classes used to perform database SQL commands like INSERT, UPSERT, UPDATE, DELETE, and SELECT with minimal effort and boilerplate.
 
-- Applications should **NOT** be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language).
+Here are some key requirements this philosophy addresses:
+
+- Applications should **NOT** be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language) commands.
 
 - Applications' Data Access Objects should act as **clients** to the database, not the other way around.
 
 - [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) are not an option due to a development process led by **Database Administrators**.
 
-These are common requirements for many organizations or database-centered solutions, and, arguably, by everyone who likes to keep things simple.
+These are common requirements for many organizations or database-centered applications.
 
 ## Quick Start
 
@@ -67,7 +69,7 @@ var customer = new CustomersDataModel();
 customer.Name = "John Three Sixteen";
 customer.Birthday = new DateTime(1980, 3, 16);
 
-var id = await _dbBroker.InsertAsync(customer);
+var id = await connection.Insert(customer);
 ```
 
 Entity persistence with transactions.

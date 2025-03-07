@@ -10,7 +10,7 @@ public static class Constants
 @"
     private $TYPE _$NAME;
 
-    [$KEYColumn(name: ""$COLUMN_NAME"")]
+    [$KEYColumn(""$COLUMN_NAME"")]
     public $TYPE $NAME
     { 
         get
@@ -23,6 +23,24 @@ public static class Constants
             _$NAME = value;
         }
     }";
+
+    public const string EDM_PROPERTY_INDENTED_TEMPLATE =
+@"
+        private $TYPE _$NAME;
+
+        [$KEYColumn(""$COLUMN_NAME"")]
+        public $TYPE $NAME
+        { 
+            get
+            {
+                return _$NAME;
+            } 
+            set
+            {
+                _IsNotPristine[nameof($NAME)] = true;
+                _$NAME = value;
+            }
+        }";
 
     public const string EDM_REFERENCE_TEMPLATE =
 @"
@@ -46,13 +64,12 @@ using DbBroker.Model;
 
 namespace $NAMESPACE;
 
-[Table(name: ""$TABLE"", Schema = ""$SCHEMA"")]
+[Table(""$TABLE"", Schema = ""$SCHEMA"")]
 public class $CLASSNAME : DataModel<$CLASSNAME>
 {
 $PROPERTIES
 $REFERENCES
 $COLLECTIONS
-
     static $CLASSNAME()
     {
         Provider = SupportedDatabaseProviders.$PROVIDER;
@@ -60,5 +77,67 @@ $COLLECTIONS
         SqlInsertTemplateTypeArguments = [$ISQLINSERTTEMPLATETYPEARGUMENTS];
     }
 }
+";
+    public const string EDM_VIEW_CLASS_TEMPLATE =
+@"using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using DbBroker.Attributes;
+using DbBroker.Common;
+using DbBroker.Model;
+using DbBroker.Model.Interfaces;
+
+namespace $NAMESPACE;
+
+[Table(""$TABLE"", Schema = ""$SCHEMA"")]
+public class $CLASSNAME : ViewDataModel<$CLASSNAME>, IViewDataModel
+{
+$PROPERTIES
+$REFERENCES
+$CLASSES
+$TUPLE
+    static $CLASSNAME()
+    {
+        Provider = SupportedDatabaseProviders.$PROVIDER;
+    }
+}
+";
+
+    public const string EDM_VIEW_STATIC_CLASS_TEMPLATE = @"
+    public class $CLASSNAME
+    {
+$PROPERTIES
+    }";
+
+    public const string EDM_VIEW_TUPLE_CLASS_TEMPLATE =
+    @"    public class $CLASSNAMETuple : DataModel<$CLASSNAMETuple>, IViewDataModelTuple
+    {
+$PROPERTIES
+    }
+";
+
+    public const string EDM_VIEW_PROPERTY_TEMPLATE =
+@"
+    [$KEYColumn(""$COLUMN_NAME"")]
+    public $TYPE $NAME { get; set; }
+";
+
+    public const string EDM_VIEW_PROPERTY_INDENTED_TEMPLATE =
+@"
+        [$KEYColumn(""$COLUMN_NAME"")]
+        public $TYPE $NAME { get; set; }
+";
+
+
+    public const string EDM_REFERENCE_VIEW_TEMPLATE =
+@"
+    [DataModelReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$))]
+    public $$REFTYPENAME$$? $$REFTYPENAME$$Ref { get; set; }
+";
+
+    public const string EDM_COLLECTION_REFERENCE_VIEW_TEMPLATE =
+@"
+    [DataModelCollectionReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$), typeof($$REFTYPENAME$$))]
+    public IEnumerable<$$REFTYPENAME$$>? $$REFTYPENAME$$Refs { get; set; }
 ";
 }

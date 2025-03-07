@@ -36,8 +36,10 @@ WHEN NOT MATCHED THEN
         IEnumerable<DbParameter> parameters,
         DbConnection connection,
         DbTransaction transaction) :
-        base(dataModel, columns, parameters, connection, transaction, Constants.SqlUpdateTemplate)
+        base(dataModel, columns, parameters, connection, transaction, string.Empty)
     {
+        RequireFilter = true;
+
         switch (dataModel.DataModelMap.Provider)
         {
             case SupportedDatabaseProviders.SqlServer:

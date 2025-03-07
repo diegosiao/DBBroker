@@ -26,6 +26,8 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
 
     protected string SqlTemplate { get; set; }
 
+    protected bool RequireFilter { get; set; }
+
     public SqlCommand(TDataModel dataModel,
         IEnumerable<DataModelMapProperty> columns,
         IEnumerable<DbParameter> parameters,
@@ -63,13 +65,18 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     protected virtual string RenderSqlCommand()
     {
         return SqlTemplate
-            .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$COLUMNS$$", string.Join(",", Columns.Select(x => $"{x.ColumnName}={Parameters.First(p => p.ParameterName[1..].Equals(x.ColumnName)).ParameterName}")))
+            .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
             .Replace("$$FILTERS$$", Filters.RenderWhereClause()); // TODO: Expose a configuration flag to avoid not filtered UPDATE or DELETE by default
     }
 
     public virtual TReturn Execute(int commandTimeout = 0)
     {
+        if (RequireFilter && Filters.Count == 0)
+        {
+            throw new InvalidOperationException("This operation is potentially destructive and requires a filter. ");
+        }
+
         if (Connection.State != ConnectionState.Open)
         {
             Connection.Open();

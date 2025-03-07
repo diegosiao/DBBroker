@@ -27,4 +27,9 @@ public class DataModelReferenceAttribute : DataModelReferenceBaseAttribute
         RefSchemaName = refSchemaName;
         RefTableName = refTableName;
     }
+
+    public DataModelReferenceAttribute(string splitOnColumnName)
+    {
+        ColumnName = splitOnColumnName;
+    }
 }

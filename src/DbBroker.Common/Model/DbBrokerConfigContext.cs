@@ -39,5 +39,17 @@ public class DbBrokerConfigContext
     /// </summary>
     public string ModelsSufix { get; set; } = "DataModel";
 
+    /// <summary>
+    /// Should DBBroker ignore database tables not described on '<see cref="Tables" />' collection?. The default value is 'false'.
+    /// </summary>
+    public bool IgnoreTablesNotListed { get; set; }
+
+    /// <summary>
+    /// Should DBBroker ignore database views not described on '<see cref="Views"/>' collection?. The default value is 'false'.
+    /// </summary>
+    public bool IgnoreViewsNotListed { get; set; }
+
     public IEnumerable<DbBrokerConfigContextTable> Tables { get; set; } = [];
+
+    public IEnumerable<DbBrokerConfigContextView> Views { get; set; } = [];
 }

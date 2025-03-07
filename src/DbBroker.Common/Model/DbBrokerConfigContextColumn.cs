@@ -12,6 +12,8 @@ public class DbBrokerConfigContextColumn
 
     public string TableName { get; set; }
 
+    public string ViewName { get; set; }
+
     public string ColumnName { get; set; }
 
     public string DataType { get; set; }
@@ -20,5 +22,5 @@ public class DbBrokerConfigContextColumn
 
     public bool IsNullable { get; set; }
 
-    public string ColumnFullName => $"{SchemaName}.{TableName}.{ColumnName}";
+    public string ColumnFullName => $"{SchemaName}.{TableName}{ViewName}.{ColumnName}";
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using DbBroker.Extensions;
 using DbBroker.Showcase.Cli.Seeders;
 using DbBroker.Model;
+using static EShop.DataModels.Oracle.UvwOrderSummaryDataModel;
 
 Console.Write(
 @"
@@ -15,13 +16,19 @@ Start databases:
 
     > docker-compose up --build
 
-Once the databases are ready, generate the Data Models:
+Once the databases are ready, install DBBroker CLI and generate the Data Models:
 
     > dotnet install -g DbBroker.Cli
     > dbbroker sync
 
 A running container does not mean the database is ready.
 Check the databases containers logs to make sure the databases are ready.
+
+Why should I use DBBroker?
+.NET ADO         -> SQL +++++  Code +++++
+Dapper           -> SQL +++++  Code ++++
+Dapper.Contrib   -> SQL ++     Code +++
+BBroker          -> SQL +      Code +
 
 All good? Showtime now? 
 (y/n): ");
@@ -37,44 +44,51 @@ Which database you would like to use?
 [1] SQL Server
 [2] Oracle
 
-Input the the option number: ");
+: ");
 
 Console.WriteLine(Guid.NewGuid().ToString());
 Console.WriteLine(Guid.NewGuid().ToString());
 
 OracleSeeder.Seed();
 
-// (Too much SQL) Dapper ------->  [ DBBroker ⭐ ]  <------- EF (Too much management)
-
 using var connection = typeof(CustomersDataModel)
     .GetConnection("user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;");
 
 // Retrieving data
-var orders = connection
-    .Select<OrdersDataModel>(
-        load: [
-            // Root properties (depth 0)
-            (x => x.CreatedAt),
-            (x => x.CreatedBy),
+// var orders = connection
+//     .Select<OrdersDataModel>(
+//         load: [
+//             // Root properties (depth 0)
+//             (x => x.CreatedAt),
+//             (x => x.CreatedBy),
 
-            // Just 'Name' for Customer (depth 1)
-            (x => x.CustomerIdRef!.Name), 
+//             // Just 'Name' for Customer (depth 1)
+//             (x => x.CustomerIdRef!.Name), 
             
-            // Just 'Country' and 'State' for Address (depth 2)
-            (x => x.CustomerIdRef!.AddressIdRef!.Country),
-            (x => x.CustomerIdRef!.AddressIdRef!.State),
+//             // Just 'Country' and 'State' for Address (depth 2)
+//             (x => x.CustomerIdRef!.AddressIdRef!.Country),
+//             (x => x.CustomerIdRef!.AddressIdRef!.State),
             
-            // Explicitly loading collections
-            (x => x.OrdersProductsOrderIdRefs),
-            (x => x.OrdersNotesOrderIdRefs)
-        ],
-        depth: 2,
-        skip: 1,
-        take: 2)
-    .OrderBy(x => x.CreatedBy)
-    .OrderBy(x => x.CustomerIdRef!.Name, ascending: false)
-    //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
+//             // Explicitly loading collections
+//             (x => x.OrdersProductsOrderIdRefs),
+//             (x => x.OrdersNotesOrderIdRefs)
+//         ],
+//         depth: 2,
+//         skip: 1,
+//         take: 2)
+//     .OrderBy(x => x.CreatedBy)
+//     .OrderBy(x => x.CustomerIdRef!.Name, ascending: false)
+//     //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
+//     .Execute();
+
+var orderSummary = connection
+    .Select<UvwOrderSummaryDataModel>()
+    .OrderBy(x => x.StatusId)
+    .OrderBy(x => x.UvwOrderSummaryCustomerRef!.Name)
     .Execute();
+
+var o = connection
+    .Insert(new UvwOrderSummaryDataModelTuple());
 
 try
 {
@@ -105,6 +119,6 @@ catch (Exception ex)
     Console.WriteLine(ex.ToString());
 }
 
-Console.WriteLine($"Customers: {string.Join(",", orders.Select(x => x.CustomerIdRef!.Name))}");
+// Console.WriteLine($"Customers: {string.Join(",", orders.Select(x => x.CustomerIdRef!.Name))}");
 Console.WriteLine($"Press any key to finish...");
 Console.Read();

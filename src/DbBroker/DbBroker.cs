@@ -37,9 +37,9 @@ public static class DbBroker
             .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)))
             // Not required
             .Replace("$$KEY_COLUMN$$", dataModel
-            .DataModelMap
-            .MappedProperties
-            .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
+                .DataModelMap
+                .MappedProperties
+                .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
 
         if (connection.State != ConnectionState.Open)
         {
@@ -115,7 +115,7 @@ public static class DbBroker
     /// <param name="ignore">Properties to be ignored when building the SQL SELECT command. Have precedence regarding <paramref name="load"/> parameter.</param>
     /// <param name="orderBy"></param>
     /// <param name="transaction">The database transaction to use to execute this command.</param>
-    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded. Needs to be coherent with <paramref name="load"/>.</param>
+    /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded. Needs to represent the same depth or deeper than properties specified by '<paramref name="load"/>' parameter.</param>
     /// <param name="skip">Number of records to skip at the begining of the result. Be careful when including collections as you might get truncated results.</param>
     /// <param name="take">Number of records to take from the result. Be careful when including collections as you might get truncated results.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(
@@ -171,7 +171,7 @@ public static class DbBroker
     }
 
     /// <summary>
-    /// <para>Scalar aggregation count over the table represented by the <typeparamref name="TDataModel"/>.</para>
+    /// <para>Scalar aggregation count over the table represented by the <typeparamref name="TDataModel"/> specified.</para>
     /// <para>Why there is no more options to this aggregation? Database Aggregations create columns at execution time, DBBroker's philosophy is based on reflecting database structure state.</para>
     /// <para>If you need a grouped list with multiple counts, create a database View then run `dbbroker sync` to consume it through the Data Model generated.</para>
     /// </summary>
@@ -195,9 +195,10 @@ public static class DbBroker
             throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
         }
 
+        var dataModelInstance = Activator.CreateInstance<TDataModel>();
         return new SqlSelectSumCommand<TDataModel, TResult>(
-            Activator.CreateInstance<TDataModel>(),
-            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            dataModelInstance,
+            dataModelInstance.DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
             connection,
             dbTransaction);
     }
@@ -209,9 +210,10 @@ public static class DbBroker
             throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
         }
 
+        var dataModelInstance = Activator.CreateInstance<TDataModel>();
         return new SqlSelectAvgCommand<TDataModel, TResult>(
-            Activator.CreateInstance<TDataModel>(),
-            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            dataModelInstance,
+            dataModelInstance.DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
             connection,
             dbTransaction);
     }
@@ -224,9 +226,10 @@ public static class DbBroker
             throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
         }
 
+        var dataModelInstance = Activator.CreateInstance<TDataModel>();
         return new SqlSelectMinCommand<TDataModel, TResult>(
-            Activator.CreateInstance<TDataModel>(),
-            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            dataModelInstance,
+            dataModelInstance.DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
             connection,
             dbTransaction);
     }
@@ -239,9 +242,10 @@ public static class DbBroker
             throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
         }
 
+        var dataModelInstance = Activator.CreateInstance<TDataModel>();
         return new SqlSelectMaxCommand<TDataModel, TResult>(
-            Activator.CreateInstance<TDataModel>(),
-            Activator.CreateInstance<TDataModel>().DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
+            dataModelInstance,
+            dataModelInstance.DataModelMap.MappedProperties[PropertyPathHelper.GetNestedPropertyPath(property)],
             connection,
             dbTransaction);
     }

@@ -13,7 +13,7 @@
             "args": [
                 "sync"
             ],
-            "cwd": "${workspaceFolder}/src/DbBroker.Cli",
+            "cwd": "${workspaceFolder}/src/DbBroker.Showcase.Cli",
             "stopAtEntry": false,
             "console": "internalConsole"
         },

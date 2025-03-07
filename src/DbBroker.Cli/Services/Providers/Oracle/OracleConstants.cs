@@ -2,7 +2,7 @@ namespace DbBroker.Cli.Services.Providers.Oracle;
 
 public class OracleConstants
 {
-    internal const string SELECT_COLUMNS = @"
+    internal const string SELECT_TABLES_COLUMNS = @"
     SELECT
         t.owner AS SchemaName,
         t.table_name AS TableName,
@@ -17,6 +17,23 @@ public class OracleConstants
     WHERE t.owner = user
     ORDER BY
         t.owner, t.table_name, c.column_id";
+
+    internal const string SELECT_VIEWS_COLUMNS = @"
+    SELECT
+        v.owner AS SchemaName,
+        v.view_name AS ViewName,
+        c.column_name AS ColumnName,
+        c.data_type AS DataType,
+        c.data_length AS MaxLength,
+        CASE c.nullable WHEN 'N' THEN 0 ELSE 1 END AS IsNullable
+    FROM
+        all_views v
+    INNER JOIN
+        all_tab_columns c ON v.view_name = c.table_name AND v.owner = c.owner
+    WHERE
+        v.owner = user
+    ORDER BY
+        v.owner, v.view_name, c.column_id";
 
     internal const string SELECT_KEYS = @"
     SELECT

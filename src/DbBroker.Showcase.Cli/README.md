@@ -2,7 +2,7 @@
 
 The easyest way of getting started with DBBroker is running the showcase using Docker Compose to run the supported databases.
 
-**NOTE:** You will neet a Personal Access Token from <container-registry.oracle.com> and `docker login container-registry.oracle.com` to build the Oracle database image.
+**NOTE:** You will need a Personal Access Token from <container-registry.oracle.com> to run `docker login container-registry.oracle.com` before building the Oracle database image.
 
 ```bash
 docker-compose build

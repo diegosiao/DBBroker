@@ -5,7 +5,7 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
-public class SqlSelectByKeyCommand<TDataModel> : SqlCommand<TDataModel, long> where TDataModel : DataModel<TDataModel>
+public class SqlSelectByKeyCommand<TDataModel> : SqlCommand<TDataModel, TDataModel> where TDataModel : DataModel<TDataModel>
 {
     public SqlSelectByKeyCommand(
         TDataModel dataModel,
@@ -17,7 +17,7 @@ public class SqlSelectByKeyCommand<TDataModel> : SqlCommand<TDataModel, long> wh
     {
     }
 
-    public override long Execute(int commandTimeout = 0)
+    public override TDataModel Execute(int commandTimeout = 0)
     {
         throw new NotImplementedException();
     }

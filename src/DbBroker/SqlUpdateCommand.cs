@@ -11,6 +11,9 @@ public class SqlUpdateCommand<TDataModel> : SqlCommand<TDataModel, int> where TD
         IEnumerable<DataModelMapProperty> columns,
         IEnumerable<DbParameter> parameters,
         DbConnection connection,
-        DbTransaction transaction) : 
-        base(dataModel, columns, parameters, connection, transaction, Constants.SqlUpdateTemplate) { }
+        DbTransaction transaction) :
+        base(dataModel, columns, parameters, connection, transaction, Constants.SqlUpdateTemplate)
+    {
+        RequireFilter = true;
+    }
 }

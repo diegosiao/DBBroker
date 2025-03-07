@@ -38,7 +38,23 @@
           }
         }
       ],
-      "views": []
+      "views": [
+        {
+          "name": "UVW_ORDER_SUMMARY",
+          "splitsOn": [
+            { 
+              "column": "CUSTOMER_ID",
+              "type": "UvwOrderSummaryCustomer",
+              "collection": false
+            },
+            {
+              "column": "PRODUCT_ID",
+              "type": "UvwOrderSummaryProduct",
+              "collection": true
+            }
+          ]
+        }
+      ]
     }
   ]
 }

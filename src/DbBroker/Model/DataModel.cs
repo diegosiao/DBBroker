@@ -7,7 +7,6 @@ using System.Reflection;
 using DbBroker.Attributes;
 using DbBroker.Common;
 using DbBroker.Common.Model.Interfaces;
-using DbBroker.Extensions;
 using DbBroker.Model.Interfaces;
 
 namespace DbBroker.Model;
@@ -59,14 +58,17 @@ public abstract class DataModel<T> : IDataModel
 
     private DataModelMap GetDataModelMap()
     {
-        var sqlInsertTemplate = Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments);
+        // TODO Allow Views to INSERT, UPDATE, DELETE (using database view triggers)
+        // var sqlInsertTemplate = Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments);
 
         DataModelMap dataModelMap = new()
         {
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
             Provider = Provider,
-            SqlInsertTemplate = sqlInsertTemplate as ISqlInsertTemplate,
+            SqlInsertTemplate = this is IViewDataModel ? 
+                null 
+                : Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments) as ISqlInsertTemplate,
         };
 
         var index = 0;
