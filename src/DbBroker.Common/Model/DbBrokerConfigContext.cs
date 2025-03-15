@@ -49,6 +49,11 @@ public class DbBrokerConfigContext
     /// </summary>
     public bool IgnoreViewsNotListed { get; set; }
 
+    /// <summary>
+    /// Remove all preexisting files from the output directory before syncing
+    /// </summary>
+    public bool ClearOutputDirectory { get; set; }
+
     public IEnumerable<DbBrokerConfigContextTable> Tables { get; set; } = [];
 
     public IEnumerable<DbBrokerConfigContextView> Views { get; set; } = [];

@@ -18,11 +18,12 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 {
     private readonly int _maxDepth;
 
-    private readonly int _skip;
+    private uint _skip;
 
-    private readonly int _take;
+    private uint _take;
 
-    private string _offsetFetchSql => _take > 0 ? $"OFFSET {_skip} ROWS FETCH NEXT {_take} ROWS ONLY" : string.Empty;
+    private string _offsetFetchSql => _skip + _take > 0 ? 
+        $"{(_skip > 0 ? $"OFFSET {_skip} ROWS " : string.Empty)} {(_take > 0 ? $"FETCH NEXT {_take} ROWS ONLY" : string.Empty)}" : string.Empty;
 
     private List<SqlJoin> _joins = [];
 
@@ -42,21 +43,29 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         IEnumerable<Expression<Func<TDataModel, object>>> load = null,
         IEnumerable<Expression<Func<TDataModel, object>>> ignore = null,
         DbTransaction transaction = null,
-        int depth = 0,
-        int skip = 0,
-        int take = 0) :
+        int depth = 0) :
         base(dataModel, columns: [], parameters: [], connection, transaction, Constants.SqlSelectTemplate)
     {
         _load = load ?? [];
         _ignore = ignore ?? [];
         _maxDepth = depth;
-        _skip = skip;
-        _take = take;
     }
 
     public SqlSelectCommand<TDataModel> OrderBy(Expression<Func<TDataModel, object>> property, bool ascending = true)
     {
         _orderBy.Add(ascending ? SqlOrderBy<TDataModel>.Ascending(property) : SqlOrderBy<TDataModel>.Descending(property));
+        return this;
+    }
+
+    public SqlSelectCommand<TDataModel> Skip(uint skip)
+    {
+        _skip = skip;
+        return this;
+    }
+
+    public SqlSelectCommand<TDataModel> Take(uint take)
+    {
+        _take = take;
         return this;
     }
 
@@ -312,6 +321,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
         Debug.WriteLine(sql);
 
+        // TODO implement a solution to allow external types to be loaded by custom types + map + splitsOn
         Type[] types = [
             typeof(TDataModel),
             .. _joins.Select(x => x.RefPropertyCollectionType ?? x.RefPropertyInfo.PropertyType).ToArray(),

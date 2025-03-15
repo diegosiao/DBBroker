@@ -3,3 +3,5 @@ obj
 
 Edm
 DataModels
+
+*.ps1

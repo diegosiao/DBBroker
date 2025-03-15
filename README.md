@@ -15,7 +15,10 @@
 
 ## What It Does?
 
-Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to generate **Entity Data Models** and a [library](https://nuget.org/dbbroker) that uses those Entity Data Models at runtime to manipulate database records.
+Think of DBBroker as set of two tools to manipulate database records in your .NET applications where:
+
+  1. The [DBBroker CLI tool](https://nuget.org/dbbroker.cli) generates [**Entity Data Models**](https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/entity-data-model) representing database **Tables** and **Views**;
+  2. Then [DBBroker NuGet Library](https://nuget.org/dbbroker) gives you the ability to use those **Entity Data Models** at runtime to manipulate database records.
 
 ## Philosophy
 

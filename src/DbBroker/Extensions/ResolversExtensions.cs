@@ -51,7 +51,7 @@ public static class ResolversExtensions
     {
         if (string.IsNullOrEmpty(connectionString))
         {
-            // get from dbbroker.config.json or application settings
+            // TODO get from dbbroker.config.json or application settings
         }
 
         return dataModelBase.DataModelMap.Provider switch
@@ -64,12 +64,33 @@ public static class ResolversExtensions
 
     public static DbParameter GetDbParameter(this SupportedDatabaseProviders provider, string name, object value)
     {
-        return provider switch
+        switch (provider)
         {
-            SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter,
-            SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter,
-            _ => throw new ArgumentException($"Not supported database provider: {provider}"),
-        };
+            case SupportedDatabaseProviders.SqlServer:
+                return Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter;
+            case SupportedDatabaseProviders.Oracle:
+                return Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess")) as DbParameter;
+            default:
+                throw new ArgumentException($"Not supported database provider: {provider}");
+        }
+    }
+
+    public static DbParameter GetDbParameter(this SupportedDatabaseProviders provider, object dataModel, DataModelMapProperty dataModelMapProperty)
+    {
+        switch (provider)
+        {
+            case SupportedDatabaseProviders.SqlServer:
+                return Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
+            case SupportedDatabaseProviders.Oracle:
+                var parameter = Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess")) as DbParameter;
+                parameter.ParameterName = $":{dataModelMapProperty.ColumnName}";
+                parameter.Value = dataModelMapProperty.PropertyInfo.GetValue(dataModel);
+                //parameter.DbType = GetOracleDbType(dataModelMapProperty.PropertyInfo);
+                parameter.GetType().GetProperty("OracleDbType").SetValue(parameter, dataModelMapProperty.ProviderDbType);
+                return parameter;
+            default:
+                throw new ArgumentException($"Not supported database provider: {provider}");
+        }
     }
 
     public static DbType GetDbType(this SupportedDatabaseProviders provider, PropertyInfo propertyInfo)
@@ -90,13 +111,33 @@ public static class ResolversExtensions
             return DbType.Decimal;
         }
 
-        if (new Type[]{ typeof(int), typeof(byte) }.Contains(propertyInfo.PropertyType))
+        if (integerOracleTypes.Contains(propertyInfo.PropertyType))
         {
             return DbType.Int32;
         }
 
+        if (dateTimeOracleTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.DateTime;
+        }
+
+
+
         throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
     }
+
+    public static string GetClientNamespace(this SupportedDatabaseProviders provider)
+    {
+        return provider switch
+        {
+            SupportedDatabaseProviders.Oracle => "using Oracle.ManagedDataAccess.Client;",
+            _ => throw new NotImplementedException($"Client namespace not implemented for {provider}"),
+        };
+    }
+
+    private static readonly Type[] dateTimeOracleTypes = [typeof(DateTime), typeof(DateTime?)];
+
+    private static readonly Type[] integerOracleTypes = [typeof(int), typeof(byte)];
 
     private static DbType GetOracleDbType(PropertyInfo propertyInfo)
     {
@@ -108,6 +149,16 @@ public static class ResolversExtensions
         if (propertyInfo.PropertyType == typeof(decimal))
         {
             return DbType.Decimal;
+        }
+
+        if (integerOracleTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        if (dateTimeOracleTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.DateTime;
         }
 
         throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");

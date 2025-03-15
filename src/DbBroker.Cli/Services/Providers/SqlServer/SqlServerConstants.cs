@@ -2,6 +2,9 @@ namespace DbBroker.Cli.Services.Providers.SqlServer;
 
 public class SqlServerConstants
 {
+    /// <summary>
+    /// Replace $$TABLESFILTER$$
+    /// </summary>
     internal const string SELECT_TABLES_COLUMNS = @"
     SELECT
         s.name AS SchemaName,
@@ -18,6 +21,8 @@ public class SqlServerConstants
         sys.columns AS c ON t.object_id = c.object_id
     INNER JOIN
         sys.types AS ty ON c.user_type_id = ty.user_type_id
+    WHERE 1=1
+    $$TABLESFILTER$$
     ORDER BY
         s.name, t.name, c.column_id;";
 

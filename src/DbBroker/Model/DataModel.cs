@@ -37,16 +37,17 @@ public abstract class DataModel<T> : IDataModel
 
     DataModelMap IDataModel.DataModelMap => DataModelMap;
 
-    // TODO Still makes sense? loading all properties is the default behavior
-    // /// <summary>
-    // /// Meta column to represent '*' in SQL SELECT commands
-    // /// </summary>
-    // [DataModelMetaColumn]
-    // public dynamic All { get; }
-
-    protected Dictionary<string, bool> _IsNotPristine { get; set; } = [];
+    protected Dictionary<string, bool> _IsNotPristine { get; private set; } = [];
 
     public bool IsNotPristine(string propertyName) => _IsNotPristine.ContainsKey(propertyName);
+
+    public void SetPristine(string propertyName)
+    {
+        if (_IsNotPristine.ContainsKey(propertyName))
+        {
+            _IsNotPristine.Remove(propertyName);
+        }
+    }
 
     protected static string SqlInsertTemplateTypeFullName;
 
@@ -66,8 +67,8 @@ public abstract class DataModel<T> : IDataModel
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
             Provider = Provider,
-            SqlInsertTemplate = this is IViewDataModel ? 
-                null 
+            SqlInsertTemplate = this is IViewDataModel ?
+                null
                 : Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments) as ISqlInsertTemplate,
         };
 
@@ -128,7 +129,8 @@ public abstract class DataModel<T> : IDataModel
                 ColumnName = property.GetCustomAttribute<ColumnAttribute>().Name,
                 IsKey = property.GetCustomAttribute<KeyAttribute>() != null,
                 Index = index++,
-                PropertyInfo = property
+                PropertyInfo = property,
+                ProviderDbType = property.GetCustomAttribute<ColumnType>().ProviderDbType
             };
 
             dataModelMap.MappedProperties.Add(property.Name, dataModelProperty);

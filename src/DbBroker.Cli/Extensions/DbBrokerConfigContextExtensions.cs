@@ -28,7 +28,8 @@ public static class DbBrokerConfigContextExtensions
         };
     }
 
-    public static IMetadataProvider GetMetadataProvider(this DbBrokerConfigContext context)
+    // TODO Do an extensive revision on access modifiers: CLI and lib
+    internal static IMetadataProvider GetMetadataProvider(this DbBrokerConfigContext context)
     {
         return context.Provider switch
         {

@@ -4,7 +4,7 @@ using DbBroker.Common.Model;
 
 namespace DbBroker.Cli.Services.Interfaces;
 
-public interface IMetadataProvider
+internal interface IMetadataProvider
 {
     /// <summary>
     /// Gets the tables descriptors for the context specified

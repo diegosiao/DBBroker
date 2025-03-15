@@ -8,27 +8,9 @@ public static class Constants
 
     public const string EDM_PROPERTY_TEMPLATE =
 @"
-    private $TYPE _$NAME;
-
-    [$KEYColumn(""$COLUMN_NAME"")]
-    public $TYPE $NAME
-    { 
-        get
-        {
-            return _$NAME;
-        } 
-        set
-        {
-            _IsNotPristine[nameof($NAME)] = true;
-            _$NAME = value;
-        }
-    }";
-
-    public const string EDM_PROPERTY_INDENTED_TEMPLATE =
-@"
         private $TYPE _$NAME;
 
-        [$KEYColumn(""$COLUMN_NAME"")]
+        [$KEYColumn(""$COLUMN_NAME""), ColumnType($$PROVIDER_DBTYPE$$)]
         public $TYPE $NAME
         { 
             get
@@ -41,6 +23,24 @@ public static class Constants
                 _$NAME = value;
             }
         }";
+
+    public const string EDM_PROPERTY_INDENTED_TEMPLATE =
+@"
+            private $TYPE _$NAME;
+
+            [$KEYColumn(""$COLUMN_NAME""), ColumnType($$PROVIDER_DBTYPE$$)]
+            public $TYPE $NAME
+            { 
+                get
+                {
+                    return _$NAME;
+                } 
+                set
+                {
+                    _IsNotPristine[nameof($NAME)] = true;
+                    _$NAME = value;
+                }
+            }";
 
     public const string EDM_REFERENCE_TEMPLATE =
 @"
@@ -58,23 +58,25 @@ public static class Constants
 @"using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+$$PROVIDER_CLIENT_NAMESPACE$$
 using DbBroker.Attributes;
 using DbBroker.Common;
 using DbBroker.Model;
 
-namespace $NAMESPACE;
-
-[Table(""$TABLE"", Schema = ""$SCHEMA"")]
-public class $CLASSNAME : DataModel<$CLASSNAME>
+namespace $NAMESPACE
 {
-$PROPERTIES
-$REFERENCES
-$COLLECTIONS
-    static $CLASSNAME()
+    [Table(""$TABLE"", Schema = ""$SCHEMA"")]
+    public class $CLASSNAME : DataModel<$CLASSNAME>
     {
-        Provider = SupportedDatabaseProviders.$PROVIDER;
-        SqlInsertTemplateTypeFullName = ""$ISQLINSERTTEMPLATETYPEFULLNAME"";
-        SqlInsertTemplateTypeArguments = [$ISQLINSERTTEMPLATETYPEARGUMENTS];
+    $PROPERTIES
+    $REFERENCES
+    $COLLECTIONS
+        static $CLASSNAME()
+        {
+            Provider = SupportedDatabaseProviders.$PROVIDER;
+            SqlInsertTemplateTypeFullName = ""$ISQLINSERTTEMPLATETYPEFULLNAME"";
+            SqlInsertTemplateTypeArguments = new object[] {$ISQLINSERTTEMPLATETYPEARGUMENTS};
+        }
     }
 }
 ";
@@ -82,28 +84,30 @@ $COLLECTIONS
 @"using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+$$PROVIDER_CLIENT_NAMESPACE$$
 using DbBroker.Attributes;
 using DbBroker.Common;
 using DbBroker.Model;
 using DbBroker.Model.Interfaces;
 
-namespace $NAMESPACE;
-
-[Table(""$TABLE"", Schema = ""$SCHEMA"")]
-public class $CLASSNAME : ViewDataModel<$CLASSNAME>, IViewDataModel
+namespace $NAMESPACE
 {
-$PROPERTIES
-$REFERENCES
-$CLASSES
-$TUPLE
-    static $CLASSNAME()
+    [Table(""$TABLE"", Schema = ""$SCHEMA"")]
+    public class $CLASSNAME : ViewDataModel<$CLASSNAME>, IViewDataModel
     {
-        Provider = SupportedDatabaseProviders.$PROVIDER;
+    $PROPERTIES
+    $REFERENCES
+    $CLASSES
+    $TUPLE
+        static $CLASSNAME()
+        {
+            Provider = SupportedDatabaseProviders.$PROVIDER;
+        }
     }
 }
 ";
 
-    public const string EDM_VIEW_STATIC_CLASS_TEMPLATE = @"
+    public const string EDM_VIEW_INTERNAL_CLASS_TEMPLATE = @"
     public class $CLASSNAME
     {
 $PROPERTIES
@@ -118,26 +122,26 @@ $PROPERTIES
 
     public const string EDM_VIEW_PROPERTY_TEMPLATE =
 @"
-    [$KEYColumn(""$COLUMN_NAME"")]
-    public $TYPE $NAME { get; set; }
+        [$KEYColumn(""$COLUMN_NAME""), ColumnType($$PROVIDER_DBTYPE$$)]
+        public $TYPE $NAME { get; set; }
 ";
 
     public const string EDM_VIEW_PROPERTY_INDENTED_TEMPLATE =
 @"
-        [$KEYColumn(""$COLUMN_NAME"")]
+        [$KEYColumn(""$COLUMN_NAME"", ColumnType($$PROVIDER_DBTYPE$$))]
         public $TYPE $NAME { get; set; }
 ";
 
 
     public const string EDM_REFERENCE_VIEW_TEMPLATE =
 @"
-    [DataModelReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$))]
-    public $$REFTYPENAME$$? $$REFTYPENAME$$Ref { get; set; }
+        [DataModelReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$))]
+        public $$REFTYPENAME$$? $$REFTYPENAME$$Ref { get; set; }
 ";
 
     public const string EDM_COLLECTION_REFERENCE_VIEW_TEMPLATE =
 @"
-    [DataModelCollectionReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$), typeof($$REFTYPENAME$$))]
-    public IEnumerable<$$REFTYPENAME$$>? $$REFTYPENAME$$Refs { get; set; }
+        [DataModelCollectionReference(nameof($$REFTYPENAME$$.$$REFPROPERTYNAME$$), typeof($$REFTYPENAME$$))]
+        public IEnumerable<$$REFTYPENAME$$>? $$REFTYPENAME$$Refs { get; set; }
 ";
 }

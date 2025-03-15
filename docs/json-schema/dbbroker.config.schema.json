@@ -45,12 +45,16 @@
             "type": "string"
           },
           "ignoreTablesNotListed": {
-            "description": "Should DBBroker ignore database tables not described on 'tables' array?. The default value is 'false'.",
-            "type": "bool"
+            "description": "Should DBBroker ignore database tables not described on 'tables' array? If true, you need to include all table references in all levels in 'tables' array. The default value is 'false'.",
+            "type": "boolean"
           },
           "ignoreViewsNotListed": {
-            "description": "Should DBBroker ignore database views not described on 'views' array?. The default value is 'false'.",
-            "type": "bool"
+            "description": "Should DBBroker ignore database views not described on 'views' array? The default value is 'false'.",
+            "type": "boolean"
+          },
+          "clearOutputDirectory": {
+            "description": "Specifies if DBBroker CLI should Remove all preexisting files from the output directory before syncing. Default value is 'false'.",
+            "type": "boolean"
           },
           "tables": {
             "description": "Array of database tables DBBroker will use to generate the Data Models. If empty, all tables will be included by default. See 'ignoreTablesNotListed'.",
@@ -83,6 +87,10 @@
                 "sqlInsertTemplateArguments": {
                   "description": "Arguments the ISqlInsertTemplate specified might be expecting",
                   "type": "object"
+                },
+                "addReferences": {
+                  "description": "Specifies if the table references should be included. Composite Primary Keys are not supported. Default value is true.",
+                  "type": "boolean"
                 }
               }
             }
@@ -121,7 +129,7 @@
                       },
                       "collection": {
                         "description": "Should the entity on this split be treated as a collection?",
-                        "type": "bool"
+                        "type": "boolean"
                       }
                     }
                   }

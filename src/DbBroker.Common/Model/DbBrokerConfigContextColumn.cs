@@ -20,7 +20,14 @@ public class DbBrokerConfigContextColumn
 
     public string MaxLength { get; set; }
 
+    public string DataTypePrecision { get; set; }
+
+    public string DataTypeScale { get; set; }
+
     public bool IsNullable { get; set; }
+
+    // TODO the logic to deal with read only column is missing
+    public bool ReadOnly { get; set; }
 
     public string ColumnFullName => $"{SchemaName}.{TableName}{ViewName}.{ColumnName}";
 }

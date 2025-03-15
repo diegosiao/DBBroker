@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using DbBroker.Cli.Commands.Sync;
 using DbBroker.Cli.Extensions;
@@ -35,12 +36,26 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
             var providerDefaultConfig = context.GetDefaultProviderConfig();
 
-            var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join('/', context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
+            var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join(Path.DirectorySeparatorChar, context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
             outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
 
-            Directory.CreateDirectory(context.OutputDirectory ?? outputDirectory);
+            var resolvedOutputDirectory = context.OutputDirectory ?? outputDirectory;
 
-            $"Output directory: {context.OutputDirectory ?? outputDirectory}".Log(context.Namespace);
+            if (context.ClearOutputDirectory)
+            {
+                try
+                {
+                    Directory.Delete(resolvedOutputDirectory, true);
+                }
+                catch (Exception ex)
+                {
+                    ex.Message.Warning(context.Namespace);
+                }
+            }
+
+            Directory.CreateDirectory(resolvedOutputDirectory);
+
+            $"Output directory: {resolvedOutputDirectory}".Log(context.Namespace);
 
             await Task.WhenAll(
                 GenerateClassesForTables(tablesDescriptors, context, sqlTransformer, providerDefaultConfig, outputDirectory),
@@ -48,7 +63,13 @@ public class CSharpClassGenerator : ICSharpClassGenerator
         }
         catch (Exception ex)
         {
-            $"{context.Namespace} | {ex.Message}".Error();
+            ex.Message.Error(context.Namespace);
+
+            if (Debugger.IsAttached)
+            {
+                ex.StackTrace?.Error(context.Namespace);
+            }
+
             SyncCommand.Results.Add(context.Namespace, 1);
             return 1;
         }
@@ -63,16 +84,16 @@ public class CSharpClassGenerator : ICSharpClassGenerator
         IProviderDefaultConfiguration providerDefaultConfig,
         string outputDirectory)
     {
-        var allKeys = tablesDescriptors
-            .Select(tableDescriptor => tableDescriptor.Value.Keys)
-            .SelectMany(x => x);
-
         $"{tablesDescriptors.Count} tables found.".Log(context.Namespace);
 
         if (tablesDescriptors.Count == 0)
         {
             "Make sure the user provided has SELECT permission on metadata tables.".Warning(context.Namespace, 0);
         }
+
+        var allKeys = tablesDescriptors
+            .Select(tableDescriptor => tableDescriptor.Value.Keys)
+            .SelectMany(x => x);
 
         StringBuilder propsString = new();
         StringBuilder refsString = new();
@@ -89,7 +110,12 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             {
                 foreach (var reference in referencesTo)
                 {
-                    var primaryKeyColumnName = tablesDescriptors[reference.TableFullName]
+                    if (!tablesDescriptors.TryGetValue(reference.TableFullName, out TableDescriptorModel? tableDescriptorModel))
+                    {
+                        throw new InvalidOperationException($"The '{reference.TableName}' table is not listed in this context. If you are filtering the tables make sure to list all referenced tables in all levels.");
+                    }
+
+                    var primaryKeyColumnName = tableDescriptorModel
                         .Keys?
                         .FirstOrDefault(x => x.ConstraintType.Equals("PrimaryKey"))?
                         .ColumnName;
@@ -114,6 +140,11 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
             foreach (var item in tableDescriptor.Value.Columns)
             {
+                if (item is null)
+                {
+                    continue;
+                }
+
                 var isPrimaryKey = tableDescriptor
                     .Value
                     .Keys
@@ -121,9 +152,10 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
                 propsString.AppendLine(
                     Constants.EDM_PROPERTY_TEMPLATE
-                        .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.IsNullable ?? false))
+                        .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item.MaxLength ?? "250", item.DataTypePrecision, item.DataTypeScale, item.IsNullable))
                         .Replace("$KEY", isPrimaryKey ? "Key, " : string.Empty)
                         .Replace("$COLUMN_NAME", item?.ColumnName)
+                        .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(item!))
                         .Replace("$NAME", item?.ColumnName.ToCamelCase()));
 
                 var foreignKey = tableDescriptor
@@ -133,6 +165,11 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
                 if (foreignKey is not null)
                 {
+                    if (!tablesDescriptors.TryGetValue($"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}", out TableDescriptorModel? foreignKeyTableDescriptorModel))
+                    {
+                        throw new InvalidOperationException($"The '{foreignKey.ReferencedTable}' table is not listed in this context. If you are filtering the tables make sure to list all referenced tables in all levels.");
+                    }
+
                     refsString.AppendLine(
                         Constants.EDM_REFERENCE_TEMPLATE
                             .Replace("$$PROPERTYNAME$$", item?.ColumnName.ToCamelCase())
@@ -144,7 +181,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                             .Replace("$$REFSCHEMANAME$$", foreignKey.SchemaName)
                             .Replace("$$REFTABLENAME$$", foreignKey.ReferencedTable)
                             .Replace("$$PKCOLUMNNAME$$", foreignKey.ReferencedColumn)
-                            .Replace("$$REFTYPENAME$$", $"{context.ModelsPrefix}{tablesDescriptors[$"{foreignKey.SchemaName}.{foreignKey.ReferencedTable}"].TableName.ToCamelCase()}{context.ModelsSufix}")
+                            .Replace("$$REFTYPENAME$$", $"{context.ModelsPrefix}{foreignKeyTableDescriptorModel.TableName.ToCamelCase()}{context.ModelsSufix}")
                     );
                 }
             }
@@ -154,6 +191,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             await File.WriteAllTextAsync(
                 Path.Combine(outputDirectory, $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}.cs"),
                 Constants.EDM_CLASS_TEMPLATE
+                    .Replace("$$PROVIDER_CLIENT_NAMESPACE$$", context.Provider.GetProviderClientUsingString())
                     .Replace("$NAMESPACE", context.Namespace ?? "-")
                     .Replace("$CLASSNAME", $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}")
                     .Replace("$TABLE", tableDescriptor.Value.TableName)
@@ -206,6 +244,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             collectionsString.Clear();
             classesString.Clear();
             tupleString.Clear();
+            tuplePropertiesString.Clear();
 
             var viewConfig = context
                 .Views
@@ -223,7 +262,8 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         Constants.EDM_PROPERTY_TEMPLATE
                             .Replace("$KEY", index == 0 ? "Key, " : string.Empty)
                             .Replace("$COLUMN_NAME", item.ColumnName)
-                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.IsNullable ?? false))
+                            .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(item!))
+                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.DataTypePrecision, item?.DataTypeScale, item?.IsNullable ?? false))
                             .Replace("$NAME", item?.ColumnName.ToCamelCase()));
                     index++;
                 }
@@ -268,15 +308,17 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         Constants.EDM_VIEW_PROPERTY_TEMPLATE
                             .Replace("$KEY", item.Index == 0 ? "Key, " : string.Empty)
                             .Replace("$COLUMN_NAME", item.ColumnName)
-                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.IsNullable ?? false))
+                            .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(item!))
+                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.DataTypePrecision, item?.DataTypeScale, item?.IsNullable ?? false))
                             .Replace("$NAME", item?.ColumnName.ToCamelCase()));
 
                     tuplePropertiesString.AppendLine(
                         Constants.EDM_PROPERTY_INDENTED_TEMPLATE
-                            .Replace("$KEY", item.Index == 0 ? "Key, " : string.Empty)
+                            .Replace("$KEY", item!.Index == 0 ? "Key, " : string.Empty)
                             .Replace("$COLUMN_NAME", item.ColumnName)
-                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item?.IsNullable ?? false))
-                            .Replace("$NAME", item?.ColumnName.ToCamelCase()));
+                            .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(item!))
+                            .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item?.MaxLength ?? "250", item!.DataTypePrecision, item!.DataTypeScale, item!.IsNullable))
+                            .Replace("$NAME", item!.ColumnName.ToCamelCase()));
                 }
 
                 // references and collections
@@ -286,18 +328,19 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         (entity.SplitOnItem.Collection ? Constants.EDM_COLLECTION_REFERENCE_VIEW_TEMPLATE : Constants.EDM_REFERENCE_VIEW_TEMPLATE)
                             .Replace("$$REFTYPENAME$$", entity.SplitOnItem.Type)
                             .Replace("$$REFPROPERTYNAME$$", entity.SplitOnItem.Column.ToCamelCase()));
-                    
+
                     // classes properties/class
                     var classProperties = string.Join(
-                        Environment.NewLine, 
+                        Environment.NewLine,
                         entity.Columns.Select(c => Constants.EDM_VIEW_PROPERTY_INDENTED_TEMPLATE
                             .Replace("$KEY", c.Index == 0 ? "Key, " : string.Empty)
                             .Replace("$COLUMN_NAME", c.ColumnName)
-                            .Replace("$TYPE", sqlTransformer.GetCSharpType(c.DataType, c?.MaxLength ?? "250", c?.IsNullable ?? false))
-                            .Replace("$NAME", c.ColumnName.ToCamelCase())));
+                            .Replace("$TYPE", sqlTransformer.GetCSharpType(c.DataType, c?.MaxLength ?? "250", c?.DataTypePrecision, c?.DataTypeScale, c?.IsNullable ?? false))
+                            .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(c!))
+                            .Replace("$NAME", c!.ColumnName.ToCamelCase())));
 
                     classesString.AppendLine(
-                        Constants.EDM_VIEW_STATIC_CLASS_TEMPLATE
+                        Constants.EDM_VIEW_INTERNAL_CLASS_TEMPLATE
                             .Replace("$CLASSNAME", entity.SplitOnItem.Type)
                             .Replace("$PROPERTIES", classProperties));
 
@@ -306,8 +349,9 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         entity.Columns.Select(c => Constants.EDM_PROPERTY_INDENTED_TEMPLATE
                             .Replace("$KEY", c.Index == 0 ? "Key, " : string.Empty)
                             .Replace("$COLUMN_NAME", c.ColumnName)
-                            .Replace("$TYPE", sqlTransformer.GetCSharpType(c.DataType, c?.MaxLength ?? "250", c?.IsNullable ?? false))
-                            .Replace("$NAME", c.ColumnName.ToCamelCase()))));
+                            .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(c!))
+                            .Replace("$TYPE", sqlTransformer.GetCSharpType(c.DataType, c?.MaxLength ?? "250", c?.DataTypePrecision, c?.DataTypeScale, c?.IsNullable ?? false))
+                            .Replace("$NAME", c!.ColumnName.ToCamelCase()))));
                 }
 
                 // tuple properties/class
@@ -320,6 +364,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             await File.WriteAllTextAsync(
                 Path.Combine(outputDirectory, "Views", $"{context.ModelsPrefix}{viewDescriptor.Value.ViewName.ToCamelCase()}{context.ModelsSufix}.cs"),
                 Constants.EDM_VIEW_CLASS_TEMPLATE
+                    .Replace("$$PROVIDER_CLIENT_NAMESPACE$$", context.Provider.GetProviderClientUsingString())
                     .Replace("$NAMESPACE", context.Namespace ?? "-")
                     .Replace("$CLASSNAME", $"{context.ModelsPrefix}{viewDescriptor.Value.ViewName.ToCamelCase()}{context.ModelsSufix}")
                     .Replace("$TABLE", viewDescriptor.Value.ViewName)

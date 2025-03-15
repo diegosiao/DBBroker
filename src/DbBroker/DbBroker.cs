@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using DbBroker.Extensions;
 using DbBroker.Model;
 
@@ -18,62 +20,82 @@ public static class DbBroker
     /// <param name="connection">The database connection to execute the SQL INSERT command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL INSERT command.</param>
+    /// <param name="commandTimeout">The time in seconds to wait before terminating the command</param>
     /// <returns>Returns true if the insertion was executed without errors, false otherwise. </returns>
-    public static bool Insert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
+    // TODO doesn't make sense return boolean, throw exception if something goes wrong
+    public static void Insert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null, int commandTimeout = 30) where TDataModel : DataModel<TDataModel>
     {
-        var insertColumns = dataModel
-            .DataModelMap
-            .MappedProperties
-            .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
-            .Select(x => x.Value);
-
-        var parameters = insertColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
-            .ToList();
-
-        var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
-            .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
-            .Replace("$$COLUMNS$$", string.Join(",", insertColumns.Select(x => x.ColumnName)))
-            .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)))
-            // Not required
-            .Replace("$$KEY_COLUMN$$", dataModel
+        try
+        {
+            var insertColumns = dataModel
                 .DataModelMap
                 .MappedProperties
-                .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
+                .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
+                .Select(x => x.Value);
 
-        if (connection.State != ConnectionState.Open)
-        {
-            connection.Open();
-        }
+            var parameters = insertColumns
+                .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(dataModel, x))
+                .ToList();
 
-        DbParameter keyParameter = null;
-        if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
-        {
-            keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
+            var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
+                .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
+                .Replace("$$COLUMNS$$", string.Join(",", insertColumns.Select(x => x.ColumnName)))
+                .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)))
+                // Not required
+                .Replace(
+                    "$$KEY_COLUMN$$",
+                    dataModel
+                        .DataModelMap
+                        .MappedProperties
+                        .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
 
-            // TODO Improve the key data type handling: determine based on the mapped property type
-            keyParameter.DbType = dataModel.DataModelMap.Provider.GetDbType(dataModel.DataModelMap.KeyProperty);
-            keyParameter.Direction = ParameterDirection.Output;
-            parameters.Add(keyParameter);
-        }
+            if (connection.State != ConnectionState.Open)
+            {
+                connection.Open();
+            }
 
-        var command = connection.CreateCommand();
-        command.CommandText = dataModel.DataModelMap.SqlInsertTemplate.ReplaceParameters(sqlInsert);
-        command.Parameters.AddRange(parameters.ToArray());
-        command.Transaction = transaction;
+            DbParameter keyParameter = null;
+            if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
+            {
+                keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
 
-        if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
-        {
+                // TODO Improve the key data type handling: determine based on the mapped property type
+                keyParameter.DbType = dataModel.DataModelMap.Provider.GetDbType(dataModel.DataModelMap.KeyProperty);
+                keyParameter.Direction = ParameterDirection.Output;
+                parameters.Add(keyParameter);
+            }
+
+            var command = connection.CreateCommand();
+            command.CommandText = dataModel.DataModelMap.SqlInsertTemplate.ReplaceParameters(sqlInsert);
+            command.Parameters.AddRange(parameters.ToArray());
+            command.Transaction = transaction;
+            command.CommandTimeout = commandTimeout;
+
+            Debug.WriteLine(command.CommandText);
+
+            if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
+            {
+                command.ExecuteNonQuery();
+                dataModel
+                    .DataModelMap
+                    .MappedProperties
+                    .FirstOrDefault(x => x.Value.IsKey).Value.PropertyInfo.SetValue(dataModel, keyParameter.Value);
+                return;
+            }
+
             command.ExecuteNonQuery();
-            dataModel
-                .DataModelMap
-                .MappedProperties
-                .FirstOrDefault(x => x.Value.IsKey).Value.PropertyInfo.SetValue(dataModel, keyParameter.Value);
-            return true;
         }
-
-        command.ExecuteNonQuery();
-        return true;
+        catch (TargetInvocationException ex)
+        {
+            // TODO Adopt this error handling on all other methods
+            Debug.WriteLine(ex.Message);
+            throw new ApplicationException(ex.InnerException?.Message ?? ex.Message, ex?.InnerException ?? ex);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            throw new ApplicationException(ex.Message, ex);
+        }
     }
 
     /// <summary>
@@ -83,23 +105,33 @@ public static class DbBroker
     /// <param name="connection">The database connection to execute the SQL MERGE command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL MERGE command.</param>
-    /// <returns>Returns true if the command was executed without errors, false otherwise. </returns>
-    public static bool Upsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
+    public static void Upsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null, int commandTimeout = 30) where TDataModel : DataModel<TDataModel>
     {
-        var upsertColumns = dataModel
-            .DataModelMap
-            .MappedProperties
-            .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
-            .Select(x => x.Value);
+        try
+        {
+            var upsertColumns = dataModel
+                .DataModelMap
+                .MappedProperties
+                .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
+                .Select(x => x.Value);
 
-        var parameters = upsertColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
-            .ToList();
+            var parameters = upsertColumns
+                .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
+                .ToList();
 
-        var sqlUpsertCommand = new SqlUpsertCommand<TDataModel>(dataModel, upsertColumns, parameters, connection, transaction);
+            var sqlUpsertCommand = new SqlUpsertCommand<TDataModel>(dataModel, upsertColumns, parameters, connection, transaction);
 
-        sqlUpsertCommand.Execute();
-        return true;
+            sqlUpsertCommand.Execute();
+        }
+        catch (TargetInvocationException ex)
+        {
+            Debug.WriteLine(ex.Message);
+            throw new ApplicationException(ex.InnerException?.Message ?? ex.Message, ex?.InnerException ?? ex);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException($"Failed to upsert the record: {ex.Message}", ex);
+        }
     }
 
     /// <summary>
@@ -123,11 +155,9 @@ public static class DbBroker
         IEnumerable<Expression<Func<TDataModel, object>>> load = null,
         IEnumerable<Expression<Func<TDataModel, object>>> ignore = null,
         DbTransaction transaction = null,
-        int depth = 0,
-        int? skip = null,
-        int? take = null) where TDataModel : DataModel<TDataModel>
+        int depth = 0) where TDataModel : DataModel<TDataModel>
     {
-        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, load, ignore, transaction, depth, skip ?? 0, take ?? 0);
+        return new SqlSelectCommand<TDataModel>(Activator.CreateInstance<TDataModel>(), connection, load, ignore, transaction, depth);
     }
 
     /// <summary>

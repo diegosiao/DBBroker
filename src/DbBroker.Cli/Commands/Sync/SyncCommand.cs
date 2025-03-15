@@ -47,7 +47,7 @@ public class SyncCommand
 
         if (Results.Sum(x => x.Value) == 0)
         {
-            $"Synchronization finished at '{DateTime.Now}' ({(DateTime.Now - startTime).TotalSeconds} seconds).".Success();
+            $"Synchronization finished at '{DateTime.Now}' ({(DateTime.Now - startTime).TotalSeconds:N2} seconds).".Success();
             return ExitCodes.SUCCESS;
         }
 

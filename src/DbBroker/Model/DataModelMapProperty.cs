@@ -12,5 +12,7 @@ public class DataModelMapProperty
 
     public int Index { get; set; }
 
+    public object ProviderDbType { get; set; }
+
     public PropertyInfo PropertyInfo { get; set; }
 }
