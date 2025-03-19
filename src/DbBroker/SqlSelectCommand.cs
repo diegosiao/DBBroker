@@ -22,7 +22,7 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
 
     private uint _take;
 
-    private string _offsetFetchSql => _skip + _take > 0 ? 
+    private string _offsetFetchSql => _skip + _take > 0 ?
         $"{(_skip > 0 ? $"OFFSET {_skip} ROWS " : string.Empty)} {(_take > 0 ? $"FETCH NEXT {_take} ROWS ONLY" : string.Empty)}" : string.Empty;
 
     private List<SqlJoin> _joins = [];
@@ -63,9 +63,36 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         return this;
     }
 
+    public SqlSelectCommand<TDataModel> Skip(int skip)
+    {
+        if (skip < 0)
+        {
+            throw new ArgumentException("You cannot use a negative number", nameof(skip));
+        }
+
+        _skip = (uint)skip;
+        return this;
+    }
+
+    new public SqlSelectCommand<TDataModel> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
+    {
+        return (SqlSelectCommand<TDataModel>)base.AddFilter(propertyLambda, sqlExpression);
+    }
+
     public SqlSelectCommand<TDataModel> Take(uint take)
     {
         _take = take;
+        return this;
+    }
+
+    public SqlSelectCommand<TDataModel> Take(int take)
+    {
+        if (take < 0)
+        {
+            throw new ArgumentException("You cannot use a negative number", nameof(take));
+        }
+
+        _take = (uint)take;
         return this;
     }
 

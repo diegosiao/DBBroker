@@ -41,11 +41,30 @@ public abstract class DataModel<T> : IDataModel
 
     public bool IsNotPristine(string propertyName) => _IsNotPristine.ContainsKey(propertyName);
 
+    /// <summary>
+    /// DbBroker will ignore pristine properties on INSERT, UPDATE, and UPSERT commands
+    /// </summary>
+    /// <param name="propertyName">The property name. Prefer using nameof().</param>
     public void SetPristine(string propertyName)
     {
-        if (_IsNotPristine.ContainsKey(propertyName))
+        if (_IsNotPristine.ContainsKey(propertyName ?? string.Empty))
         {
             _IsNotPristine.Remove(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// DbBroker will ignore pristine properties on INSERT, UPDATE, and UPSERT commands
+    /// </summary>
+    /// <param name="propertiesNames">The properties names to set as pristine. Prefer using nameof().</param>
+    public void SetPristine(params string[] propertiesNames)
+    {
+        foreach (var propertyName in propertiesNames ?? [])
+        {
+            if (_IsNotPristine.ContainsKey(propertyName ?? string.Empty))
+            {
+                _IsNotPristine.Remove(propertyName);
+            }
         }
     }
 

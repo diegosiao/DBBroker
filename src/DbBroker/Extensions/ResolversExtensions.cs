@@ -69,7 +69,7 @@ public static class ResolversExtensions
             case SupportedDatabaseProviders.SqlServer:
                 return Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter;
             case SupportedDatabaseProviders.Oracle:
-                return Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess")) as DbParameter;
+                return Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter;
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");
         }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +12,8 @@ namespace DbBroker;
 
 public static class DbBroker
 {
+    private const string AggregationPropertyNotInRootMessage = "The aggregation property needs to be at the root of the Data Model specified";
+
     /// <summary>
     /// Inserts a database record for the specified <typeparamref name="TDataModel"/>.
     /// </summary>
@@ -20,82 +21,13 @@ public static class DbBroker
     /// <param name="connection">The database connection to execute the SQL INSERT command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL INSERT command.</param>
-    /// <param name="commandTimeout">The time in seconds to wait before terminating the command</param>
-    /// <returns>Returns true if the insertion was executed without errors, false otherwise. </returns>
-    // TODO doesn't make sense return boolean, throw exception if something goes wrong
-    public static void Insert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null, int commandTimeout = 30) where TDataModel : DataModel<TDataModel>
+    /// <returns>Returns the number of rows affected.</returns>
+    public static SqlInsertCommand<TDataModel> Insert<TDataModel>(
+        this DbConnection connection, 
+        TDataModel dataModel, 
+        DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
-        try
-        {
-            var insertColumns = dataModel
-                .DataModelMap
-                .MappedProperties
-                .Where(x => dataModel.IsNotPristine(x.Value.PropertyName) && !x.Value.IsKey || (dataModel.DataModelMap.SqlInsertTemplate.IncludeKeyColumn && x.Value.IsKey))
-                .Select(x => x.Value);
-
-            var parameters = insertColumns
-                .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(dataModel, x))
-                .ToList();
-
-            var sqlInsert = dataModel.DataModelMap.SqlInsertTemplate.SqlTemplate
-                .Replace("$$TABLEFULLNAME$$", dataModel.DataModelMap.TableFullName)
-                .Replace("$$COLUMNS$$", string.Join(",", insertColumns.Select(x => x.ColumnName)))
-                .Replace("$$PARAMETERS$$", string.Join(",", parameters.Select(x => x.ParameterName)))
-                // Not required
-                .Replace(
-                    "$$KEY_COLUMN$$",
-                    dataModel
-                        .DataModelMap
-                        .MappedProperties
-                        .FirstOrDefault(x => x.Value.IsKey).Value?.ColumnName);
-
-            if (connection.State != ConnectionState.Open)
-            {
-                connection.Open();
-            }
-
-            DbParameter keyParameter = null;
-            if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
-            {
-                keyParameter = dataModel.DataModelMap.Provider.GetDbParameter("pKey", DBNull.Value);
-
-                // TODO Improve the key data type handling: determine based on the mapped property type
-                keyParameter.DbType = dataModel.DataModelMap.Provider.GetDbType(dataModel.DataModelMap.KeyProperty);
-                keyParameter.Direction = ParameterDirection.Output;
-                parameters.Add(keyParameter);
-            }
-
-            var command = connection.CreateCommand();
-            command.CommandText = dataModel.DataModelMap.SqlInsertTemplate.ReplaceParameters(sqlInsert);
-            command.Parameters.AddRange(parameters.ToArray());
-            command.Transaction = transaction;
-            command.CommandTimeout = commandTimeout;
-
-            Debug.WriteLine(command.CommandText);
-
-            if (dataModel.DataModelMap.SqlInsertTemplate.TryRetrieveKey)
-            {
-                command.ExecuteNonQuery();
-                dataModel
-                    .DataModelMap
-                    .MappedProperties
-                    .FirstOrDefault(x => x.Value.IsKey).Value.PropertyInfo.SetValue(dataModel, keyParameter.Value);
-                return;
-            }
-
-            command.ExecuteNonQuery();
-        }
-        catch (TargetInvocationException ex)
-        {
-            // TODO Adopt this error handling on all other methods
-            Debug.WriteLine(ex.Message);
-            throw new ApplicationException(ex.InnerException?.Message ?? ex.Message, ex?.InnerException ?? ex);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.Message);
-            throw new ApplicationException(ex.Message, ex);
-        }
+        return new SqlInsertCommand<TDataModel>(dataModel, connection, transaction);
     }
 
     /// <summary>
@@ -105,7 +37,11 @@ public static class DbBroker
     /// <param name="connection">The database connection to execute the SQL MERGE command.</param>
     /// <param name="dataModel">The <typeparamref name="TDataModel"/> instance to be inserted.</param>
     /// <param name="transaction">The database transaction to use to execute the SQL MERGE command.</param>
-    public static void Upsert<TDataModel>(this DbConnection connection, TDataModel dataModel, DbTransaction transaction = null, int commandTimeout = 30) where TDataModel : DataModel<TDataModel>
+    /// <returns>Number of rows affected</returns>
+    public static SqlUpsertCommand<TDataModel> Upsert<TDataModel>(
+        this DbConnection connection, 
+        TDataModel dataModel, 
+        DbTransaction transaction = null) where TDataModel : DataModel<TDataModel>
     {
         try
         {
@@ -119,9 +55,7 @@ public static class DbBroker
                 .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)))
                 .ToList();
 
-            var sqlUpsertCommand = new SqlUpsertCommand<TDataModel>(dataModel, upsertColumns, parameters, connection, transaction);
-
-            sqlUpsertCommand.Execute();
+            return new SqlUpsertCommand<TDataModel>(dataModel, upsertColumns, parameters, connection, transaction);
         }
         catch (TargetInvocationException ex)
         {
@@ -178,9 +112,14 @@ public static class DbBroker
             .Select(x => x.Value);
 
         var parameters = updateColumns
-            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(x.ColumnName, x.PropertyInfo.GetValue(dataModel)));
+            .Select(x => dataModel.DataModelMap.Provider.GetDbParameter(dataModel, dataModel.DataModelMap.MappedProperties[x.PropertyName]));
 
-        return new SqlUpdateCommand<TDataModel>(dataModel, updateColumns, parameters, connection, transaction);
+        return new SqlUpdateCommand<TDataModel>(
+            dataModel, 
+            updateColumns, 
+            parameters, 
+            connection, 
+            transaction);
     }
 
     /// <summary>
@@ -222,7 +161,7 @@ public static class DbBroker
     {
         if (!PropertyPathHelper.IsRootProperty(property))
         {
-            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+            throw new ArgumentException($"{AggregationPropertyNotInRootMessage} ({typeof(TDataModel).Name}).", nameof(property));
         }
 
         var dataModelInstance = Activator.CreateInstance<TDataModel>();
@@ -237,7 +176,7 @@ public static class DbBroker
     {
         if (!PropertyPathHelper.IsRootProperty(property))
         {
-            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+            throw new ArgumentException($"{AggregationPropertyNotInRootMessage} ({typeof(TDataModel).Name}).", nameof(property));
         }
 
         var dataModelInstance = Activator.CreateInstance<TDataModel>();
@@ -253,7 +192,7 @@ public static class DbBroker
     {
         if (!PropertyPathHelper.IsRootProperty(property))
         {
-            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+            throw new ArgumentException($"{AggregationPropertyNotInRootMessage} ({typeof(TDataModel).Name}).", nameof(property));
         }
 
         var dataModelInstance = Activator.CreateInstance<TDataModel>();
@@ -269,7 +208,7 @@ public static class DbBroker
     {
         if (!PropertyPathHelper.IsRootProperty(property))
         {
-            throw new ArgumentException($"The aggregation property needs to be at the root of the Data Model specified ({typeof(TDataModel).Name}).", nameof(property));
+            throw new ArgumentException($"{AggregationPropertyNotInRootMessage} ({typeof(TDataModel).Name}).", nameof(property));
         }
 
         var dataModelInstance = Activator.CreateInstance<TDataModel>();

@@ -49,6 +49,8 @@ public abstract class SqlSelectAggregateCommand<TDataModel, TResult> : SqlComman
             command.Transaction = Transaction;
             command.CommandTimeout = commandTimeout;
 
+            Debug.WriteLine(command.CommandText);
+
             var result = command.ExecuteScalar();
 
             if (result is null)

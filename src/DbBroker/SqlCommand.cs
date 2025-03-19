@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using DbBroker.Extensions;
@@ -44,7 +45,8 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     }
 
     int paramIndex = 0;
-    public IFilteredCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
+
+    public SqlCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
     {
         var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
 
@@ -94,6 +96,8 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         command.Parameters.AddRange(filterParameters.ToArray());
         command.Transaction = Transaction;
         command.CommandTimeout = commandTimeout;
+
+        Debug.WriteLine(command.CommandText);
 
         return (TReturn)(object)command.ExecuteNonQuery();
     }

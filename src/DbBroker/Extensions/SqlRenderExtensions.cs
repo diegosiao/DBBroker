@@ -17,7 +17,12 @@ public static class SqlRenderExtensions
         var whereClause = new StringBuilder();
         foreach (var filter in filters)
         {
-            whereClause.AppendLine($"AND {filter.RenderSql()}");
+            var filterSql = filter.RenderSql();
+
+            if (string.IsNullOrEmpty(filterSql))
+                continue;
+            
+            whereClause.AppendLine(filterSql);
         }
         return whereClause.ToString();
     }

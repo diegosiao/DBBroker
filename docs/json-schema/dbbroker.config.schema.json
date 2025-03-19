@@ -45,7 +45,7 @@
             "type": "string"
           },
           "ignoreTablesNotListed": {
-            "description": "Should DBBroker ignore database tables not described on 'tables' array? If true, you need to include all table references in all levels in 'tables' array. The default value is 'false'.",
+            "description": "Should DBBroker ignore database tables not described on 'tables' array? If 'true', you need to include manually all table references of tables listed in 'tables' array, unless you set the 'addReferences' property on the table to false. The default value is 'false'.",
             "type": "boolean"
           },
           "ignoreViewsNotListed": {

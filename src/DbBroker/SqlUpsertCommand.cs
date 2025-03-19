@@ -6,6 +6,7 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+// TODO it may not make sense to inherit from SqlCommand
 public class SqlUpsertCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
 {
     private const string SqlUpsertOracleTemplate =
@@ -57,7 +58,7 @@ WHEN NOT MATCHED THEN
 
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
-            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join("," , Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
+            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join(",", Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
             .Replace("$$KEYCOLUMN$$", keyPropertyMap.Value.ColumnName)
             .Replace("$$KEYCOLUMNPARAM$$", keyPropertyMap.Value.ColumnName)
             .Replace("$$UPDATE$$", string.Join(",", $"UPDATE SET {string.Join(",", Columns.Where(c => !c.IsKey).Select(x => $"t.{x.ColumnName} = s.{x.ColumnName}"))}"))

@@ -7,5 +7,6 @@ public enum SqlOperator
     LessThanOrEqual,
     GreaterThan,
     GreaterThanOrEqual,
-    Between
+    Between,
+    Is
 }
