@@ -17,6 +17,12 @@ public class SqlBetween : SqlExpression
 
     // TODO include the ability to compare with another column
 
+    /// <summary>
+    /// Column specified BETWEEN <paramref name="value1"/> AND <paramref name="value2"/>
+    /// </summary>
+    /// <param name="value1"></param>
+    /// <param name="value2"></param>
+    /// <returns></returns>
     public static SqlBetween These(object value1, object value2)
     {
         return new SqlBetween(value1, value2);

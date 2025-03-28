@@ -5,7 +5,7 @@ namespace DbBroker.Cli.Extensions;
 
 public static class ResolversExtensions
 {
-    public static string GetDbTypeString(this SupportedDatabaseProviders provider, ColumnDescriptorModel columnDescriptorModel)
+    public static string GetDbTypeString(this SupportedDatabaseProviders? provider, ColumnDescriptorModel columnDescriptorModel)
     {
         switch (provider)
         {
@@ -54,7 +54,7 @@ public static class ResolversExtensions
         }
     }
 
-    public static string GetProviderClientUsingString(this SupportedDatabaseProviders provider)
+    public static string GetProviderClientUsingString(this SupportedDatabaseProviders? provider)
     {
         return provider switch
         {

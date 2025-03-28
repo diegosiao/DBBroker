@@ -41,7 +41,7 @@ public static class DbBrokerConfigContextExtensions
 
     public static IProviderDefaultConfiguration GetDefaultProviderConfig(this DbBrokerConfigContext context)
     {
-        return _defaultProviderConfigs[context.Provider];
+        return _defaultProviderConfigs[context.Provider!.Value];
     }
 
     public static ISqlTransformer GetSqlTransformer(this DbBrokerConfigContext context)

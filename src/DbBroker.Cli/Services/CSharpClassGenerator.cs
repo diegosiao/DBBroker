@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using DbBroker.Cli.Commands.Sync;
+using DbBroker.Cli.Exceptions;
 using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Interfaces;
@@ -22,6 +23,16 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
         try
         {
+            if (context.Provider is null)
+            {
+                throw new DbBrokerConfigurationException("The context does not have a Provider specified. ");
+            }
+
+            if (context.ConnectionString is null)
+            {
+                throw new DbBrokerConfigurationException("The context does not have a Connection String specified. ");
+            }
+
             using var connection = context.GetDbConnection();
 
             var sqlTransformer = context.GetSqlTransformer();
@@ -155,7 +166,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                         .Replace("$TYPE", sqlTransformer.GetCSharpType(item.DataType, item.MaxLength ?? "250", item.DataTypePrecision, item.DataTypeScale, item.IsNullable))
                         .Replace("$KEY", isPrimaryKey ? "Key, " : string.Empty)
                         .Replace("$COLUMN_NAME", item?.ColumnName)
-                        .Replace("$$PROVIDER_DBTYPE$$", context.Provider.GetDbTypeString(item!))
+                        .Replace("$$PROVIDER_DBTYPE$$", context.Provider!.GetDbTypeString(item!))
                         .Replace("$NAME", item?.ColumnName.ToCamelCase()));
 
                 var foreignKey = tableDescriptor
@@ -191,7 +202,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             await File.WriteAllTextAsync(
                 Path.Combine(outputDirectory, $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}.cs"),
                 Constants.EDM_CLASS_TEMPLATE
-                    .Replace("$$PROVIDER_CLIENT_NAMESPACE$$", context.Provider.GetProviderClientUsingString())
+                    .Replace("$$PROVIDER_CLIENT_NAMESPACE$$", context.Provider!.GetProviderClientUsingString())
                     .Replace("$NAMESPACE", context.Namespace ?? "-")
                     .Replace("$CLASSNAME", $"{context.ModelsPrefix}{tableDescriptor.Value.TableName.ToCamelCase()}{context.ModelsSufix}")
                     .Replace("$TABLE", tableDescriptor.Value.TableName)

@@ -8,7 +8,7 @@ public class DbBrokerConfigContext
 
     public string Name { get; set; }
 
-    public SupportedDatabaseProviders Provider { get; set; }
+    public SupportedDatabaseProviders? Provider { get; set; }
 
     public string ConnectionString { get; set; }
 

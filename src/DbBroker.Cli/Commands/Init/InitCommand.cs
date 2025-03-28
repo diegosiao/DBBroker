@@ -9,12 +9,14 @@ public class InitCommand
   """
 {
   "$schema": "https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/v3.0.0/docs/json-schema/dbbroker.config.schema.json",
+  "database": {
+    "provider": "$PROVIDER$",
+    "connectionString": "$CONNECTIONSTRING$"
+  },
   "contexts": [
     {
       "namespace": "$NAMESPACE$",
       "outputDirectory": null,
-      "provider": "$PROVIDER$",
-      "connectionString": "$CONNECTIONSTRING$",
       "tables": [],
       "views": []
     }

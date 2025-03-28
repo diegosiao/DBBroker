@@ -4,6 +4,9 @@ using DbBroker.Model.Interfaces;
 
 namespace DbBroker.Model;
 
+/// <summary>
+/// Base class for all SQL Expressions
+/// </summary>
 public abstract class SqlExpression : ISqlExpression
 {
     public SqlOperator SqlOperator { get; private set; }

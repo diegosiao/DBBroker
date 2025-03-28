@@ -10,11 +10,14 @@ using DbBroker.Model.Interfaces;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Collections;
-using DbBroker.Common.Model;
 
 namespace DbBroker;
 
-public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
+/// <summary>
+/// Abstraction for SQL SELECT command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
+public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<TDataModel>> where TDataModel : DataModel<TDataModel>
 {
     private readonly int _maxDepth;
 
@@ -51,18 +54,34 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         _maxDepth = depth;
     }
 
+    /// <summary>
+    /// Orders by the specified column
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="ascending"></param>
+    /// <returns></returns>
     public SqlSelectCommand<TDataModel> OrderBy(Expression<Func<TDataModel, object>> property, bool ascending = true)
     {
         _orderBy.Add(ascending ? SqlOrderBy<TDataModel>.Ascending(property) : SqlOrderBy<TDataModel>.Descending(property));
         return this;
     }
 
+    /// <summary>
+    /// Offsets the select result by number of records specified
+    /// </summary>
+    /// <param name="skip"></param>
+    /// <returns></returns>
     public SqlSelectCommand<TDataModel> Skip(uint skip)
     {
         _skip = skip;
         return this;
     }
 
+    /// <summary>
+    /// Offsets the select result by number of records specified
+    /// </summary>
+    /// <param name="skip"></param>
+    /// <returns></returns>
     public SqlSelectCommand<TDataModel> Skip(int skip)
     {
         if (skip < 0)
@@ -74,17 +93,28 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         return this;
     }
 
+    /// <inheritdoc />
     new public SqlSelectCommand<TDataModel> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
     {
         return (SqlSelectCommand<TDataModel>)base.AddFilter(propertyLambda, sqlExpression);
     }
 
+    /// <summary>
+    /// Takes the number of records specified from select result
+    /// </summary>
+    /// <param name="take"></param>
+    /// <returns></returns>
     public SqlSelectCommand<TDataModel> Take(uint take)
     {
         _take = take;
         return this;
     }
 
+    /// <summary>
+    /// Takes the number of records specified from select result
+    /// </summary>
+    /// <param name="take"></param>
+    /// <returns></returns>
     public SqlSelectCommand<TDataModel> Take(int take)
     {
         if (take < 0)
@@ -191,7 +221,11 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         }
     }
 
-    protected override string RenderSqlCommand()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    internal protected override string RenderSqlCommand()
     {
         if (_maxDepth > 0)
         {
@@ -329,6 +363,11 @@ public class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnumerable<T
         return string.Join(",", sqlSelectColumns);
     }
 
+    /// <summary>
+    /// Executes the SQL Command
+    /// </summary>
+    /// <param name="commandTimeout"></param>
+    /// <returns></returns>
     public override IEnumerable<TDataModel> Execute(int commandTimeout = 0)
     {
         // TODO Check if there isn't invalid include expressions (duplicated, methods, collections not in root, etc.)

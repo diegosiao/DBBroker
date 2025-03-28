@@ -7,7 +7,11 @@ using DbBroker.Model;
 namespace DbBroker;
 
 // TODO it may not make sense to inherit from SqlCommand
-public class SqlUpsertCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
+/// <summary>
+/// Abstraction for SQL UPSERT command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
+public sealed class SqlUpsertCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
 {
     private const string SqlUpsertOracleTemplate =
 @"MERGE INTO $$TABLEFULLNAME$$ t
@@ -52,7 +56,11 @@ WHEN NOT MATCHED THEN
         }
     }
 
-    protected override string RenderSqlCommand()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    internal protected override string RenderSqlCommand()
     {
         var keyPropertyMap = DataModel.DataModelMap.MappedProperties.FirstOrDefault(x => x.Value.IsKey);
 

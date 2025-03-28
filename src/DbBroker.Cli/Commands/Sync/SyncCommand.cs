@@ -34,6 +34,15 @@ public class SyncCommand
             $"- {configFile}".Log();
             if (TryParseConfig(configFile, out DbBrokerConfig? config))
             {
+                if (config?.Database is not null)
+                {
+                    foreach (var context in config.Contexts)
+                    {
+                        context.Provider ??= config.Database.Provider;
+                        context.ConnectionString ??= config.Database.ConnectionString;
+                    }
+                }
+
                 contexts.AddRange(config!.Contexts!);
             }
         }

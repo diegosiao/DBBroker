@@ -19,7 +19,7 @@ public abstract class SqlSelectAggregateCommand<TDataModel, TResult> : SqlComman
     {
     }
 
-    protected override string RenderSqlCommand()
+    internal protected override string RenderSqlCommand()
     {
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)

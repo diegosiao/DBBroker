@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace DbBroker.Model.Interfaces;
 
-public interface ISqlExpression
+internal interface ISqlExpression
 {
     SqlOperator SqlOperator { get; }
 

@@ -62,6 +62,7 @@ $$PROVIDER_CLIENT_NAMESPACE$$
 using DbBroker.Attributes;
 using DbBroker.Common;
 using DbBroker.Model;
+using System.Collections.Generic;
 
 namespace $NAMESPACE
 {

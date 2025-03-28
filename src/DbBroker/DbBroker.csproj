@@ -9,6 +9,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>DBBroker</PackageId>
     <Version>3.0.1-beta</Version>
     <Authors>Diego De Medeiros</Authors>

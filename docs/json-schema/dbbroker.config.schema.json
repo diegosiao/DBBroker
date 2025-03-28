@@ -5,6 +5,21 @@
   "description": "Configuration file to describe database contexts",
   "type": "object",
   "properties": {
+    "database": {
+      "description": "The database information against which DBBroker will run",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "The database provider",
+          "type": "string",
+          "enum": ["SqlServer", "Oracle"]
+        },
+        "connectionString": {
+          "description": "The connection string DBBroker is going to use to prospect database metadata",
+          "type": "string"
+        }
+      }
+    },   
     "contexts": {
       "description": "Database contexts",
       "type": "array",
@@ -24,12 +39,12 @@
             "type": "string"
           },
           "provider": {
-            "description": "The database provider",
+            "description": "The database provider. Overrides 'database.provider'.",
             "type": "string",
             "enum": ["SqlServer", "Oracle"]
           },
           "connectionString": {
-            "description": "The connection string DBBroker is going to use to prospect database metadata",
+            "description": "The connection string DBBroker is going to use to prospect database metadata. Overrides 'database.connectionString'.",
             "type": "string"
           },
           "defaultSqlInsertTemplateTypeFullName": {
