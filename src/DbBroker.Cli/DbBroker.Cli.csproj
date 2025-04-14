@@ -15,7 +15,7 @@
     <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
     <Company></Company>
     <Copyright></Copyright>
-    <Description>CLI to generate Entity Data Models</Description>
+    <Description>CLI to generate Entity Data Models which DBBroker library uses to interact with database.</Description>
     <PackageTags>orm, data, mapping, sql server, oracle, mysql</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>

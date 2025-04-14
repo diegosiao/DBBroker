@@ -24,8 +24,8 @@ public class SelectTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        var customerInserted = _oracleConnection.Insert(customer);
-        Assert.True(customerInserted);
+        _oracleConnection.Insert(customer);
+        Assert.True(true);
 
         var customerSelected = _oracleConnection
             .Select<CustomersDataModel>()

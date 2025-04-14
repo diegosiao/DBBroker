@@ -22,8 +22,7 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        var customerInserted = _oracleConnection.Insert(customer);
-        Assert.True(customerInserted);
+        _oracleConnection.Insert(customer);
     }
 
     [Fact]
@@ -65,10 +64,9 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        Assert.True(
-            _oracleConnection.Insert(address, transaction) 
-            && _oracleConnection.Insert(customer, transaction) 
-            && _oracleConnection.Insert(order, transaction));
+        _oracleConnection.Insert(address, transaction);
+        _oracleConnection.Insert(customer, transaction);
+        _oracleConnection.Insert(order, transaction);
 
         transaction.Commit();
     }

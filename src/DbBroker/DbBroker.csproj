@@ -16,7 +16,7 @@
     <Company></Company>
     <Copyright></Copyright>
     <Description>A lightweight and simple to use .NET library for manipulating database records.
-      Used with DBBroker.Cli dotnet tool which generates the Data Models.</Description>
+      Used with DBBroker.Cli dotnet tool which generates the Entity Data Models.</Description>
     <PackageTags>orm data mapping sql server oracle mysql</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl></PackageProjectUrl>

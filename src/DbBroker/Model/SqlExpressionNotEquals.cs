@@ -6,13 +6,13 @@ using DbBroker.Model;
 namespace DbBroker;
 
 /// <summary>
-/// Apply a filter using the equals to expression (x = y)
+/// Apply a filter using the not equals to expression (x <> y)
 /// </summary>
-public class SqlEquals : SqlExpression
+public class SqlNotEquals : SqlExpression
 {
     private bool _lowerAll;
 
-    private SqlEquals(object value, bool lowerAll) : base(SqlOperator.Equals)
+    private SqlNotEquals(object value, bool lowerAll) : base(SqlOperator.Equals)
     {
         _lowerAll = lowerAll;
 
@@ -23,13 +23,13 @@ public class SqlEquals : SqlExpression
     }
 
     /// <summary>
-    /// Specifies the right side of the Equals Expression
+    /// Specifies the right side of the Not Equals Expression
     /// </summary>
     /// <param name="value">The value to compare to</param>
     /// <param name="lowerAll">If true, applies the SQL function lower() on both sides of the expression. Default value is false.</param>
-    public static SqlEquals To(object value, bool lowerAll = false)
+    public static SqlNotEquals To(object value, bool lowerAll = false)
     {
-        return new SqlEquals(value, lowerAll);
+        return new SqlNotEquals(value, lowerAll);
     }
 
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
@@ -41,9 +41,9 @@ public class SqlEquals : SqlExpression
 
         if (_lowerAll)
         {
-            return $"AND lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) = lower({parameters.FirstOrDefault()?.ParameterName})";
+            return $"AND lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) <> lower({parameters.FirstOrDefault()?.ParameterName})";
         }
 
-        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} = {parameters.FirstOrDefault()?.ParameterName}";
+        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} <> {parameters.FirstOrDefault()?.ParameterName}";
     }
 }
