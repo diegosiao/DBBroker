@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace DbBroker.Unit.Tests;
+namespace DbBroker.Tests;
 
 public class Startup
 {

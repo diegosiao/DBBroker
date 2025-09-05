@@ -1,9 +1,9 @@
-using DbBroker.Model;
 using DbBroker.Tests.DataModels.Oracle;
+using DbBroker.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
-namespace DbBroker.Unit.Tests.Providers.Oracle;
+namespace DbBroker.Tests.Providers.Oracle;
 
 public class SelectTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {
@@ -24,14 +24,17 @@ public class SelectTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        var customerInserted = _oracleConnection.Insert(customer);
-        Assert.True(customerInserted);
+        var rowsAffected = _oracleConnection
+            .Insert(customer)
+            .Execute();
 
-        var customerSelected = _oracleConnection
+        Assert.Equal(1, rowsAffected);
+
+        var result = _oracleConnection
             .Select<CustomersDataModel>()
             .AddFilter(x => x.Id, SqlEquals.To(customerId.ToByteArray()))
             .Execute();
 
-        Assert.True(customerSelected.Count() == 1);
+        Assert.Single(result);
     }
 }

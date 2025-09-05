@@ -4,7 +4,7 @@ using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
-namespace DbBroker.Unit.Tests.Providers.Oracle;
+namespace DbBroker.Tests.Providers.Oracle;
 
 public class DeleteTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {

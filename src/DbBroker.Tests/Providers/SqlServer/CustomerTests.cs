@@ -2,7 +2,7 @@ using Microsoft.Data.SqlClient;
 using DbBroker.Tests.DataModels.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DbBroker.Unit.Tests.Providers.SqlServer;
+namespace DbBroker.Tests.Providers.SqlServer;
 
 public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {

@@ -3,7 +3,7 @@ using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
-namespace DbBroker.Unit.Tests.Providers.Oracle;
+namespace DbBroker.Tests.Providers.Oracle;
 
 public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {
@@ -22,8 +22,11 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        var customerInserted = _oracleConnection.Insert(customer);
-        Assert.True(customerInserted);
+        var rowsAffected = _oracleConnection
+            .Insert(customer)
+            .Execute();
+
+        Assert.Equal(1, rowsAffected);
     }
 
     [Fact]
@@ -65,11 +68,13 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        Assert.True(
-            _oracleConnection.Insert(address, transaction) 
-            && _oracleConnection.Insert(customer, transaction) 
-            && _oracleConnection.Insert(order, transaction));
+        var rowsAffected =
+            _oracleConnection.Insert(address, transaction).Execute()
+            + _oracleConnection.Insert(customer, transaction).Execute() 
+            + _oracleConnection.Insert(order, transaction).Execute();
 
+        Assert.Equal(3, rowsAffected);
+        
         transaction.Commit();
     }
 }
