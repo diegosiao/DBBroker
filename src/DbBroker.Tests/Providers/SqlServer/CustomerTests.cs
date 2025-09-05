@@ -1,5 +1,5 @@
-using System.Data.SqlClient;
-using EShop.DataModels.SqlServer;
+using Microsoft.Data.SqlClient;
+using DbBroker.Tests.DataModels.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DbBroker.Unit.Tests.Providers.SqlServer;
@@ -21,6 +21,7 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
             CreatedBy = Environment.UserName,
         };
 
-        _sqlConnection.Insert(customer);
+        var row = _sqlConnection.Insert(customer);
+        Assert.True(row);
     }
 }

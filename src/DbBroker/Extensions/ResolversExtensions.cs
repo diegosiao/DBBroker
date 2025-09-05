@@ -56,7 +56,7 @@ public static class ResolversExtensions
 
         return dataModelBase.DataModelMap.Provider switch
         {
-            SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlConnection, System.Data.SqlClient"), connectionString) as DbConnection,
+            SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlConnection, Microsoft.Data.SqlClient"), connectionString) as DbConnection,
             SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleConnection, Oracle.ManagedDataAccess"), connectionString) as DbConnection,
             _ => throw new ArgumentException($"Not supported database provider: {dataModelBase.DataModelMap.Provider}"),
         };
@@ -67,9 +67,11 @@ public static class ResolversExtensions
         switch (provider)
         {
             case SupportedDatabaseProviders.SqlServer:
-                return Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{name}", value) as DbParameter;
+                return Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlParameter, Microsoft.Data.SqlClient"), $"@{name}", value) as DbParameter;
+
             case SupportedDatabaseProviders.Oracle:
                 return Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter;
+
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");
         }
@@ -80,7 +82,8 @@ public static class ResolversExtensions
         switch (provider)
         {
             case SupportedDatabaseProviders.SqlServer:
-                return Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlParameter, System.Data.SqlClient"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
+                return Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlParameter, Microsoft.Data.SqlClient"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
+
             case SupportedDatabaseProviders.Oracle:
                 var parameter = Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess")) as DbParameter;
                 parameter.ParameterName = $":{dataModelMapProperty.ColumnName}";
@@ -88,6 +91,7 @@ public static class ResolversExtensions
                 //parameter.DbType = GetOracleDbType(dataModelMapProperty.PropertyInfo);
                 parameter.GetType().GetProperty("OracleDbType").SetValue(parameter, dataModelMapProperty.ProviderDbType);
                 return parameter;
+
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");
         }

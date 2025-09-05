@@ -1,6 +1,6 @@
 using System.Data.Common;
 using DbBroker.Model;
-using EShop.DataModels.Oracle;
+using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
@@ -33,7 +33,7 @@ public class DeleteTests(ServiceProviderFixture fixture) : IClassFixture<Service
 
         transaction?.Commit();
 
-        Assert.True(rowsAffected == 1);
+        Assert.Equal(1, rowsAffected);
     }
 
     [Fact]

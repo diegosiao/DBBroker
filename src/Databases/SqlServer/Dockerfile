@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/mssql/server:2019-latest
 
 # Set environment variables
-ENV SA_PASSWORD=DBBroker_1
+ENV SA_PASSWORD=YourStrong!Passw0rd
 ENV ACCEPT_EULA=Y
 
 # Copy the initialization scripts

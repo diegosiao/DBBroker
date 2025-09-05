@@ -1,8 +1,9 @@
-name: dbbroker-showcase
+name: dbbroker-databases
+
 services:
   sqlserver:
     build:
-      context: ./Databases/SqlServer
+      context: ./SqlServer
       dockerfile: Dockerfile
     environment:
       SA_PASSWORD: "DBBroker_1"
@@ -11,19 +12,24 @@ services:
       - "1439:1433"
     networks:
       - database-network
+    profiles:
+      - all
+      - no-oracle
 
   oracle:
     build:
-      context: ./Databases/Oracle
+      context: ./Oracle
       dockerfile: Dockerfile
     ports:
       - "1529:1521"
     networks:
       - database-network
+    profiles:
+      - all
 
   postgres:
     build:
-      context: ./Databases/Postgres
+      context: ./Postgres
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: "dbbroker"
@@ -33,10 +39,13 @@ services:
       - "5439:5432"
     networks:
       - database-network
+    profiles:
+      - all
+      - no-oracle
       
   mysql: 
     build: 
-      context: ./Databases/MySQL 
+      context: ./MySQL 
       dockerfile: Dockerfile 
     environment: 
       MYSQL_ROOT_PASSWORD: "DBBroker_1" 
@@ -47,6 +56,9 @@ services:
       - "3306:3306" 
     networks: 
       - database-network
+    profiles:
+      - all
+      - no-oracle
 
 networks:
   database-network:

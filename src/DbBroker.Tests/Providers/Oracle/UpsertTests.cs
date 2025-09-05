@@ -1,16 +1,16 @@
 using DbBroker.Model;
-using EShop.DataModels.Oracle;
+using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
 namespace DbBroker.Unit.Tests.Providers.Oracle;
 
-public class SelectTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
+public class UpsertTests(ServiceProviderFixture fixture) : IClassFixture<ServiceProviderFixture>
 {
     private readonly OracleConnection _oracleConnection = fixture.ServiceProvider.GetService<OracleConnection>()!;
 
     [Fact]
-    public void CanSelectRecord()
+    public void CanUpsertRecord()
     {
         var customerId = Guid.NewGuid();
 
@@ -24,14 +24,26 @@ public class SelectTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Insert(customer);
-        Assert.True(true);
+        _oracleConnection.Upsert(customer);
 
-        var customerSelected = _oracleConnection
+        var customerInserted = _oracleConnection
             .Select<CustomersDataModel>()
             .AddFilter(x => x.Id, SqlEquals.To(customerId.ToByteArray()))
-            .Execute();
+            .Execute()
+            .FirstOrDefault();
+        
+        Assert.True(customerInserted is not null);
 
-        Assert.True(customerSelected.Count() == 1);
+        customer.Name = "John Fourteen Six";
+
+        _oracleConnection.Upsert(customer);
+
+        var customerUpdated = _oracleConnection
+            .Select<CustomersDataModel>()
+            .AddFilter(x => x.Id, SqlEquals.To(customerId.ToByteArray()))
+            .Execute()
+            .FirstOrDefault();
+
+        Assert.Equal(customer.Name, customerUpdated?.Name);
     }
 }

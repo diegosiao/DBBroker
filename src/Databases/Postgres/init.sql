@@ -9,7 +9,7 @@ CREATE TABLE customers (
     id UUID PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     birthday DATE,
-    orders_total INT,
+    orders_count INT,
     created_at TIMESTAMPTZ NOT NULL,
     created_by VARCHAR(50) NOT NULL,
     modified_at TIMESTAMPTZ,
@@ -54,7 +54,8 @@ CREATE TABLE orders_notes (
 
 CREATE TABLE products (
     id UUID PRIMARY KEY,
-    product_name VARCHAR(50) NOT NULL
+    product_name VARCHAR(50) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE orders_products (
@@ -79,11 +80,52 @@ CREATE TABLE promotions_enrollments (
     FOREIGN KEY (promotion_id) REFERENCES promotions (id)
 );
 
--- Data
+-- SEEDING DATA
 
+-- Customers >>>
+INSERT INTO customers (id, name, birthday, orders_count, created_at, created_by)
+VALUES ('123e4567-e89b-12d3-a456-426614174000', 'John Doe', '1980-01-01', 5, NOW(), 'system');
+
+INSERT INTO customers (id, name, birthday, orders_count, created_at, created_by)
+VALUES ('223e4567-e89b-12d3-a456-426614174001', 'Jane Smith', '1990-02-02', 3, NOW(), 'system');
+
+INSERT INTO customers (id, name, birthday, orders_count, created_at, created_by)
+VALUES ('323e4567-e89b-12d3-a456-426614174002', 'Alice Johnson', '1985-03-03', 8, NOW(), 'system');
+-- <<< Customers
+
+-- Customers Notes Status >>>
 INSERT INTO customers_notes_status (status)
 VALUES ('Enabled');
 
 INSERT INTO customers_notes_status (status)
 VALUES ('Disabled');
+-- <<< Customers Notes Status
+
+-- Products >>>
+INSERT INTO products (id, product_name, price)
+VALUES ('11111111-1111-1111-1111-111111111111', 'Product A', 10.00);
+
+INSERT INTO products (id, product_name, price)
+VALUES ('22222222-2222-2222-2222-222222222222', 'Product B', 20.00);
+
+INSERT INTO products (id, product_name, price)
+VALUES ('33333333-3333-3333-3333-333333333333', 'Product C', 30.00);
+-- <<< Products
+
+-- Order Status >>>
+INSERT INTO order_status (status)
+VALUES ('New');
+
+INSERT INTO order_status (status)
+VALUES ('Processing');
+
+INSERT INTO order_status (status)
+VALUES ('Shipped');
+
+INSERT INTO order_status (status)
+VALUES ('Delivered');
+
+INSERT INTO order_status (status)
+VALUES ('Cancelled');
+-- <<< Order Status
 

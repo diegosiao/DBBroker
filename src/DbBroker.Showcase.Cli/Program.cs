@@ -1,10 +1,7 @@
-﻿using EShop.DataModels.Oracle;
-using DbBroker;
+﻿using DbBroker;
 using System.Diagnostics;
 using DbBroker.Extensions;
-using DbBroker.Showcase.Cli.Seeders;
-using DbBroker.Model;
-using static EShop.DataModels.Oracle.UvwOrderSummaryDataModel;
+using DbBroker.Tests.DataModels.Oracle;
 
 Console.Write(
 @"
@@ -12,17 +9,19 @@ Console.Write(
 DBBroker Showtime!
 ==================
 
+This project is a showcase of DBBroker capabilities.
+
 Start databases:
 
     > docker-compose up --build
 
 Once the databases are ready, install DBBroker CLI and generate the Data Models:
 
-    > dotnet install -g DbBroker.Cli
+    > dotnet tool install --global DbBroker.Cli --prerelease
     > dbbroker sync
 
 A running container does not mean the database is ready.
-Check the databases containers logs to make sure the databases are ready.
+Check the databases containers logs or healthcheck status to make sure the databases are ready.
 
 Why should I use DBBroker?
 .NET ADO         -> SQL +++++  Code +++++
@@ -49,8 +48,7 @@ Which database you would like to use?
 Console.WriteLine(Guid.NewGuid().ToString());
 Console.WriteLine(Guid.NewGuid().ToString());
 
-OracleSeeder.Seed();
-
+// Creating connection from a Data Model type
 using var connection = typeof(CustomersDataModel)
     .GetConnection("user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;");
 
@@ -81,14 +79,14 @@ using var connection = typeof(CustomersDataModel)
 //     //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
 //     .Execute();
 
-var orderSummary = connection
-    .Select<UvwOrderSummaryDataModel>()
-    .OrderBy(x => x.StatusId)
-    .OrderBy(x => x.UvwOrderSummaryCustomerRef!.Name)
-    .Execute();
+// var orderSummary = connection
+//     .Select<UvwOrderSummaryDataModel>()
+//     .OrderBy(x => x.StatusId)
+//     .OrderBy(x => x.UvwOrderSummaryCustomerRef!.Name)
+//     .Execute();
 
-var o = connection
-    .Insert(new UvwOrderSummaryDataModelTuple());
+// var o = connection
+//     .Insert(new UvwOrderSummaryDataModelTuple());
 
 try
 {

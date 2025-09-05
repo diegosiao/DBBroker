@@ -1,4 +1,4 @@
-namespace DbBroker.Unit.Tests.Config;
+namespace DbBroker.Tests.Config;
 
 public class ConnectionStrings
 {

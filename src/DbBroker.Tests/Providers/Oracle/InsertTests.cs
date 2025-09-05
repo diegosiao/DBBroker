@@ -1,5 +1,5 @@
 using System.Data;
-using EShop.DataModels.Oracle;
+using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 
@@ -22,7 +22,8 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Insert(customer);
+        var customerInserted = _oracleConnection.Insert(customer);
+        Assert.True(customerInserted);
     }
 
     [Fact]
@@ -64,9 +65,10 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Insert(address, transaction);
-        _oracleConnection.Insert(customer, transaction);
-        _oracleConnection.Insert(order, transaction);
+        Assert.True(
+            _oracleConnection.Insert(address, transaction) 
+            && _oracleConnection.Insert(customer, transaction) 
+            && _oracleConnection.Insert(order, transaction));
 
         transaction.Commit();
     }

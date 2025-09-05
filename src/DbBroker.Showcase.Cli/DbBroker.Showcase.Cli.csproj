@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DbBroker.Common\DbBroker.Common.csproj" />
+    <ProjectReference Include="../DbBroker.Tests.DataModels/DbBroker.Tests.DataModels.csproj" />
     <ProjectReference Include="..\DbBroker\DbBroker.csproj" />
   </ItemGroup>
 

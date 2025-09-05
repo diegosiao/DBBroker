@@ -1,5 +1,5 @@
-using System.Data.SqlClient;
-using DbBroker.Unit.Tests.Config;
+using Microsoft.Data.SqlClient;
+using DbBroker.Tests.Config;
 using Oracle.ManagedDataAccess.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
