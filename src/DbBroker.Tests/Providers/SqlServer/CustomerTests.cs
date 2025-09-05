@@ -21,7 +21,7 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
             CreatedBy = Environment.UserName,
         };
 
-        var row = _sqlConnection.Insert(customer);
-        Assert.True(row);
+        var rowsAffected = _sqlConnection.Insert(customer).Execute();
+        Assert.Equal(1, rowsAffected);
     }
 }
