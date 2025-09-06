@@ -4,7 +4,7 @@ using DbBroker.Model.Interfaces;
 
 namespace DbBroker;
 
-public class DataModelKeyComparer : IEqualityComparer<object>
+internal class DataModelKeyComparer : IEqualityComparer<object>
 {
     private static readonly IEqualityComparer structuralComparer = StructuralComparisons.StructuralEqualityComparer;
 
@@ -29,7 +29,7 @@ public class DataModelKeyComparer : IEqualityComparer<object>
 }
 
 
-public class DataModelKeyComparer<TDataModel> : IEqualityComparer<TDataModel> where TDataModel : IDataModel
+internal class DataModelKeyComparer<TDataModel> : IEqualityComparer<TDataModel> where TDataModel : IDataModel
 {
     public static readonly DataModelKeyComparer<TDataModel> Instance = new();
 

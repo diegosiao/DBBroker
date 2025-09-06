@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace DbBroker.Extensions;
 
+/// <summary>
+/// Provides LINQ extension methods for .NET Standard 2.0
+/// </summary>
 public static class NetStandard2LinqExtensions
 {
     /// <summary>

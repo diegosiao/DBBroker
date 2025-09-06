@@ -1,5 +1,3 @@
-using System;
-
 namespace DbBroker.Compatibility;
 
 /// <summary>
@@ -7,5 +5,5 @@ namespace DbBroker.Compatibility;
 /// </summary>
 public class DescriptorGenerator
 {
-
+    // TODO: Implement logic to generate descriptors from DBBroker Data Models on an Assembly and from Database.
 }

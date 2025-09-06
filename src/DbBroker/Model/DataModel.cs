@@ -11,6 +11,10 @@ using DbBroker.Model.Interfaces;
 
 namespace DbBroker.Model;
 
+/// <summary>
+/// Base class for Data Models
+/// </summary>
+/// <typeparam name="T">DBBroker generated Data Model</typeparam>
 public abstract class DataModel<T> : IDataModel
 {
     private static IEnumerable<PropertyInfo> _properties;
@@ -37,8 +41,16 @@ public abstract class DataModel<T> : IDataModel
 
     DataModelMap IDataModel.DataModelMap => DataModelMap;
 
+    /// <summary>
+    /// Tracks which properties are not pristine (i.e. have been modified)
+    /// </summary>
     protected Dictionary<string, bool> _IsNotPristine { get; private set; } = [];
 
+    /// <summary>
+    /// Checks if the property is not pristine (i.e. has been modified)
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
     public bool IsNotPristine(string propertyName) => _IsNotPristine.ContainsKey(propertyName);
 
     /// <summary>
@@ -68,12 +80,26 @@ public abstract class DataModel<T> : IDataModel
         }
     }
 
+    /// <summary>
+    /// The full name of the ISqlInsertTemplate implementation to use for this DataModel.
+    /// The type must have a constructor with the following signature:
+    /// (string tableName, IEnumerable&lt;DataModelMapProperty&gt; mappedProperties, SupportedDatabaseProviders provider)
+    /// </summary>
     protected static string SqlInsertTemplateTypeFullName;
 
+    /// <summary>
+    /// The arguments to pass to the ISqlInsertTemplate implementation constructor.
+    /// </summary>
     protected static object[] SqlInsertTemplateTypeArguments;
 
+    /// <summary>
+    /// The database provider this DataModel is targeting.
+    /// </summary>
     protected static SupportedDatabaseProviders Provider;
 
+    /// <summary>
+    /// Properties to ignore when building the DataModelMap
+    /// </summary>
     readonly string[] _ignoreProperties = ["ALL", "DataModelMap"];
 
     private DataModelMap GetDataModelMap()

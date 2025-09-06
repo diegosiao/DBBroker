@@ -5,6 +5,9 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// SQL Expression for BETWEEN operator
+/// </summary>
 public class SqlBetween : SqlExpression
 {
     private SqlBetween(object value1, object value2) : base(SqlOperator.Between)
@@ -28,6 +31,14 @@ public class SqlBetween : SqlExpression
         return new SqlBetween(value1, value2);
     }
 
+    /// <summary>
+    /// Renders the SQL for this expression
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="columnName"></param>
+    /// <param name="parameters"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
         if (!Parameters.Any())

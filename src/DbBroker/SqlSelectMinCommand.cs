@@ -3,8 +3,20 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// Select SQL MIN command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
+/// <typeparam name="TResult"></typeparam>
 public class SqlSelectMinCommand<TDataModel, TResult> : SqlSelectAggregateCommand<TDataModel, TResult> where TDataModel : DataModel<TDataModel>
 {
+    /// <summary>
+    /// Constructor for SQL MIN command
+    /// </summary>
+    /// <param name="dataModel"></param>
+    /// <param name="column"></param>
+    /// <param name="connection"></param>
+    /// <param name="transaction"></param>
     public SqlSelectMinCommand(
         TDataModel dataModel,
         DataModelMapProperty column,

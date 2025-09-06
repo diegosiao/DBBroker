@@ -4,6 +4,10 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// Represents a SQL UPDATE command for a specific data model type.
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
 public class SqlUpdateCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
 {
     internal SqlUpdateCommand(

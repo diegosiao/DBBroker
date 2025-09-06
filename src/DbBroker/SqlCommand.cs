@@ -18,20 +18,44 @@ namespace DbBroker;
 /// <typeparam name="TReturn"></typeparam>
 public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataModel, TReturn> where TDataModel : DataModel<TDataModel>
 {
+    /// <summary>
+    /// List of filters to apply to the SQL command
+    /// </summary>
     protected List<CommandFilter> Filters { get; set; } = [];
 
+    /// <summary>
+    /// The DataModel instance
+    /// </summary>
     protected readonly TDataModel DataModel;
 
+    /// <summary>
+    /// The list of columns to be used in the SQL command
+    /// </summary>
     protected readonly IEnumerable<DataModelMapProperty> Columns;
 
+    /// <summary>
+    /// The list of parameters to be used in the SQL command
+    /// </summary>
     protected readonly IEnumerable<DbParameter> Parameters;
 
+    /// <summary>
+    /// The database connection
+    /// </summary>
     protected readonly DbConnection Connection;
 
+    /// <summary>
+    /// The database transaction
+    /// </summary>
     protected readonly DbTransaction Transaction;
 
+    /// <summary>
+    /// The SQL template to be used in the command
+    /// </summary>
     protected string SqlTemplate { get; set; }
 
+    /// <summary>
+    /// Indicates if the command requires at least one filter to be executed
+    /// </summary>
     protected bool RequireFilter { get; set; }
 
     /// <summary>

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace DbBroker.Model;
 
+/// <summary>
+/// SQL Expression for Greater Than and Greater Than or Equal To operators
+/// </summary>
 public class SqlGreater : SqlExpression
 {
 
@@ -21,16 +24,34 @@ public class SqlGreater : SqlExpression
 
     // TODO include the ability to compare with another column
 
+    /// <summary>
+    /// Specifies the right side of the Greater Than Expression (x > y)
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static SqlGreater Than(object value)
     {
         return new SqlGreater(SqlOperator.GreaterThan, value);
     }
 
+    /// <summary>
+    /// Specifies the right side of the Greater Than or Equal To Expression (x >= y)
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static SqlGreater ThanOrEqualTo(object value)
     {
         return new SqlGreater(SqlOperator.GreaterThanOrEqual, value);
     }
 
+    /// <summary>
+    /// Renders the SQL for this expression
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="columnName"></param>
+    /// <param name="parameters"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
         if (!Parameters.Any())

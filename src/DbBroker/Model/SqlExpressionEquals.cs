@@ -32,6 +32,14 @@ public class SqlEquals : SqlExpression
         return new SqlEquals(value, lowerAll);
     }
 
+    /// <summary>
+    /// Renders the SQL for this expression
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="columnName"></param>
+    /// <param name="parameters"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
         if (!Parameters.Any())

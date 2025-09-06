@@ -6,7 +6,7 @@ using DbBroker.Model;
 namespace DbBroker;
 
 /// <summary>
-/// Apply a filter using the not equals to expression (x <> y)
+/// Represents a SQL "not equals" expression.
 /// </summary>
 public class SqlNotEquals : SqlExpression
 {
@@ -32,6 +32,14 @@ public class SqlNotEquals : SqlExpression
         return new SqlNotEquals(value, lowerAll);
     }
 
+    /// <summary>
+    /// Renders the SQL representation of the expression.
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="columnName"></param>
+    /// <param name="parameters"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
         if (!Parameters.Any())

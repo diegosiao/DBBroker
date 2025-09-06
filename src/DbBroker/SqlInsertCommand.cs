@@ -9,6 +9,10 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// SQL INSERT command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
 public class SqlInsertCommand<TDataModel> where TDataModel : DataModel<TDataModel>
 {
     private TDataModel DataModel { get; set; }
@@ -19,7 +23,7 @@ public class SqlInsertCommand<TDataModel> where TDataModel : DataModel<TDataMode
 
     internal SqlInsertCommand(
         TDataModel dataModel,
-        DbConnection connection, 
+        DbConnection connection,
         DbTransaction transaction)
     {
         DataModel = dataModel;
@@ -27,6 +31,12 @@ public class SqlInsertCommand<TDataModel> where TDataModel : DataModel<TDataMode
         Transaction = transaction;
     }
 
+    /// <summary>
+    /// Executes the INSERT command and returns the number of affected rows for consistency.
+    /// </summary>
+    /// <param name="commandTimeout"></param>
+    /// <returns></returns>
+    /// <exception cref="ApplicationException"></exception>
     public int Execute(int commandTimeout = 0)
     {
         try

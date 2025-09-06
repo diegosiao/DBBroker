@@ -5,6 +5,9 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// Represents a SQL "like" expression.
+/// </summary>
 public class SqlLike : SqlExpression
 {
     private readonly bool _lowerAll;
@@ -19,11 +22,25 @@ public class SqlLike : SqlExpression
         }
     }
 
+    /// <summary>
+    /// Creates a "like" SQL expression.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="lowerAll"></param>
+    /// <returns></returns>
     public static SqlLike To(string value, bool lowerAll = true)
     {
         return new SqlLike(value, lowerAll);
     }
 
+    /// <summary>
+    /// Renders the SQL representation of the expression.
+    /// </summary>
+    /// <param name="alias"></param>
+    /// <param name="columnName"></param>
+    /// <param name="parameters"></param>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
         if (!Parameters.Any())

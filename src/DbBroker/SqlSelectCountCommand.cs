@@ -7,6 +7,10 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
+/// <summary>
+/// SQL SELECT COUNT command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
 public class SqlSelectCountCommand<TDataModel> : SqlCommand<TDataModel, long> where TDataModel : DataModel<TDataModel>
 {
     internal SqlSelectCountCommand(
@@ -15,7 +19,12 @@ public class SqlSelectCountCommand<TDataModel> : SqlCommand<TDataModel, long> wh
         DbTransaction transaction) : base(dataModel, [], [], connection, transaction, Constants.SqlSelectCountTemplate)
     {
     }
-
+    
+    /// <summary>
+    /// Executes the SELECT COUNT command and returns the result
+    /// </summary>
+    /// <param name="commandTimeout"></param>
+    /// <returns></returns>
     public override long Execute(int commandTimeout = 0)
     {
         try

@@ -1,6 +1,6 @@
 namespace DbBroker;
 
-public class Constants
+internal class Constants
 {
     public const string SqlSelectTemplate = @"
 SELECT $$COLUMNS$$ 
