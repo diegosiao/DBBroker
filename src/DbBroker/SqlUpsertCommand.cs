@@ -43,7 +43,7 @@ WHEN NOT MATCHED THEN
         DbTransaction transaction) :
         base(dataModel, columns, parameters, connection, transaction, string.Empty)
     {
-        RequireFilter = true;
+        RequireFilter = false;
 
         switch (dataModel.DataModelMap.Provider)
         {

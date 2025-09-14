@@ -24,7 +24,9 @@ public class UpdateTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Insert(customer, transaction);
+        _oracleConnection
+            .Insert(customer, transaction)
+            .Execute();
 
         var customerInserted = _oracleConnection
             .Select<CustomersDataModel>()

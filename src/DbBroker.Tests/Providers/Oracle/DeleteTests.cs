@@ -23,7 +23,9 @@ public class DeleteTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Insert(customer, transaction);
+        _oracleConnection
+            .Insert(customer, transaction)
+            .Execute();
 
         var rowsAffected = _oracleConnection
             .Delete<CustomersDataModel>()

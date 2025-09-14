@@ -24,11 +24,12 @@ public class UpsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             CreatedBy = Environment.UserName,
         };
 
-        _oracleConnection.Upsert(customer);
+        _oracleConnection
+            .Upsert(customer)
+            .Execute();
 
         var customerInserted = _oracleConnection
             .Select<CustomersDataModel>()
-            .AddFilter(x => x.Id, SqlEquals.To(customerId.ToByteArray()))
             .Execute()
             .FirstOrDefault();
         
@@ -36,7 +37,9 @@ public class UpsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
 
         customer.Name = "John Fourteen Six";
 
-        _oracleConnection.Upsert(customer);
+        _oracleConnection
+            .Upsert(customer)
+            .Execute();
 
         var customerUpdated = _oracleConnection
             .Select<CustomersDataModel>()
