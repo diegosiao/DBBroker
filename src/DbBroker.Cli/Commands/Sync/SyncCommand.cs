@@ -17,18 +17,22 @@ public class SyncCommand
 
         var startTime = DateTime.Now;
         $"Synchronizing... Started at {startTime}.".Log();
-        var configFilesDirectory = options.ConfigFilesDirectory ?? Directory.GetCurrentDirectory();
-        var configFiles = Directory.EnumerateFiles(configFilesDirectory, "dbbroker.config.*");
+        var configFiles = 
+            options.ConfigurationFiles.Any() ?
+            options.ConfigurationFiles :
+            Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "dbbroker.config.*");
 
+        var configFilesDirectory = Directory.GetCurrentDirectory();
         if (!configFiles.Any())
         {
-            $"No configuration file was found at '{configFilesDirectory}'.".Error();
-            $"Run 'dbbroker init' at your *.csproj file level to create one.".Error();
+            $"No configuration file was found at '{configFilesDirectory}' and no file was specified using --file argument.".Error();
+            $"Run 'dbbroker init' at the same directory of your *.csproj file to create one.".Error();
             return ExitCodes.CONFIG_FILE_NOTFOUND;
         }
 
         $"Loading {configFiles.Count()} configuration(s) file(s):".Log();
         List<DbBrokerConfigContext> contexts = [];
+        bool anyLoadedContext = false;
         foreach (var configFile in configFiles)
         {
             $"- {configFile}".Log();
@@ -44,10 +48,17 @@ public class SyncCommand
                 }
 
                 contexts.AddRange(config!.Contexts!);
+                anyLoadedContext = true;
             }
         }
 
         "".Log(); // empty line
+
+        if (!anyLoadedContext)
+        {
+            "No database context loaded correctly. Finished with error.".Error();
+            return ExitCodes.NO_CONTEXT_LOADED_ERROR;
+        }
 
         var tasks = contexts
             .Select(x => new CSharpClassGenerator().GenerateAsync(x));

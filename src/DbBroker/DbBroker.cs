@@ -11,10 +11,28 @@ using DbBroker.Model;
 namespace DbBroker;
 
 /// <summary>
-/// This is the class where the magic happens through its <see cref="DbConnection"/> extension methods
+/// This is the class where the magic happens through its <see cref="DbConnection"/> extension methods.
+/// <para>It provides a simple and intuitive API to perform CRUD operations and aggregations on database records represented by Data Models.</para>
+/// <para>Each method returns a command object that can be further customized before execution.</para>
+/// <para>Example usage:</para> 
+/// <code>
+/// using (var connection = new SqlConnection(connectionString))
+/// {
+///     connection.Open();
+///     var newRecord = new YourDataModel { Property1 = "Value1", Property2 = 123 };
+///     int rowsInserted = connection.Insert(newRecord).Execute();  
+///     var existingRecord = new YourDataModel { Id = 1, Property1 = "NewValue" };
+///     int rowsUpdated = connection.Update(existingRecord)
+///         .AddFilter(x => x.Id, SqlExpression.Equal) // Specify which record to update
+///         .Execute();
+/// }
+/// </code>
 /// </summary>
 public static class DbBroker
 {
+    // TODO Add support to Async and DbBatch operations
+    // https://learn.microsoft.com/en-us/dotnet/api/system.data.common.dbbatch?view=net-9.0
+
     private const string AggregationPropertyNotInRootMessage = "The aggregation property needs to be at the root of the Data Model specified";
 
     /// <summary>
@@ -79,9 +97,9 @@ public static class DbBroker
     /// <param name="load">
     ///     <para>Properties to be included in the SQL SELECT command as columns. Keys are implicitly included.</para>
     ///     <para>PROPERTIES: Regardless of the depth being loaded, if no property of the Data Model is specified all properties will be included.</para>
-    ///     <para>COLLECTIONS: Not loaded by default, it is necessary to explicitly include collection properties. Only collections on Data Model root properties can be included. Only root properties of collections objects are loaded, regardless of the depth specified.</para>
+    ///     <para>COLLECTIONS: Not loaded by default, only loaded if explicitly included. Only collections on Data Model root properties can be included. Only root properties of collections objects are loaded, regardless of the depth specified.</para>
     /// </param>
-    /// <param name="ignore">Properties to be ignored when building the SQL SELECT command. Have precedence regarding <paramref name="load"/> parameter.</param>
+    /// <param name="ignore">Properties to be ignored when building the SQL SELECT command. Useful when want to exclude columns from the SQL SELECT. Have precedence over <paramref name="load"/> parameter.</param>
     /// <param name="transaction">The database transaction to use to execute this command.</param>
     /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded. Needs to represent the same depth or deeper than properties specified by '<paramref name="load"/>' parameter.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(

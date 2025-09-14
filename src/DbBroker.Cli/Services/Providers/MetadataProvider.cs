@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Diagnostics;
 using Dapper;
+using DbBroker.Cli.Exceptions;
 using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Interfaces;
@@ -16,11 +17,6 @@ internal abstract class MetadataProvider(string sqlSelectTablesColumns, string s
 
     public virtual async Task<Dictionary<string, TableDescriptorModel>> GetTableDescriptorsAsync(DbConnection connection, DbBrokerConfigContext context)
     {
-        if (!context.Tables.Any())
-        {
-            return [];
-        }
-
         var stopwatch = Stopwatch.StartNew();
         Dictionary<string, TableDescriptorModel> tableDescriptors = [];
 
@@ -45,12 +41,15 @@ internal abstract class MetadataProvider(string sqlSelectTablesColumns, string s
                 Columns = [.. tableColumns]
             };
 
-            var contextTable = context.Tables.First(t => t.Name.ToLower().Equals(tableDescriptor.TableName.ToLower()));
+            var contextTable = context
+                .Tables
+                .FirstOrDefault(t => t.Name.ToLower().Equals(tableDescriptor.TableName.ToLower()));
+
             tableDescriptor.Keys = [..
                 keys.Where(x =>
                     x.SchemaName.Equals(tableDescriptor.SchemaName)
                     && x.TableName.Equals(tableDescriptor.TableName)
-                    && (x.ConstraintType != "PrimaryKey" || contextTable.PrimaryKeyColumn is null || x.ColumnName.ToLower().Equals(contextTable.PrimaryKeyColumn.ToLower())))];
+                    && (x.ConstraintType != "PrimaryKey" || contextTable?.PrimaryKeyColumn is null || x.ColumnName.ToLower().Equals(contextTable?.PrimaryKeyColumn.ToLower())))];
 
             tableDescriptors.Add(tableDescriptor.TableFullName, tableDescriptor);
         }

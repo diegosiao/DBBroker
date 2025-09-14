@@ -132,9 +132,9 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 
 | Database | Status | --provider |
 |----------|--------|--------|
-| SQL Server | ✅ | SqlServer |
 | Oracle | ✅ | Oracle |
-| Postgres | ⚒️ | Postgres |
+| SQL Server | ⚒️ | SqlServer |
+| Postgres | 🛣️ | Postgres |
 | MySQL | 🛣️ | MySql |
 
 ## Contribute

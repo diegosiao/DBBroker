@@ -12,8 +12,8 @@ public class SyncOptions
     public string? Context { get; init; }
 
     [Option(
-        'c', 
-        "configFilesDirectory", 
-        HelpText = "Provide a file path directory to one or more configuration file you want to use to synchronize. File names to starting with 'dbbroker.config*' will be processed.")]
-    public string? ConfigFilesDirectory { get; init; }
+        'f',
+        "file",
+        HelpText = "Provide a file path to a configuration file you want to use to synchronize. You can use multiple files at once.")]
+    public IEnumerable<string> ConfigurationFiles { get; init; } = [];
 }

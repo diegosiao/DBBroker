@@ -77,7 +77,7 @@ public static class ResolversExtensions
     {
         switch (provider)
         {
-            case SupportedDatabaseProviders.SqlServer:
+            case SupportedDatabaseProviders.SqlServer:                
                 return Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlParameter, Microsoft.Data.SqlClient"), $"@{name}", value) as DbParameter;
 
             case SupportedDatabaseProviders.Oracle:

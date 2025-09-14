@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using DbBroker.Extensions;
 using DbBroker.Model;
 using DbBroker.Model.Interfaces;
@@ -121,13 +122,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
             .Replace("$$FILTERS$$", Filters.RenderWhereClause()); // TODO: Expose a configuration flag to avoid not filtered UPDATE or DELETE by default
     }
 
-    /// <summary>
-    /// Executes the SQL command
-    /// </summary>
-    /// <param name="commandTimeout">The time in seconds to wait the execution</param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public virtual TReturn Execute(int commandTimeout = 0)
+    private DbCommand PrepareCommand(int commandTimeout = 0)
     {
         if (RequireFilter && Filters.Count == 0)
         {
@@ -154,6 +149,30 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
 
         Debug.WriteLine(command.CommandText);
 
+        return command;
+    }
+
+    /// <summary>
+    /// Executes the SQL command
+    /// </summary>
+    /// <param name="commandTimeout">The time in seconds to wait the execution</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public virtual TReturn Execute(int commandTimeout = 0)
+    {
+        var command = PrepareCommand(commandTimeout);
         return (TReturn)(object)command.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// Executes the SQL command asynchronously
+    /// </summary>
+    /// <param name="commandTimeout">The time in seconds to wait the execution</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public virtual async Task<TReturn> ExecuteAsync(int commandTimeout = 0)
+    {
+        var command = PrepareCommand(commandTimeout);
+        return (TReturn)(object) await command.ExecuteNonQueryAsync();
     }
 }

@@ -1,5 +1,6 @@
 using DbBroker.Cli.Model;
 using DbBroker.Common;
+using System.Data;
 
 namespace DbBroker.Cli.Extensions;
 
@@ -11,9 +12,39 @@ public static class ResolversExtensions
         {
             case SupportedDatabaseProviders.Oracle:
                 return GetOracleDbTypeString(columnDescriptorModel);
-
+            case SupportedDatabaseProviders.SqlServer:
+                return GetSqlServerDbTypeString(columnDescriptorModel);
             default:
                 throw new NotImplementedException($"Provider DbType resolution not implemented for {provider}");
+        }
+    }
+
+    /// <summary>
+    /// https://learn.microsoft.com/en-us/dotnet/api/system.data.sqldbtype?view=net-9.0
+    /// </summary>
+    /// <param name="columnDescriptorModel"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private static string GetSqlServerDbTypeString(ColumnDescriptorModel columnDescriptorModel)
+    {
+        switch (columnDescriptorModel.DataType.ToLower())
+        {
+            case "varchar":
+                return "SqlDbType.VarChar";
+            case "datetime":
+                return "SqlDbType.DateTime";
+            case "datetime2":
+                return "SqlDbType.DateTime2";
+            case "date":
+                return "SqlDbType.Date";
+            case "money":
+                return "SqlDbType.Money";
+            case "uniqueidentifier":
+                return "SqlDbType.UniqueIdentifier";
+            case "int":
+                return "SqlDbType.Int";
+            default:
+                throw new NotImplementedException();
         }
     }
 
@@ -59,6 +90,7 @@ public static class ResolversExtensions
         return provider switch
         {
             SupportedDatabaseProviders.Oracle => "using Oracle.ManagedDataAccess.Client;",
+            SupportedDatabaseProviders.SqlServer => "using System.Data;",
             _ => throw new NotImplementedException($"Client namespace not implemented for {provider}"),
         };
     }

@@ -23,17 +23,18 @@ Once the databases are ready, install DBBroker CLI and generate the Data Models:
 A running container does not mean the database is ready.
 Check the databases containers logs or healthcheck status to make sure the databases are ready.
 
-Why should I use DBBroker?
-.NET ADO         -> SQL +++++  Code +++++
-Dapper           -> SQL +++++  Code ++++
-Dapper.Contrib   -> SQL ++     Code +++
-BBroker          -> SQL +      Code +
+> Why should I use DBBroker?
+
+If you choose to use it, you will effortlessly generate and maintain Data Models classes
+that represents your database, besides you will get out-of-the-box CRUD and aggregation operations,
+plus application compatibility reports.
 
 All good? Showtime now? 
 (y/n): ");
 
 if (!Debugger.IsAttached && (!Console.ReadLine()?.ToLower().Equals("y") ?? true))
 {
+    Environment.Exit(0);
     return;
 }
 
@@ -53,31 +54,30 @@ using var connection = typeof(CustomersDataModel)
     .GetConnection("user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;");
 
 // Retrieving data
-// var orders = connection
-//     .Select<OrdersDataModel>(
-//         load: [
-//             // Root properties (depth 0)
-//             (x => x.CreatedAt),
-//             (x => x.CreatedBy),
+var orders = connection
+    .Select<OrdersDataModel>(
+        load: [
 
-//             // Just 'Name' for Customer (depth 1)
-//             (x => x.CustomerIdRef!.Name), 
+            // Root properties (depth 0)
+            (x => x.CreatedAt),
+            (x => x.CreatedBy),
+
+            // Just 'Name' for Customer (depth 1)
+            (x => x.CustomerIdRef!.Name), 
             
-//             // Just 'Country' and 'State' for Address (depth 2)
-//             (x => x.CustomerIdRef!.AddressIdRef!.Country),
-//             (x => x.CustomerIdRef!.AddressIdRef!.State),
+            // Just 'Country' and 'State' for Address (depth 2)
+            (x => x.CustomerIdRef!.AddressIdRef!.Country),
+            (x => x.CustomerIdRef!.AddressIdRef!.State),
             
-//             // Explicitly loading collections
-//             (x => x.OrdersProductsOrderIdRefs),
-//             (x => x.OrdersNotesOrderIdRefs)
-//         ],
-//         depth: 2,
-//         skip: 1,
-//         take: 2)
-//     .OrderBy(x => x.CreatedBy)
-//     .OrderBy(x => x.CustomerIdRef!.Name, ascending: false)
-//     //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
-//     .Execute();
+             // Explicitly loading collections
+            (x => x.OrdersProductsOrderIdRefs),
+            (x => x.OrdersNotesOrderIdRefs)
+        ],
+        depth: 2)
+    .OrderBy(x => x.CreatedBy)
+    .OrderBy(x => x.CustomerIdRef!.Name, ascending: false)
+    //.AddFilter(x => x.CustomerId, SqlEquals.To(OracleSeeder.customerId_1))
+    .Execute();
 
 // var orderSummary = connection
 //     .Select<UvwOrderSummaryDataModel>()

@@ -67,7 +67,7 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
     }
 
     /// <summary>
-    /// Offsets the select result by number of records specified
+    /// Offsets the select result by the number of records specified
     /// </summary>
     /// <param name="skip"></param>
     /// <returns></returns>
@@ -78,7 +78,7 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
     }
 
     /// <summary>
-    /// Offsets the select result by number of records specified
+    /// Offsets the select result by the number of records specified
     /// </summary>
     /// <param name="skip"></param>
     /// <returns></returns>

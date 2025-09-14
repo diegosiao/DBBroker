@@ -32,7 +32,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             {
                 throw new DbBrokerConfigurationException("The context does not have a Connection String specified. ");
             }
-
+            
             using var connection = context.GetDbConnection();
 
             var sqlTransformer = context.GetSqlTransformer();
@@ -69,8 +69,8 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             $"Output directory: {resolvedOutputDirectory}".Log(context.Namespace);
 
             await Task.WhenAll(
-                GenerateClassesForTables(tablesDescriptors, context, sqlTransformer, providerDefaultConfig, outputDirectory),
-                GenerateClassesForViews(viewsDescriptors, context, sqlTransformer, outputDirectory));
+                GenerateClassesForTables(tablesDescriptors, context, sqlTransformer, providerDefaultConfig, resolvedOutputDirectory),
+                GenerateClassesForViews(viewsDescriptors, context, sqlTransformer, resolvedOutputDirectory));
         }
         catch (Exception ex)
         {

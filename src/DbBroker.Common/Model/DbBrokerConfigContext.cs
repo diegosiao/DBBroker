@@ -19,7 +19,7 @@ public class DbBrokerConfigContext
     public string ConnectionStringKey { get; set; }
 
     /// <summary>
-    /// Optional. Will override the default behavior of using the namespace as folder structure (skipping the first namespace segment when multiple).
+    /// Optional. Will override the default behavior of using the namespace as folder structure.
     /// </summary>
     public string OutputDirectory { get; set; }
 

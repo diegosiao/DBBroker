@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DbBroker.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "sync --file ./../../../../DbBroker.Tests.DataModels/Tests/DataModels/SqlServer/dbbroker.config.json"
+    }
+  }
+}

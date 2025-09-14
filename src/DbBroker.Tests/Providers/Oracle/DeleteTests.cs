@@ -1,5 +1,4 @@
 using System.Data.Common;
-using DbBroker.Model;
 using DbBroker.Tests.DataModels.Oracle;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
