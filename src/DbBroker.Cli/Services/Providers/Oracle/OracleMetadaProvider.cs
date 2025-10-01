@@ -4,7 +4,11 @@ namespace DbBroker.Cli.Services.Providers.Oracle;
 
 internal class OracleMetadaProvider : MetadataProvider
 {
-    internal OracleMetadaProvider() : base(OracleConstants.SELECT_TABLES_COLUMNS, OracleConstants.SELECT_VIEWS_COLUMNS, OracleConstants.SELECT_KEYS)
+    internal OracleMetadaProvider()
+        : base(
+            OracleConstants.SELECT_TABLES_COLUMNS,
+            OracleConstants.SELECT_VIEWS_COLUMNS,
+            OracleConstants.SELECT_KEYS)
     {
     }
 

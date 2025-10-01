@@ -1,7 +1,6 @@
 using System.Data.Common;
 using System.Data.SqlClient;
 using DbBroker.Cli.Services.Interfaces;
-using DbBroker.Cli.Services.Providers;
 using DbBroker.Cli.Services.Providers.Oracle;
 using DbBroker.Cli.Services.Providers.SqlServer;
 using DbBroker.Common;

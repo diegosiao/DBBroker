@@ -1,7 +1,7 @@
 namespace DbBroker.Cli.Services.Interfaces;
 
 /// <summary>
-/// Methods to transform SQL in C#
+/// Methods to translate Database types into C# types
 /// </summary>
 public interface ISqlTransformer 
 {

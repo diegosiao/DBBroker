@@ -1,7 +1,6 @@
 using System.Data.Common;
 using System.Diagnostics;
 using Dapper;
-using DbBroker.Cli.Exceptions;
 using DbBroker.Cli.Extensions;
 using DbBroker.Cli.Model;
 using DbBroker.Cli.Services.Interfaces;

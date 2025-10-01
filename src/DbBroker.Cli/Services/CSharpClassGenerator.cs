@@ -34,18 +34,15 @@ public class CSharpClassGenerator : ICSharpClassGenerator
             }
             
             using var connection = context.GetDbConnection();
+            connection.Open();
 
-            var sqlTransformer = context.GetSqlTransformer();
+            var metadataProvider = context.GetMetadataProvider();
 
-            var tablesDescriptors = await context
-                .GetMetadataProvider()
+            var tablesDescriptors = await metadataProvider
                 .GetTableDescriptorsAsync(connection, context);
 
-            var viewsDescriptors = await context
-                .GetMetadataProvider()
+            var viewsDescriptors = await metadataProvider
                 .GetViewsDescriptorsAsync(connection, context);
-
-            var providerDefaultConfig = context.GetDefaultProviderConfig();
 
             var outputDirectory = (context.Namespace?.Split(".")?.Length > 1 ? string.Join(Path.DirectorySeparatorChar, context.Namespace.Split(".").Skip(1)) : context.Namespace) ?? string.Empty;
             outputDirectory = Path.Combine(Directory.GetCurrentDirectory(), outputDirectory!);
@@ -68,9 +65,24 @@ public class CSharpClassGenerator : ICSharpClassGenerator
 
             $"Output directory: {resolvedOutputDirectory}".Log(context.Namespace);
 
+            var sqlTransformer = context.GetSqlTransformer();
+            var providerDefaultConfig = context.GetDefaultProviderConfig();
+
             await Task.WhenAll(
                 GenerateClassesForTables(tablesDescriptors, context, sqlTransformer, providerDefaultConfig, resolvedOutputDirectory),
                 GenerateClassesForViews(viewsDescriptors, context, sqlTransformer, resolvedOutputDirectory));
+        }
+        catch (DbBrokerConfigurationException configEx)
+        {
+            configEx.Message.Error(context.Namespace);
+
+            if (Debugger.IsAttached)
+            {
+                configEx.StackTrace?.Error(context.Namespace);
+            }
+
+            SyncCommand.Results.Add(context.Namespace, ExitCodes.CONFIG_FILE_INIT_ERROR);
+            return ExitCodes.CONFIG_FILE_INIT_ERROR;
         }
         catch (Exception ex)
         {

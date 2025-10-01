@@ -72,10 +72,10 @@ public class SyncCommand
         }
 
         "There is an error synchronizing the Data Models.".Error();
-        "Namespaces with error(s): ".Error();
+        "Contexts with error(s): ".Error();
         foreach (var result in Results)
         {
-            $"- {result.Key}: Code {result.Value}".Error();
+            $"- {result.Key}: [{result.Value}] {ExitCodes.Messages[result.Value]}".Error();
         }
         return 1;
     }
