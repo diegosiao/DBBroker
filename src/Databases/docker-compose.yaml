@@ -3,6 +3,7 @@ name: dbbroker-databases
 services:
   sqlserver:
     container_name: sqlserver
+    image: dbbroker-sqlserver
     build:
       context: ./SqlServer
       dockerfile: Dockerfile
@@ -19,6 +20,7 @@ services:
 
   oracle:
     container_name: oracle
+    image: dbbroker-oracle
     build:
       context: ./Oracle
       dockerfile: Dockerfile
@@ -31,6 +33,7 @@ services:
 
   postgres:
     container_name: postgres
+    image: dbbroker-postgres
     build:
       context: ./Postgres
       dockerfile: Dockerfile
@@ -48,6 +51,7 @@ services:
       
   mysql:
     container_name: mysql
+    image: dbbroker-mysql
     build: 
       context: ./MySQL 
       dockerfile: Dockerfile

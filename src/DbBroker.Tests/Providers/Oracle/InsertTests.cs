@@ -38,7 +38,7 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
         }
 
         var transaction = _oracleConnection.BeginTransaction();
-        AddressDataModel address = new()
+        AddressesDataModel address = new()
         {
             Id = Guid.NewGuid().ToByteArray(),
             Street = "Prudente De Morais, Av.",
@@ -64,6 +64,8 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             Id = Guid.NewGuid().ToByteArray(),
             CustomerId = customer.Id,
             StatusId = 1,
+            BillingAddressId = address.Id,
+            ShippingAddressId = address.Id,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = Environment.UserName,
         };

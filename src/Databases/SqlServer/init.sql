@@ -13,6 +13,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Customers](
 	[Id] [uniqueidentifier] NOT NULL,
+	[AddressId] [uniqueidentifier],
 	[Name] [varchar](250) NOT NULL,
 	[Email] [varchar](250) NULL,
 	[Birthday] [date] NULL,
@@ -183,7 +184,7 @@ CREATE TABLE [dbo].[PromotionsEnrollments](
 GO
 
 -- #CONSTRAINTS
-ALTER TABLE [dbo].[Customers] WITH CHECK ADD CONSTRAINT FK_CustomersAddressId FOREIGN KEY([Id])
+ALTER TABLE [dbo].[Customers] WITH CHECK ADD CONSTRAINT FK_CustomersAddressId FOREIGN KEY([AddressId])
 REFERENCES [dbo].[Addresses] ([Id])
 GO
 --

@@ -6,7 +6,7 @@ Generate your Data Models easily and work seamlessly with [DBBroker](https://www
 dotnet tool install --global DbBroker.Cli
 
 # Or if you are building from source
-dotnet tool install --global --add-source ./bin/Debug/ dbbroker.cli
+dotnet tool install --global --prerelease --add-source ./bin/Debug/ dbbroker.cli
 ```
 
 On your terminal navigate to the `.csproj` file of the DataModels project directory then follow the instructions below.
