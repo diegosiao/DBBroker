@@ -2,6 +2,7 @@ name: dbbroker-databases
 
 services:
   sqlserver:
+    container_name: sqlserver
     build:
       context: ./SqlServer
       dockerfile: Dockerfile
@@ -17,6 +18,7 @@ services:
       - no-oracle
 
   oracle:
+    container_name: oracle
     build:
       context: ./Oracle
       dockerfile: Dockerfile
@@ -28,6 +30,7 @@ services:
       - all
 
   postgres:
+    container_name: postgres
     build:
       context: ./Postgres
       dockerfile: Dockerfile
@@ -43,10 +46,11 @@ services:
       - all
       - no-oracle
       
-  mysql: 
+  mysql:
+    container_name: mysql
     build: 
       context: ./MySQL 
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     environment: 
       MYSQL_ROOT_PASSWORD: "DBBroker_1" 
       MYSQL_DATABASE: "dbbroker" 
