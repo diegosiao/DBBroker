@@ -46,7 +46,7 @@ WHERE 1=1
 $$FILTERS$$";
 
     public const string SqlDeleteTemplate = @"
-DELETE $$TABLEFULLNAME$$
+DELETE FROM $$TABLEFULLNAME$$
 WHERE 1=1
 $$FILTERS$$";
 }
