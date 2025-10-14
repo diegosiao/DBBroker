@@ -23,6 +23,14 @@ class Program
             .MapResult(
                 (InitOptions opts) => InitCommand.Execute(opts),
                 (SyncOptions opts) => SyncCommand.Execute(opts),
-                errs => 1);
+                errs =>
+                {
+                    foreach (var err in errs)
+                    {
+                        err.ToString()?.Error();
+                    }
+
+                    return 1;
+                });
     }
 }

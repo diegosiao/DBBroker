@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DbBroker.Attributes;
 using DbBroker.Common;
+using DbBroker.Common.Model;
 using DbBroker.Common.Model.Interfaces;
 using DbBroker.Model.Interfaces;
 
@@ -111,11 +113,22 @@ public abstract class DataModel<T> : IDataModel
         {
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
-            Provider = Provider,
-            SqlInsertTemplate = this is IViewDataModel ?
-                null
-                : Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments) as ISqlInsertTemplate,
+            Provider = Provider
         };
+
+        var insertTemplateType = Type.GetType(SqlInsertTemplateTypeFullName);
+
+        if (insertTemplateType is null && SqlInsertTemplateTypeFullName is not null)
+        {
+            throw new ApplicationException($"Could not find type '{SqlInsertTemplateTypeFullName}' for DataModel '{typeof(T).FullName}'.");
+        }
+
+        if (insertTemplateType is not null && this is not IViewDataModel)
+        {
+            dataModelMap.SqlInsertTemplate =
+                Activator.CreateInstance(insertTemplateType, SqlInsertTemplateTypeArguments) as ISqlInsertTemplate;
+        }
+
 
         var index = 0;
         foreach (var property in Properties)

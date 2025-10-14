@@ -93,7 +93,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
                 ex.StackTrace?.Error(context.Namespace);
             }
 
-            SyncCommand.Results.Add(context.Namespace, 1);
+            SyncCommand.Results.Add(context.Namespace, ExitCodes.CONTEXT_GENERIC_ERROR);
             return 1;
         }
 

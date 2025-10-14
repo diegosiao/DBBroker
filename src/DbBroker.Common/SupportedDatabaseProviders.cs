@@ -25,7 +25,8 @@ public enum SupportedDatabaseProviders
     /// </summary>
     Oracle,
 
+    Postgres,
+    
     // Roadmap...
-    // Postgres,
     // MySQl
 }

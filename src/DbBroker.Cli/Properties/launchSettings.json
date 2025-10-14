@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "DbBroker.Cli": {
+    "DbBroker.Cli.Sync": {
       "commandName": "Project",
-      "commandLineArgs": "sync --file ./../../../../DbBroker.Tests.DataModels/Tests/DataModels/Oracle/dbbroker.config.json --file ./../../../../DbBroker.Tests.DataModels/Tests/DataModels/SqlServer/dbbroker.config.json"
+      "commandLineArgs": "sync --file C:\\Users\\USER\\git\\finbook\\src\\back-end\\Finbook.Infrastructure.Persistence\\dbbroker.config.json"
+    },
+    "DbBroker.Cli.Init": {
+      "commandName": "Project",
+      "commandLineArgs": "init --namespace Finbook.Persistence.DataModels --connectionString Host=localhost;Port=5432;Username=admin;Password=admin;Database=finbook;Pooling=true;"
     }
   }
 }

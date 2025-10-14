@@ -9,9 +9,8 @@ public class InitOptions
     [Option(
         'n', 
         "namespace", 
-        HelpText = "The namespace the classes generated should be put in. Required.", 
-        Required = true)]
-    public required string Namespace { get; init; }
+        HelpText = "The namespace the classes generated should be put in. Required.")]
+    public string? Namespace { get; init; }
 
     [Option(
         'p', 
@@ -23,13 +22,18 @@ public class InitOptions
     [Option(
         'c', 
         "connectionString", 
-        HelpText = "The database provider connection string. Required.", 
-        Required = true)]
-    public required string ConnectionString { get; init; }
+        HelpText = "The database provider connection string. Required.")]
+    public string? ConnectionString { get; init; }
 
     [Option(
         'f',
         "force",
         HelpText = "Overrides the dbbroker.config.json file if it exists. Default is false.")]
     public bool Force { get; set; }
+
+    [Option(
+    'd',
+    "working-directory",
+    HelpText = "Overrides the executable working directory.")]
+    public string? WorkingDirectory { get; set; }
 }

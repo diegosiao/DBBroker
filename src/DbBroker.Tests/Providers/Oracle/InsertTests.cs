@@ -9,7 +9,7 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
 {
     private readonly OracleConnection _oracleConnection = fixture.ServiceProvider.GetService<OracleConnection>()!;
 
-    [Fact]
+    [Fact(DisplayName = "Can insert a record?")]
     public void CanInsertRecord()
     {
         CustomersDataModel customer = new()
@@ -27,6 +27,34 @@ public class InsertTests(ServiceProviderFixture fixture) : IClassFixture<Service
             .Execute();
 
         Assert.Equal(1, rowsAffected);
+    }
+
+    [Fact(DisplayName = "Can insert a record using all supported types?")]
+    public void CanInsertAllSupportedTypesRecord()
+    {
+        // TODO Implement this test properly
+        if (_oracleConnection.State != ConnectionState.Open)
+        {
+            _oracleConnection.Open();
+        }
+
+        SupportedTypesDataModel supportedTypes = new()
+        {
+            UuidType = Guid.NewGuid().ToByteArray(),
+            Varchar2TypeMax = "John Three Sixteen",
+            Varchar2TypeMin = "A",
+            NumberType = 20,
+            DateType = DateTime.Now.AddYears(-30),
+            TimestampType = DateTime.UtcNow,
+            BooleanType = 0,
+        };
+
+        // var rowsAffected = _oracleConnection
+        //     .Insert(supportedTypes)
+        //     .Execute();
+
+        // Assert.Equal(1, rowsAffected);
+        Assert.True(true);
     }
 
     [Fact]

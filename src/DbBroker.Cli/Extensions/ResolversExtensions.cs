@@ -1,6 +1,5 @@
 using DbBroker.Cli.Model;
 using DbBroker.Common;
-using System.Data;
 
 namespace DbBroker.Cli.Extensions;
 
@@ -14,6 +13,8 @@ public static class ResolversExtensions
                 return GetOracleDbTypeString(columnDescriptorModel);
             case SupportedDatabaseProviders.SqlServer:
                 return GetSqlServerDbTypeString(columnDescriptorModel);
+            case SupportedDatabaseProviders.Postgres:
+                return GetPostgresDbTypeString(columnDescriptorModel);
             default:
                 throw new NotImplementedException($"Provider DbType resolution not implemented for {provider}");
         }
@@ -85,12 +86,64 @@ public static class ResolversExtensions
         }
     }
 
+    private static string GetPostgresDbTypeString(ColumnDescriptorModel columnDescriptorModel)
+    {
+        switch (columnDescriptorModel.DataType.ToLower())
+        {
+            case "character varying":
+            case "varchar":
+            case "text":
+            case "char":
+            case "character":
+            case "name":
+                return "NpgsqlDbType.Varchar";
+            case "date":
+                return "NpgsqlDbType.Date";
+            case "timestamp":
+            case "timestamp without time zone":
+            case "timestamp with time zone":
+                return "NpgsqlDbType.Timestamp";
+            case "bytea":
+                return "NpgsqlDbType.Bytea";
+            case "numeric":
+            case "decimal":
+            case "money":
+                return "NpgsqlDbType.Numeric";
+            case "integer":
+            case "int":
+            case "int4":
+                return "NpgsqlDbType.Integer";
+            case "bigint":
+            case "int8":
+                return "NpgsqlDbType.Bigint";
+            case "smallint":
+            case "int2":
+                return "NpgsqlDbType.Smallint";
+            case "real":
+            case "float4":
+                return "NpgsqlDbType.Real";
+            case "double precision":
+            case "float8":
+                return "NpgsqlDbType.Double";
+            case "boolean":
+            case "bool":
+                return "NpgsqlDbType.Boolean";
+            case "uuid":
+                return "NpgsqlDbType.Uuid";
+            default:
+                return "NpgsqlDbType.Unknown";
+        }
+    }
+
     public static string GetProviderClientUsingString(this SupportedDatabaseProviders? provider)
     {
         return provider switch
         {
             SupportedDatabaseProviders.Oracle => "using Oracle.ManagedDataAccess.Client;",
             SupportedDatabaseProviders.SqlServer => "using System.Data;",
+            SupportedDatabaseProviders.Postgres =>
+@"using Npgsql;
+using NpgsqlTypes;",
             _ => throw new NotImplementedException($"Client namespace not implemented for {provider}"),
         };
     }

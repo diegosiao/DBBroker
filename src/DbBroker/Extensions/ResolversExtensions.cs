@@ -37,6 +37,7 @@ public static class ResolversExtensions
         {
             SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("System.Data.SqlClient.SqlConnection, System.Data.SqlClient"), connectionString) as DbConnection,
             SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleConnection, Oracle.ManagedDataAccess"), connectionString) as DbConnection,
+            SupportedDatabaseProviders.Postgres => Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlConnection, Npgsql"), connectionString) as DbConnection,
             _ => throw new ArgumentException($"Not supported database provider: {dataModelBase?.DataModelMap?.Provider}"),
         };
     }
@@ -60,6 +61,7 @@ public static class ResolversExtensions
         {
             SupportedDatabaseProviders.SqlServer => Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlConnection, Microsoft.Data.SqlClient"), connectionString) as DbConnection,
             SupportedDatabaseProviders.Oracle => Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleConnection, Oracle.ManagedDataAccess"), connectionString) as DbConnection,
+            SupportedDatabaseProviders.Postgres => Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlConnection, Npgsql"), connectionString) as DbConnection,
             _ => throw new ArgumentException($"Not supported database provider: {dataModelBase.DataModelMap.Provider}"),
         };
     }
@@ -82,6 +84,9 @@ public static class ResolversExtensions
 
             case SupportedDatabaseProviders.Oracle:
                 return Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess"), $":{name}", value) as DbParameter;
+
+            case SupportedDatabaseProviders.Postgres:
+                return Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlParameter, Npgsql"), $"@{name}", value) as DbParameter;
 
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");
@@ -112,6 +117,9 @@ public static class ResolversExtensions
                 //parameter.DbType = GetOracleDbType(dataModelMapProperty.PropertyInfo);
                 parameter.GetType().GetProperty("OracleDbType").SetValue(parameter, dataModelMapProperty.ProviderDbType);
                 return parameter;
+            
+            case SupportedDatabaseProviders.Postgres:
+                return Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlParameter, Npgsql"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
 
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");
@@ -133,30 +141,9 @@ public static class ResolversExtensions
         {
             SupportedDatabaseProviders.Oracle => GetOracleDbType(propertyInfo),
             SupportedDatabaseProviders.SqlServer => GetSqlServerDbType(propertyInfo),
+            SupportedDatabaseProviders.Postgres => GetPostgresDbType(propertyInfo),
             _ => throw new ArgumentException($"Not supported database provider: {provider}"),
         };
-    }
-
-    private static DbType GetSqlServerDbType(PropertyInfo propertyInfo)
-    {
-        if (propertyInfo.PropertyType == typeof(decimal))
-        {
-            return DbType.Decimal;
-        }
-
-        if (integerOracleTypes.Contains(propertyInfo.PropertyType))
-        {
-            return DbType.Int32;
-        }
-
-        if (dateTimeOracleTypes.Contains(propertyInfo.PropertyType))
-        {
-            return DbType.DateTime;
-        }
-
-
-
-        throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
     }
 
     /// <summary>
@@ -175,9 +162,29 @@ public static class ResolversExtensions
         };
     }
 
-    private static readonly Type[] dateTimeOracleTypes = [typeof(DateTime), typeof(DateTime?)];
+    private static readonly Type[] dateTimeTypes = [typeof(DateTime), typeof(DateTime?)];
 
-    private static readonly Type[] integerOracleTypes = [typeof(int), typeof(byte)];
+    private static readonly Type[] integerTypes = [typeof(int), typeof(byte)];
+
+    private static DbType GetSqlServerDbType(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.PropertyType == typeof(decimal))
+        {
+            return DbType.Decimal;
+        }
+
+        if (integerTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        if (dateTimeTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.DateTime;
+        }
+
+        throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
+    }
 
     private static DbType GetOracleDbType(PropertyInfo propertyInfo)
     {
@@ -191,12 +198,37 @@ public static class ResolversExtensions
             return DbType.Decimal;
         }
 
-        if (integerOracleTypes.Contains(propertyInfo.PropertyType))
+        if (integerTypes.Contains(propertyInfo.PropertyType))
         {
             return DbType.Int32;
         }
 
-        if (dateTimeOracleTypes.Contains(propertyInfo.PropertyType))
+        if (dateTimeTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.DateTime;
+        }
+
+        throw new ArgumentException($"Database type mapping not available: {propertyInfo.PropertyType.Name}");
+    }
+
+    private static DbType GetPostgresDbType(PropertyInfo propertyInfo)
+    {
+        if (new Type[] { typeof(int), typeof(byte) }.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        if (propertyInfo.PropertyType == typeof(decimal))
+        {
+            return DbType.Decimal;
+        }
+
+        if (integerTypes.Contains(propertyInfo.PropertyType))
+        {
+            return DbType.Int32;
+        }
+
+        if (dateTimeTypes.Contains(propertyInfo.PropertyType))
         {
             return DbType.DateTime;
         }
