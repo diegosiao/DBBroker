@@ -10,6 +10,7 @@ using DbBroker.Model.Interfaces;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace DbBroker;
 
@@ -277,7 +278,7 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
             var propertyPathSplitted = propertyPath.Split('.');
             if (propertyPathSplitted.Count() == 1)
             {
-                orderByColumns.Add($"d0.{DataModel.DataModelMap.MappedProperties[propertyPath].ColumnName} {(IsOrderByAscending(propertyPath) ? "ASC" : "DESC")}");
+                orderByColumns.Add($"d0.\"{DataModel.DataModelMap.MappedProperties[propertyPath].ColumnName}\" {(IsOrderByAscending(propertyPath) ? "ASC" : "DESC")}");
                 continue;
             }
 
@@ -289,14 +290,14 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
                     .DataModelMap
                     .MappedProperties[propertyPathSplitted.TakeLast(1).First()];
 
-                orderByColumns.Add($"{join.RefTableNameAlias}.{mappedProperty.ColumnName} {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
+                orderByColumns.Add($"{join.RefTableNameAlias}.\"{mappedProperty.ColumnName}\" {(IsOrderByAscending($"{join.Path}.{mappedProperty.PropertyName}") ? "ASC" : "DESC")}");
                 continue;
             }
 
             if (DataModel is IViewDataModel)
             {
                 // TODO check if all providers do not accept duplicated columns on views like Oracle
-                orderByColumns.Add($"d0.{propertyPathSplitted.Last()} {(column.Asc ? "ASC" : "DESC")}");
+                orderByColumns.Add($"d0.\"{propertyPathSplitted.Last()}\" {(column.Asc ? "ASC" : "DESC")}");
             }
         }
 
@@ -328,7 +329,7 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
                     x => x.Value.IsKey
                     || includedRootProperties.Count() == 0
                     || includedRootProperties.Any(p => p.Equals(x.Value.PropertyName)))
-                .Select(x => $"d0.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
+                .Select(x => $"d0.\"{x.Value.ColumnName}\" AS {x.Value.PropertyName}"));
 
         // Only the ones affecting joins
         var includedReferencesProperties = _load
@@ -348,7 +349,7 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
                     .Where(x => joinIncludedProperties.Any() ?
                                     joinIncludedProperties.Contains($"{join.Path}.{x.Value.PropertyName}") || x.Value.IsKey
                                     : true)
-                    .Select(x => $"{join.RefTableNameAlias}.{x.Value.ColumnName} AS {x.Value.PropertyName}"));
+                    .Select(x => $"{join.RefTableNameAlias}.\"{x.Value.ColumnName}\" AS {x.Value.PropertyName}"));
         }
 
         // Views: The split columns are required
@@ -406,6 +407,16 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
             commandTimeout: commandTimeout,
             commandType: CommandType.Text)
             .Distinct();
+    }
+
+    /// <summary>
+    /// Executes the SQL command asynchronously
+    /// </summary>
+    /// <param name="commandTimeout">The time in seconds to wait the execution</param>
+    /// <returns></returns>
+    public override async Task<IEnumerable<TDataModel>> ExecuteAsync(int commandTimeout = 0)
+    {
+        return await Task.Run(() => Execute(commandTimeout));
     }
 
     private TDataModel MapResult(params object[] objs)

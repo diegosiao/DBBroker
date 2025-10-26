@@ -108,18 +108,18 @@ public static class ResolversExtensions
         switch (provider)
         {
             case SupportedDatabaseProviders.SqlServer:
-                return Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlParameter, Microsoft.Data.SqlClient"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
+                return Activator.CreateInstance(Type.GetType("Microsoft.Data.SqlClient.SqlParameter, Microsoft.Data.SqlClient"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel) ?? DBNull.Value) as DbParameter;
 
             case SupportedDatabaseProviders.Oracle:
                 var parameter = Activator.CreateInstance(Type.GetType("Oracle.ManagedDataAccess.Client.OracleParameter, Oracle.ManagedDataAccess")) as DbParameter;
                 parameter.ParameterName = $":{dataModelMapProperty.ColumnName}";
-                parameter.Value = dataModelMapProperty.PropertyInfo.GetValue(dataModel);
+                parameter.Value = dataModelMapProperty.PropertyInfo.GetValue(dataModel) ?? DBNull.Value;
                 //parameter.DbType = GetOracleDbType(dataModelMapProperty.PropertyInfo);
                 parameter.GetType().GetProperty("OracleDbType").SetValue(parameter, dataModelMapProperty.ProviderDbType);
                 return parameter;
             
             case SupportedDatabaseProviders.Postgres:
-                return Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlParameter, Npgsql"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel)) as DbParameter;
+                return Activator.CreateInstance(Type.GetType("Npgsql.NpgsqlParameter, Npgsql"), $"@{dataModelMapProperty.ColumnName}", dataModelMapProperty.PropertyInfo.GetValue(dataModel) ?? DBNull.Value) as DbParameter;
 
             default:
                 throw new ArgumentException($"Not supported database provider: {provider}");

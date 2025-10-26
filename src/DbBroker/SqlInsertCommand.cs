@@ -1,11 +1,12 @@
+using DbBroker.Extensions;
+using DbBroker.Model;
 using System;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using DbBroker.Extensions;
-using DbBroker.Model;
+using System.Threading.Tasks;
 
 namespace DbBroker;
 
@@ -29,6 +30,17 @@ public class SqlInsertCommand<TDataModel> where TDataModel : DataModel<TDataMode
         DataModel = dataModel;
         Connection = connection;
         Transaction = transaction;
+    }
+
+    /// <summary>
+    /// Executes the SQL command asynchronously
+    /// </summary>
+    /// <param name="commandTimeout">The time in seconds to wait the execution</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task<int> ExecuteAsync(int commandTimeout = 0)
+    {
+        return await Task.Run(() => Execute(commandTimeout));
     }
 
     /// <summary>

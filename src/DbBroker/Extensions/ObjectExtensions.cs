@@ -44,7 +44,7 @@ public static class ObjectExtensions
         foreach (var prop in type.GetProperties())
         {
             var column = prop.GetCustomAttribute<ColumnAttribute>().Name;
-            yield return $"{alias}{column} AS {prop.Name}";
+            yield return $"\"{alias}{column}\" AS {prop.Name}";
         }
     }
 }
