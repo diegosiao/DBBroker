@@ -6,18 +6,31 @@ using DbBroker.Cli.Extensions;
 namespace DbBroker.Cli;
 
 /// <summary>
-/// DBBroker CLI is a .NET tool to create and synchronize Data Models
+/// DBBroker CLI is a .NET tool to create and synchronize Data Models for using DBBroker NuGet library
 /// </summary>
 class Program
 {
-    static void Main(string[] args) 
+    static void Main(string[] args)
     {
-        $"Running DBBroker v1.0.1-alpha...".Log();
+        $"Running DBBroker...".Log();
+        var parser = new Parser(settings =>
+        {
+            settings.AllowMultiInstance = true;
+        });
 
-        Parser.Default.ParseArguments<InitOptions, SyncOptions>(args)
-                      .MapResult(
-                          (InitOptions opts) => InitOptions.Execute(opts),
-                          (SyncOptions opts) => SyncCommand.Execute(opts),
-                          errs => 1);
+        parser
+            .ParseArguments<InitOptions, SyncOptions>(args)
+            .MapResult(
+                (InitOptions opts) => InitCommand.Execute(opts),
+                (SyncOptions opts) => SyncCommand.Execute(opts),
+                errs =>
+                {
+                    foreach (var err in errs)
+                    {
+                        err.ToString()?.Error();
+                    }
+
+                    return 1;
+                });
     }
 }

@@ -12,7 +12,7 @@ public class OracleSqlTransformer : ISqlTransformer
     /// <param name="databaseTypeLength">The database type length</param>
     /// <param name="isNullable">Specifies if the column associated with the type accepts null values</param>
     /// <returns>The .NET type short name or object if no mapping is found.</returns>
-    public string? GetCSharpType(string databaseType, string? databaseTypeLength, bool isNullable)
+    public string? GetCSharpType(string databaseType, string? databaseTypeLength, string? dataPrecision, string? dataScale, bool isNullable)
     {
         switch (databaseType.ToLower())
         {
@@ -20,8 +20,11 @@ public class OracleSqlTransformer : ISqlTransformer
             case "varchar2":
             case "nvarchar2":
             case "char":
+            case "nchar":
             case "clob":
             case "rowid":
+            case "nclob":
+            case "long":
                 return "string?";
             case "date":
             case "datetime":

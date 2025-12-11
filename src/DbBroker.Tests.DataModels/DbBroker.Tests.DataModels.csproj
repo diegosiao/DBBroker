@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../DbBroker.Common/DbBroker.Common.csproj" />
+    <ProjectReference Include="../DbBroker/DbBroker.csproj" />
+  </ItemGroup>
+
+</Project>

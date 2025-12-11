@@ -3,7 +3,7 @@ namespace DbBroker.Cli.Extensions;
 public static class StringExtensions
 {
     /// <summary>
-    /// Transforms an object name like 'MY_TABLE' into MyTable
+    /// Transforms an object name like 'LAST_NAME' or 'last_name' into LastName
     /// </summary>
     /// <param name="value"></param>
     public static string ToCamelCase(this string value)
@@ -14,8 +14,6 @@ public static class StringExtensions
             return string.Join(string.Empty, words.Select(w => $"{w.ToUpperInvariant()[0]}{w.ToLowerInvariant()[1..]}"));
         }
 
-        return value?.All(char.IsUpper) ?? false
-            ? $"{value?.ToUpperInvariant()[0]}{value?.ToLowerInvariant()[1..]}"
-            : value ?? string.Empty;
+        return $"{(value ?? string.Empty).ToUpperInvariant()[0]}{(value ?? string.Empty).ToLowerInvariant()[1..]}";
     }
 }

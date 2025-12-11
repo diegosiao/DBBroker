@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>12.0</LangVersion>
@@ -9,32 +9,36 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>DBBroker</PackageId>
-    <Version>3.0.0-beta</Version>
+    <Version>3.0.2-beta</Version>
     <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>
-    <Description>A lightweight and simple to use .NET library for manipulating database records. Used with DBBroker.Cli dotnet tool which generates the Data Models.</Description>
-    <PackageTags>orm, data, mapping, sql server, oracle, mysql</PackageTags>
+    <Description>A lightweight and simple to use .NET library for manipulating database records.
+      Used with DBBroker.Cli dotnet tool which generates the Entity Data Models.</Description>
+    <PackageTags>orm data mapping sql server oracle mysql</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/diegosiao/DBBroker</PackageProjectUrl>
     <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
     <IncludeSource>true</IncludeSource>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIconUrl>https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-100x100.png</PackageIconUrl>
+    <PackageIconUrl>
+      https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-100x100.png</PackageIconUrl>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Include="Images\logo.png" Pack="true" PackagePath="\" />
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DbBroker.Common\DbBroker.Common.csproj" />
+    <ProjectReference Include="..\DbBroker.Common\DbBroker.Common.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,5 +46,21 @@
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>
+      $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <Title>DBBroker</Title>
+  </PropertyGroup>
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
+    </ItemGroup>
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)" />
+    </ItemGroup>
+  </Target>
 
 </Project>

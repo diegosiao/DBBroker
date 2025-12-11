@@ -2,15 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using DbBroker.Attributes;
 using DbBroker.Common;
+using DbBroker.Common.Model;
 using DbBroker.Common.Model.Interfaces;
 using DbBroker.Model.Interfaces;
 
 namespace DbBroker.Model;
 
+/// <summary>
+/// Base class for Data Models
+/// </summary>
+/// <typeparam name="T">DBBroker generated Data Model</typeparam>
 public abstract class DataModel<T> : IDataModel
 {
     private static IEnumerable<PropertyInfo> _properties;
@@ -37,41 +43,97 @@ public abstract class DataModel<T> : IDataModel
 
     DataModelMap IDataModel.DataModelMap => DataModelMap;
 
-    // TODO Still makes sense? loading all properties is the default behavior
-    // /// <summary>
-    // /// Meta column to represent '*' in SQL SELECT commands
-    // /// </summary>
-    // [DataModelMetaColumn]
-    // public dynamic All { get; }
+    /// <summary>
+    /// Tracks which properties are not pristine (i.e. have been modified)
+    /// </summary>
+    protected Dictionary<string, bool> _IsNotPristine { get; private set; } = [];
 
-    protected Dictionary<string, bool> _IsNotPristine { get; set; } = [];
-
+    /// <summary>
+    /// Checks if the property is not pristine (i.e. has been modified)
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <returns></returns>
     public bool IsNotPristine(string propertyName) => _IsNotPristine.ContainsKey(propertyName);
 
+    /// <summary>
+    /// DbBroker will ignore pristine properties on INSERT, UPDATE, and UPSERT commands
+    /// </summary>
+    /// <param name="propertyName">The property name. Prefer using nameof().</param>
+    public void SetPristine(string propertyName)
+    {
+        if (_IsNotPristine.ContainsKey(propertyName ?? string.Empty))
+        {
+            _IsNotPristine.Remove(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// DbBroker will ignore pristine properties on INSERT, UPDATE, and UPSERT commands
+    /// </summary>
+    /// <param name="propertiesNames">The properties names to set as pristine. Prefer using nameof().</param>
+    public void SetPristine(params string[] propertiesNames)
+    {
+        foreach (var propertyName in propertiesNames ?? [])
+        {
+            if (_IsNotPristine.ContainsKey(propertyName ?? string.Empty))
+            {
+                _IsNotPristine.Remove(propertyName);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The full name of the ISqlInsertTemplate implementation to use for this DataModel.
+    /// The type must have a constructor with the following signature:
+    /// (string tableName, IEnumerable&lt;DataModelMapProperty&gt; mappedProperties, SupportedDatabaseProviders provider)
+    /// </summary>
     protected static string SqlInsertTemplateTypeFullName;
 
+    /// <summary>
+    /// The arguments to pass to the ISqlInsertTemplate implementation constructor.
+    /// </summary>
     protected static object[] SqlInsertTemplateTypeArguments;
 
+    /// <summary>
+    /// The database provider this DataModel is targeting.
+    /// </summary>
     protected static SupportedDatabaseProviders Provider;
 
-    readonly string[] _internalProperties = ["ALL", "DataModelMap"];
+    /// <summary>
+    /// Properties to ignore when building the DataModelMap
+    /// </summary>
+    readonly string[] _ignoreProperties = ["ALL", "DataModelMap"];
 
     private DataModelMap GetDataModelMap()
     {
-        var sqlInsertTemplate = Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments);
+        // TODO Allow Views to INSERT, UPDATE, DELETE (using database view triggers)
+        // var sqlInsertTemplate = Activator.CreateInstance(Type.GetType(SqlInsertTemplateTypeFullName), SqlInsertTemplateTypeArguments);
 
         DataModelMap dataModelMap = new()
         {
             SchemaName = typeof(T).GetCustomAttribute<TableAttribute>().Schema,
             TableName = typeof(T).GetCustomAttribute<TableAttribute>().Name,
-            Provider = Provider,
-            SqlInsertTemplate = sqlInsertTemplate as ISqlInsertTemplate,
+            Provider = Provider
         };
+
+        var insertTemplateType = Type.GetType(SqlInsertTemplateTypeFullName);
+
+        if (insertTemplateType is null && SqlInsertTemplateTypeFullName is not null)
+        {
+            throw new ApplicationException($"Could not find type '{SqlInsertTemplateTypeFullName}' for DataModel '{typeof(T).FullName}'.");
+        }
+
+        if (insertTemplateType is not null && this is not IViewDataModel)
+        {
+            dataModelMap.SqlInsertTemplate =
+                Activator.CreateInstance(insertTemplateType, SqlInsertTemplateTypeArguments) as ISqlInsertTemplate;
+        }
+
 
         var index = 0;
         foreach (var property in Properties)
         {
-            if (_internalProperties.Contains(property.Name))
+            if (_ignoreProperties.Contains(property.Name))
             {
                 continue;
             }
@@ -125,7 +187,8 @@ public abstract class DataModel<T> : IDataModel
                 ColumnName = property.GetCustomAttribute<ColumnAttribute>().Name,
                 IsKey = property.GetCustomAttribute<KeyAttribute>() != null,
                 Index = index++,
-                PropertyInfo = property
+                PropertyInfo = property,
+                ProviderDbType = property.GetCustomAttribute<ColumnType>().ProviderDbType
             };
 
             dataModelMap.MappedProperties.Add(property.Name, dataModelProperty);

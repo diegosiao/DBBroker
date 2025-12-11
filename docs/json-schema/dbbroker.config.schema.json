@@ -5,6 +5,21 @@
   "description": "Configuration file to describe database contexts",
   "type": "object",
   "properties": {
+    "database": {
+      "description": "The database information against which DBBroker will run",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "The database provider",
+          "type": "string",
+          "enum": ["SqlServer", "Oracle"]
+        },
+        "connectionString": {
+          "description": "The connection string DBBroker is going to use to prospect database metadata",
+          "type": "string"
+        }
+      }
+    },   
     "contexts": {
       "description": "Database contexts",
       "type": "array",
@@ -15,13 +30,21 @@
             "description": "The namespace where Data Models should be placed in",
             "type": "string"
           },
+          "name": {
+            "description": "The context name. Can be used to selectively synchronize a context in a dbbroker.config.json file.",
+            "type": "string"
+          },
+          "outputDirectory": {
+            "description": "The relative directory where Data Models should be placed in. If omitted a folder structure based on the namespace will be created skipping the first part (generaly the application name).",
+            "type": "string"
+          },
           "provider": {
-            "description": "The database provider",
+            "description": "The database provider. Overrides 'database.provider'.",
             "type": "string",
             "enum": ["SqlServer", "Oracle"]
           },
           "connectionString": {
-            "description": "The connection string DBBroker is going to use to prospect database metadata",
+            "description": "The connection string DBBroker is going to use to prospect database metadata. Overrides 'database.connectionString'.",
             "type": "string"
           },
           "defaultSqlInsertTemplateTypeFullName": {
@@ -36,8 +59,20 @@
             "description": "The name sufix that Entity Data Models classes will receive when generated. The default value is 'DataModel'.",
             "type": "string"
           },
+          "ignoreTablesNotListed": {
+            "description": "Should DBBroker ignore database tables not described on 'tables' array? If 'true', you need to include manually all table references of tables listed in 'tables' array, unless you set the 'addReferences' property on the table to false. The default value is 'false'.",
+            "type": "boolean"
+          },
+          "ignoreViewsNotListed": {
+            "description": "Should DBBroker ignore database views not described on 'views' array? The default value is 'false'.",
+            "type": "boolean"
+          },
+          "clearOutputDirectory": {
+            "description": "Specifies if DBBroker CLI should Remove all preexisting files from the output directory before syncing. Default value is 'false'.",
+            "type": "boolean"
+          },
           "tables": {
-            "description": "Array of tables DBBroker will use to generate the Data Models",
+            "description": "Array of database tables DBBroker will use to generate the Data Models. If empty, all tables will be included by default. See 'ignoreTablesNotListed'.",
             "type": "array",
             "items": {
               "type": "object",
@@ -67,6 +102,52 @@
                 "sqlInsertTemplateArguments": {
                   "description": "Arguments the ISqlInsertTemplate specified might be expecting",
                   "type": "object"
+                },
+                "addReferences": {
+                  "description": "Specifies if the table references should be included. Composite Primary Keys are not supported. Default value is true.",
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "views": {
+            "description": "Array of database views DBBroker will use to generate the Data Models. If empty, all tables will be included by default.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "The view name",
+                  "type": "string"
+                },
+                "schema": {
+                  "description": "The view schema name",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The Data Model type name",
+                  "type": "string"
+                },
+                "splitsOn": {
+                  "description": "A collection of descriptors to split the database view record set into Data Model entities. When using this feature the first column on the view will be used as the first 'Split value', therefore use an identifier value.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "column": {
+                        "description": "The column name to split the record set and start loading data of an entity",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "The Data Model type name",
+                        "type": "string"
+                      },
+                      "collection": {
+                        "description": "Should the entity on this split be treated as a collection?",
+                        "type": "boolean"
+                      }
+                    }
+                  }
                 }
               }
             }

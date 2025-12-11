@@ -6,7 +6,9 @@ public class DbBrokerConfigContext
 {
     public string Namespace { get; set; }
 
-    public SupportedDatabaseProviders Provider { get; set; }
+    public string Name { get; set; }
+
+    public SupportedDatabaseProviders? Provider { get; set; }
 
     public string ConnectionString { get; set; }
 
@@ -17,7 +19,7 @@ public class DbBrokerConfigContext
     public string ConnectionStringKey { get; set; }
 
     /// <summary>
-    /// Optional. Will override the default behavior of using the namespace as folder structure (skipping the first namespace segment when multiple).
+    /// Optional. Will override the default behavior of using the namespace as folder structure.
     /// </summary>
     public string OutputDirectory { get; set; }
 
@@ -37,5 +39,22 @@ public class DbBrokerConfigContext
     /// </summary>
     public string ModelsSufix { get; set; } = "DataModel";
 
+    /// <summary>
+    /// Should DBBroker ignore database tables not described on '<see cref="Tables" />' collection?. The default value is 'false'.
+    /// </summary>
+    public bool IgnoreTablesNotListed { get; set; }
+
+    /// <summary>
+    /// Should DBBroker ignore database views not described on '<see cref="Views"/>' collection?. The default value is 'false'.
+    /// </summary>
+    public bool IgnoreViewsNotListed { get; set; }
+
+    /// <summary>
+    /// Remove all preexisting files from the output directory before syncing
+    /// </summary>
+    public bool ClearOutputDirectory { get; set; }
+
     public IEnumerable<DbBrokerConfigContextTable> Tables { get; set; } = [];
+
+    public IEnumerable<DbBrokerConfigContextView> Views { get; set; } = [];
 }

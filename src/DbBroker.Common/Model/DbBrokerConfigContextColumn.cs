@@ -12,13 +12,22 @@ public class DbBrokerConfigContextColumn
 
     public string TableName { get; set; }
 
+    public string ViewName { get; set; }
+
     public string ColumnName { get; set; }
 
     public string DataType { get; set; }
 
     public string MaxLength { get; set; }
 
+    public string DataTypePrecision { get; set; }
+
+    public string DataTypeScale { get; set; }
+
     public bool IsNullable { get; set; }
 
-    public string ColumnFullName => $"{SchemaName}.{TableName}.{ColumnName}";
+    // TODO the logic to deal with read only column is missing
+    public bool ReadOnly { get; set; }
+
+    public string ColumnFullName => $"{SchemaName}.{TableName}{ViewName}.{ColumnName}";
 }

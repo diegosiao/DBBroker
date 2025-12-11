@@ -4,7 +4,7 @@ namespace DbBroker.Cli.Services.Providers.SqlServer;
 
 public class SqlServerSqlTransformer : ISqlTransformer
 {
-    public string? GetCSharpType(string databaseType, string? databaseTypeLength, bool isNullable)
+    public string? GetCSharpType(string databaseType, string? databaseTypeLength, string? dataPrecision, string? dataScale, bool isNullable)
     {
         return databaseType.ToLower() switch
         {

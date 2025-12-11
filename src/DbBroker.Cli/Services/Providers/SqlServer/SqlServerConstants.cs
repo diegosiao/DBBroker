@@ -1,10 +1,11 @@
-using System;
-
 namespace DbBroker.Cli.Services.Providers.SqlServer;
 
 public class SqlServerConstants
 {
-    internal const string SELECT_COLUMNS = @"
+    /// <summary>
+    /// Replace $$TABLESFILTER$$
+    /// </summary>
+    internal const string SELECT_TABLES_COLUMNS = @"
     SELECT
         s.name AS SchemaName,
         t.name AS TableName,
@@ -20,8 +21,29 @@ public class SqlServerConstants
         sys.columns AS c ON t.object_id = c.object_id
     INNER JOIN
         sys.types AS ty ON c.user_type_id = ty.user_type_id
+    WHERE 1=1
+    $$TABLESFILTER$$
     ORDER BY
         s.name, t.name, c.column_id;";
+
+    internal const string SELECT_VIEWS_COLUMNS = @"
+    SELECT
+        s.name AS SchemaName,
+        v.name AS ViewName,
+        c.name AS ColumnName,
+        ty.name AS DataType,
+        c.max_length AS MaxLength,
+        c.is_nullable AS IsNullable
+    FROM
+        sys.views AS v
+    INNER JOIN
+        sys.schemas AS s ON v.schema_id = s.schema_id
+    INNER JOIN
+        sys.columns AS c ON v.object_id = c.object_id
+    INNER JOIN
+        sys.types AS ty ON c.user_type_id = ty.user_type_id
+    ORDER BY
+        s.name, v.name, c.column_id;";
 
     internal const string SELECT_KEYS = @"
     SELECT

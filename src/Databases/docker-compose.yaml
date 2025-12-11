@@ -1,0 +1,73 @@
+name: dbbroker-databases
+
+services:
+  sqlserver:
+    container_name: sqlserver
+    image: dbbroker-sqlserver
+    build:
+      context: ./SqlServer
+      dockerfile: Dockerfile
+    environment:
+      SA_PASSWORD: "DBBroker_1"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1439:1433"
+    networks:
+      - database-network
+    profiles:
+      - all
+      - no-oracle
+
+  oracle:
+    container_name: oracle
+    image: dbbroker-oracle
+    build:
+      context: ./Oracle
+      dockerfile: Dockerfile
+    ports:
+      - "1529:1521"
+    networks:
+      - database-network
+    profiles:
+      - all
+
+  postgres:
+    container_name: postgres
+    image: dbbroker-postgres
+    build:
+      context: ./Postgres
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: "dbbroker"
+      POSTGRES_PASSWORD: "DBBroker_1"
+      POSTGRES_DB: "dbbroker"
+    ports:
+      - "5439:5432"
+    networks:
+      - database-network
+    profiles:
+      - all
+      - no-oracle
+      
+  mysql:
+    container_name: mysql
+    image: dbbroker-mysql
+    build: 
+      context: ./MySQL 
+      dockerfile: Dockerfile
+    environment: 
+      MYSQL_ROOT_PASSWORD: "DBBroker_1" 
+      MYSQL_DATABASE: "dbbroker" 
+      MYSQL_USER: "dbbroker" 
+      MYSQL_PASSWORD: "dbroker1!" 
+    ports: 
+      - "3306:3306" 
+    networks: 
+      - database-network
+    profiles:
+      - all
+      - no-oracle
+
+networks:
+  database-network:
+    driver: bridge

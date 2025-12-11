@@ -1,21 +1,28 @@
-<div align="center">
-  <img src="/assets/logo-with-name.png" alt="DBBroker logo" />
-  <br/>
-  A lightweight and easy to use .NET tool and library for effortless database records manipulation.
-</div>
+# DBBroker
+
+![DbBroker logo](/assets/logo-with-name.png "logo")
+
+A lightweight and easy to use .NET tool and library for effortless database records manipulation.
+
+## Benefits
+
+- Automatically generated Data Models
+- Zero-SQL
+- Compile time database compatibility and change check
 
 ## NuGet
 
 | Package | Latest | |
 |----|----|----|
-| DBBroker | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
-| DBBroker.Cli | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
+| [DBBroker](https://www.nuget.org/packages/DBBroker) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
+| [DBBroker.Cli](https://www.nuget.org/packages/DBBroker.Cli) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
 
-**IMPORTANT:** This version has no backward compatibility with DBBroker 1.x and 2.x.
+> [!WARNING]
+> Version 3.x has no backward compatibility with DBBroker 1.x and 2.x
 
-## What It Does?
+## How it works?
 
-Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
+DBBroker approach is powerful and different from other ORMs because it associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to generate SQL and manipulate database records.
 
 ## Philosophy
 
@@ -29,7 +36,7 @@ DBBroker offers features that benefit any kind of application, from the simplest
 
 These are common requirements for many organizations or database-centered solutions, and, arguably, by everyone who likes to keep things simple.
 
-## Quick Start
+## Quick Start⚡
 
 Open your terminal and navigate to your application's *.csproj directory. Then follow these steps:
 
@@ -48,7 +55,7 @@ dotnet nuget add DBBroker
 **Step 3:** Create a `dbbroker.config.json` file at the root of your project.
 
 ```bash
-dbbroker init --namespace="MyApp.DataModels" --connection-string "[database-connection-string]" --provider Oracle
+dbbroker init --namespace="MyApp.DataModels" --connection-string "<my_connection_string>" --provider Oracle
 ```
 
 **Step 4:** Synchronize your project with your database schemas to generate the Data Models.
@@ -67,15 +74,15 @@ var customer = new CustomersDataModel();
 customer.Name = "John Three Sixteen";
 customer.Birthday = new DateTime(1980, 3, 16);
 
-var id = await _dbBroker.InsertAsync(customer);
+var id = await dbConnection.InsertAsync(customer);
 ```
 
 Entity persistence with transactions.
 
 ```C#
-using var connection = new SqlConnection();
-connection.Open();
-var transaction = connection.GetTransaction();
+using var dbConnection = new SqlConnection();
+dbConnection.Open();
+var transaction = dbConnection.GetTransaction();
 
 try 
 {
@@ -84,14 +91,14 @@ try
     customer.Name = "John Three Sixteen";
     customer.Birthday = new DateTime(1980, 3, 16);
 
-    await connection.InsertAsync(customer, transaction);
+    await dbConnection.InsertAsync(customer, transaction);
 
-    var car = new CarEdm();
+    var car = new CarsDataModel();
     car.Model = "Renault Twingo";
     car.Year = 2001;
     car.CustomerId = customer.Id;
 
-    await connection.InsertAsync(car, transaction);
+    await dbConnection.InsertAsync(car, transaction);
     transaction.Commit();
 }
 catch(Exception ex)
@@ -103,24 +110,34 @@ catch(Exception ex)
 Retrieving a record.
 
 ```C#
-var customer = await connection.GetByKey<CustomersDataModel>("543491fa-788a-474c-9f3b-6ed6566e5d2c");
+var result = await dbConnection
+    .Select<CustomersDataModel>()
+    .AddFilter(x => x.Id, SqlEquals.To("1e6fc0e6-1fe2-49c0-ba37-ec14bf8eddc4"))
+    .ExecuteAsync();
+
+var customer = result.FirstOrDefault();
 ```
 
 Retrieving multiple and filtered records.
 
 ```C#
-var inactiveCustomers = await connection.Select<CustomersDataModel>()
+var inactiveCustomers = await dbConnection.Select<CustomersDataModel>()
   .AddFilter(x => x.StatusId, SqlEquals.To(3))
-  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' or pagination strategy
   .ExecuteAsync();
 ```
 
-```C#
-// another example with columns
-```
+Retrieving multiple records loading only specified columns.
 
 ```C#
-// another example with columns and order by
+var inactiveCustomers = await dbConnection
+    .Select<CustomersDataModel>([
+        x => x.Id,
+        x => x.Name,
+        x => x.Birthday
+    ])
+    .OrderBy(x => x.Name)
+    .AddFilter(x => x.StatusId, SqlEquals.To(3))
+    .ExecuteAsync();
 ```
 
 ## Supported Databases
@@ -134,7 +151,7 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 
 ## Contribute
 
-We appreciate all contributions, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
+All contributions are appreciated, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
 
 Financial support is also welcome, whether large or small contributions will help to keep this project moving and always secure.
 

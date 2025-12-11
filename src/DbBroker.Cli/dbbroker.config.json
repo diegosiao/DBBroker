@@ -1,31 +1,11 @@
 {
+  "$schema": "https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/v3.0.0/docs/json-schema/dbbroker.config.schema.json",
   "contexts": [
     {
-      "namespace": "EShop.DataModels.SqlServer",
-      "connectionString": "Server=localhost,1439;Database=DbBroker;User Id=sa;Password=DBBroker_1;",
+      "namespace": "MyApp.DataModels",
       "provider": "SqlServer",
-      "modelsPrefix": "Db",
-      "modelsSufix": "",
+      "connectionString": "<connection_string>",
       "tables": [],
-      "views": []
-    },
-    {
-      "namespace": "EShop.DataModels.Oracle",
-      "provider": "Oracle",
-      "connectionString": "user id=dbbroker;password=DBBroker_1;data source=//localhost:1529/xe;",
-      "defaultSqlInsertTemplateTypeFullName": "DbBroker.Model.Providers.Oracle.OracleExplicitKeySqlInsertTemplate",
-      "modelsPrefix": "Db",
-      "modelsSufix": "",
-      "tables": [
-        {
-          "name": "ORDER_STATUS",
-          "SqlInsertTemplateTypeFullName": "",
-          "SqlInsertTemplate": "OracleSequence",
-          "SqlInsertTemplateArguments": {
-            "sequence": "ORDER_STATUS_SEQ"
-          }
-        }
-      ],
       "views": []
     }
   ]

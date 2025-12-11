@@ -6,7 +6,12 @@ using DbBroker.Model;
 
 namespace DbBroker;
 
-public class SqlUpsertCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
+// TODO it may not make sense to inherit from SqlCommand
+/// <summary>
+/// Abstraction for SQL UPSERT command
+/// </summary>
+/// <typeparam name="TDataModel"></typeparam>
+public sealed class SqlUpsertCommand<TDataModel> : SqlCommand<TDataModel, int> where TDataModel : DataModel<TDataModel>
 {
     private const string SqlUpsertOracleTemplate =
 @"MERGE INTO $$TABLEFULLNAME$$ t
@@ -36,8 +41,10 @@ WHEN NOT MATCHED THEN
         IEnumerable<DbParameter> parameters,
         DbConnection connection,
         DbTransaction transaction) :
-        base(dataModel, columns, parameters, connection, transaction, Constants.SqlUpdateTemplate)
+        base(dataModel, columns, parameters, connection, transaction, string.Empty)
     {
+        RequireFilter = false;
+
         switch (dataModel.DataModelMap.Provider)
         {
             case SupportedDatabaseProviders.SqlServer:
@@ -49,13 +56,17 @@ WHEN NOT MATCHED THEN
         }
     }
 
-    protected override string RenderSqlCommand()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    internal protected override string RenderSqlCommand()
     {
         var keyPropertyMap = DataModel.DataModelMap.MappedProperties.FirstOrDefault(x => x.Value.IsKey);
 
         return SqlTemplate
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
-            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join("," , Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
+            .Replace("$$USING$$", SqlUpsertOracleUsingTemplate.Replace("$$COLUMNS$$", string.Join(",", Parameters.Select(x => $"{x.ParameterName} AS {x.ParameterName[1..]}"))))
             .Replace("$$KEYCOLUMN$$", keyPropertyMap.Value.ColumnName)
             .Replace("$$KEYCOLUMNPARAM$$", keyPropertyMap.Value.ColumnName)
             .Replace("$$UPDATE$$", string.Join(",", $"UPDATE SET {string.Join(",", Columns.Where(c => !c.IsKey).Select(x => $"t.{x.ColumnName} = s.{x.ColumnName}"))}"))
