@@ -1,19 +1,27 @@
 # DBBroker 3.x
 
+![DbBroker logo](/assets/logo-with-name.png "logo")
+
 A lightweight and easy to use .NET tool and library for effortless database records manipulation.
+
+## Benefits
+
+- Automatically generated Data Models
+- Zero-SQL
+- Compile time database compatibility and change check
 
 ## NuGet
 
 | Package | Latest | |
 |----|----|----|
-| DBBroker | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
-| DBBroker.Cli | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
+| [DBBroker](https://www.nuget.org/packages/DBBroker) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
+| [DBBroker.Cli](https://www.nuget.org/packages/DBBroker.Cli) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
 
 **IMPORTANT:** This version has no backward compatibility with DBBroker 1.x and 2.x.
 
-## What It Does?
+## How it works?
 
-Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
+DBBroker approach is powerful and different from other ORMs because it associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to generate SQL and manipulate database records.
 
 ## Philosophy
 
@@ -84,7 +92,7 @@ try
 
     await dbConnection.InsertAsync(customer, transaction);
 
-    var car = new CarEdm();
+    var car = new CarsDataModel();
     car.Model = "Renault Twingo";
     car.Year = 2001;
     car.CustomerId = customer.Id;
