@@ -1,16 +1,15 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using DbBroker.Model;
 
-namespace DbBroker;
+namespace DbBroker.Model;
 
 /// <summary>
-/// SQL Expression for BETWEEN operator
+/// Represents a SQL Expression for NOT BETWEEN operator
 /// </summary>
-public class SqlBetween : SqlExpression
+public class SqlExpressionNotBetween : SqlExpression
 {
-    private SqlBetween(object value1, object value2) : base(SqlOperator.Between)
+    private SqlExpressionNotBetween(object value1, object value2) : base(SqlOperator.NotBetween)
     {
         if (value1 is not null && value2 is not null)
         {
@@ -18,17 +17,17 @@ public class SqlBetween : SqlExpression
         }
     }
 
-    // TODO include the ability to compare with another column
+    // TODO add the ability to compare with another column
 
     /// <summary>
-    /// Column specified BETWEEN <paramref name="value1"/> AND <paramref name="value2"/>
+    /// Column specified NOT BETWEEN <paramref name="value1"/> AND <paramref name="value2"/>
     /// </summary>
     /// <param name="value1"></param>
     /// <param name="value2"></param>
     /// <returns></returns>
-    public static SqlBetween These(object value1, object value2)
+    public static SqlExpressionNotBetween These(object value1, object value2)
     {
-        return new SqlBetween(value1, value2);
+        return new SqlExpressionNotBetween(value1, value2);
     }
 
     /// <summary>
@@ -45,7 +44,6 @@ public class SqlBetween : SqlExpression
         {
             return string.Empty;
         }
-
-        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} BETWEEN {parameters.First()?.ParameterName} AND {parameters.ElementAt(1)?.ParameterName}";
+        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} NOT BETWEEN {parameters.First()?.ParameterName} AND {parameters.ElementAt(1)?.ParameterName}";
     }
 }

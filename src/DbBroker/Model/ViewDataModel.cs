@@ -1,7 +1,8 @@
 using DbBroker.Common.Model;
+using DbBroker.Model;
 using DbBroker.Model.Interfaces;
 
-namespace DbBroker.Model;
+namespace DbBroker;
 
 /// <summary>
 /// Base class for view data models.

@@ -1,8 +1,9 @@
+using DbBroker.Model;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
-namespace DbBroker.Model;
+namespace DbBroker;
 
 /// <summary>
 /// SQL Expression for Greater Than and Greater Than or Equal To operators
@@ -59,6 +60,6 @@ public class SqlGreater : SqlExpression
             return string.Empty;
         }
 
-        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} {_operator} {parameters.FirstOrDefault()?.ParameterName}";
+        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} {_operator} {parameters.FirstOrDefault()?.ParameterName}";
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace DbBroker.Model;
+namespace DbBroker;
 
 /// <summary>
 /// Represents an ORDER BY clause in SQL.

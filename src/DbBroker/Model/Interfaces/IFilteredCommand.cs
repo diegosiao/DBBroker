@@ -20,6 +20,24 @@ public interface IFilteredCommand<TDataModel, TReturn> where TDataModel : DataMo
     SqlCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
 
     /// <summary>
+    /// Group an AND expression to the last added filter
+    /// </summary>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <param name="propertyLambda"></param>
+    /// <param name="sqlExpression"></param>
+    /// <returns></returns>
+    SqlCommand<TDataModel, TReturn> And<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
+
+    /// <summary>
+    /// Group an OR expression to the last added filter
+    /// </summary>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <param name="propertyLambda"></param>
+    /// <param name="sqlExpression"></param>
+    /// <returns></returns>
+    SqlCommand<TDataModel, TReturn> Or<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression);
+
+    /// <summary>
     /// Execute the command with the applied filters
     /// </summary>
     /// <param name="commandTimeout"></param>

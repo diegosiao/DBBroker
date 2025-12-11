@@ -49,9 +49,9 @@ public class SqlNotEquals : SqlExpression
 
         if (_lowerAll)
         {
-            return $"AND lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) <> lower({parameters.FirstOrDefault()?.ParameterName})";
+            return $"lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) <> lower({parameters.FirstOrDefault()?.ParameterName})";
         }
 
-        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} <> {parameters.FirstOrDefault()?.ParameterName}";
+        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} <> {parameters.FirstOrDefault()?.ParameterName}";
     }
 }

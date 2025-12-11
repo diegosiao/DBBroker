@@ -1,8 +1,9 @@
+using DbBroker.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace DbBroker.Model;
+namespace DbBroker;
 
 /// <summary>
 /// SQL Expression for IN operator

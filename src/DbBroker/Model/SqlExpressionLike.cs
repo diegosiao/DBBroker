@@ -50,9 +50,9 @@ public class SqlLike : SqlExpression
 
         if (_lowerAll)
         {
-            return $"AND lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) LIKE lower({parameters.FirstOrDefault()?.ParameterName})";
+            return $"lower({(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName}) LIKE lower({parameters.FirstOrDefault()?.ParameterName})";
         }
 
-        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} LIKE {parameters.FirstOrDefault()?.ParameterName}";
+        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} LIKE {parameters.FirstOrDefault()?.ParameterName}";
     }
 }

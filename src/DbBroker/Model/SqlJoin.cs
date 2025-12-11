@@ -1,8 +1,9 @@
+using DbBroker.Model;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace DbBroker.Model;
+namespace DbBroker;
 
 /// <summary>
 /// Represents a SQL Join between two tables

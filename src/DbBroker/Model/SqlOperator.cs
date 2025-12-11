@@ -6,6 +6,16 @@ namespace DbBroker.Model;
 public enum SqlOperator
 {
     /// <summary>
+    /// AND SQL operator
+    /// </summary>
+    AND,
+
+    /// <summary>
+    /// OR SQL operator
+    /// </summary>
+    OR,
+
+    /// <summary>
     /// Equals SQL operator
     /// </summary>
     Equals,
@@ -39,6 +49,11 @@ public enum SqlOperator
     /// Between SQL operator
     /// </summary>
     Between,
+
+    /// <summary>
+    /// Not between SQL operator
+    /// </summary>
+    NotBetween,
 
     /// <summary>
     /// Is SQL operator

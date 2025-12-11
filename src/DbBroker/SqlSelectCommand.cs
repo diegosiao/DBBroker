@@ -94,12 +94,6 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
         return this;
     }
 
-    /// <inheritdoc />
-    new public SqlSelectCommand<TDataModel> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
-    {
-        return (SqlSelectCommand<TDataModel>)base.AddFilter(propertyLambda, sqlExpression);
-    }
-
     /// <summary>
     /// Takes the number of records specified from select result
     /// </summary>

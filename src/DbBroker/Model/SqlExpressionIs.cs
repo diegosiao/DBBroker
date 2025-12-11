@@ -45,6 +45,6 @@ public class SqlIs : SqlExpression
     /// <returns></returns>
     public override string RenderSql(string alias, string columnName, IEnumerable<DbParameter> parameters, int index)
     {
-        return $"AND {(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} IS {(_isNull ? string.Empty : "NOT")} NULL";
+        return $"{(string.IsNullOrEmpty(alias) ? string.Empty : $"{alias}.")}{columnName} IS {(_isNull ? string.Empty : "NOT")} NULL";
     }
 }

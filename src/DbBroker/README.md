@@ -1,8 +1,6 @@
-<div align="center">
-  <img src="/assets/logo-with-name.png" alt="DBBroker logo" />
-  <br/>
-  A lightweight and easy to use .NET tool and library for effortless database records manipulation.
-</div>
+# DBBroker 3.x
+
+A lightweight and easy to use .NET tool and library for effortless database records manipulation.
 
 ## NuGet
 
@@ -67,15 +65,15 @@ var customer = new CustomersDataModel();
 customer.Name = "John Three Sixteen";
 customer.Birthday = new DateTime(1980, 3, 16);
 
-var id = await _dbBroker.InsertAsync(customer);
+var id = await dbConnection.InsertAsync(customer);
 ```
 
 Entity persistence with transactions.
 
 ```C#
-using var connection = new SqlConnection();
-connection.Open();
-var transaction = connection.GetTransaction();
+using var dbConnection = new SqlConnection();
+dbConnection.Open();
+var transaction = dbConnection.GetTransaction();
 
 try 
 {
@@ -84,14 +82,14 @@ try
     customer.Name = "John Three Sixteen";
     customer.Birthday = new DateTime(1980, 3, 16);
 
-    await connection.InsertAsync(customer, transaction);
+    await dbConnection.InsertAsync(customer, transaction);
 
     var car = new CarEdm();
     car.Model = "Renault Twingo";
     car.Year = 2001;
     car.CustomerId = customer.Id;
 
-    await connection.InsertAsync(car, transaction);
+    await dbConnection.InsertAsync(car, transaction);
     transaction.Commit();
 }
 catch(Exception ex)
@@ -103,24 +101,34 @@ catch(Exception ex)
 Retrieving a record.
 
 ```C#
-var customer = await connection.GetByKey<CustomersDataModel>("543491fa-788a-474c-9f3b-6ed6566e5d2c");
+var result = await dbConnection
+    .Select<CustomersDataModel>()
+    .AddFilter(x => x.Id, SqlEquals.To("1e6fc0e6-1fe2-49c0-ba37-ec14bf8eddc4"))
+    .ExecuteAsync();
+
+var customer = result.FirstOrDefault();
 ```
 
 Retrieving multiple and filtered records.
 
 ```C#
-var inactiveCustomers = await connection.Select<CustomersDataModel>()
+var inactiveCustomers = await dbConnection.Select<CustomersDataModel>()
   .AddFilter(x => x.StatusId, SqlEquals.To(3))
-  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' or pagination strategy
   .ExecuteAsync();
 ```
 
-```C#
-// another example with columns
-```
+Retrieving multiple records loading only specified columns.
 
 ```C#
-// another example with columns and order by
+var inactiveCustomers = await dbConnection
+    .Select<CustomersDataModel>([
+        x => x.Id,
+        x => x.Name,
+        x => x.Birthday
+    ])
+    .OrderBy(x => x.Name)
+    .AddFilter(x => x.StatusId, SqlEquals.To(3))
+    .ExecuteAsync();
 ```
 
 ## Supported Databases
@@ -134,7 +142,7 @@ var inactiveCustomers = await connection.Select<CustomersDataModel>()
 
 ## Contribute
 
-We appreciate all contributions, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
+All contributions are appreciated, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
 
 Financial support is also welcome, whether large or small contributions will help to keep this project moving and always secure.
 

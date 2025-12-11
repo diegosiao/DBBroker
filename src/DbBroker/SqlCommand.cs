@@ -24,6 +24,8 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     /// </summary>
     protected List<CommandFilter> Filters { get; set; } = [];
 
+    private int paramIndex = 0;
+
     /// <summary>
     /// The DataModel instance
     /// </summary>
@@ -82,9 +84,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         Transaction = transaction;
         SqlTemplate = sqlTemplate;
     }
-
-    int paramIndex = 0;
-
+    
     /// <summary>
     /// Add a filter to the SQL command
     /// </summary>
@@ -92,28 +92,104 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     /// <param name="propertyLambda"></param>
     /// <param name="sqlExpression"></param>
     /// <returns></returns>
-    public SqlCommand<TDataModel, TReturn> AddFilter<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
+    public SqlCommand<TDataModel, TReturn> AddFilter<TProperty>(
+        Expression<Func<TDataModel, TProperty>> propertyLambda, 
+        SqlExpression sqlExpression)
     {
         var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
 
-        Filters.Add(new CommandFilter
+        var commandFilter = new CommandFilter
         {
             DataModelMapProperty = DataModel.DataModelMap.MappedProperties[propertyName],
             SqlExpression = sqlExpression,
+            // ChainedExpressions = chainedExpressions,
             Index = Filters.Count,
             Parameters = sqlExpression
                 .Parameters
                 .Select(x => DataModel.DataModelMap.Provider.GetDbParameter($"{propertyName}{Filters.Count}_f{paramIndex++}", x))
                 .ToArray()
-        });
+        };
+
+        Filters.Add(commandFilter);
 
         return this;
     }
 
     /// <summary>
-    /// 
+    /// Group an additional filter with AND operator to the last added filter
     /// </summary>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <param name="propertyLambda"></param>
+    /// <param name="sqlExpression"></param>
     /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public SqlCommand<TDataModel, TReturn> And<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
+    {
+        var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
+
+        var commandFilter = new CommandFilter
+        {
+            DataModelMapProperty = DataModel.DataModelMap.MappedProperties[propertyName],
+            SqlExpression = sqlExpression,
+            Index = -1,
+            Operator = SqlOperator.AND,
+            Parameters = sqlExpression
+                .Parameters
+                .Select(x => DataModel.DataModelMap.Provider.GetDbParameter($"{propertyName}{Filters.Count}_f{paramIndex++}", x))
+                .ToArray()
+        };
+
+        var lastFilter = Filters.LastOrDefault();
+
+        if (lastFilter == null)
+        {
+            throw new InvalidOperationException("Cannot apply AND operator without a previous filter. ");
+        }
+
+        lastFilter.GroupedExpressions.Add(commandFilter);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Group an additional filter with OR operator to the last added filter
+    /// </summary>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <param name="propertyLambda"></param>
+    /// <param name="sqlExpression"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public SqlCommand<TDataModel, TReturn> Or<TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda, SqlExpression sqlExpression)
+    {
+        var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
+
+        var commandFilter = new CommandFilter
+        {
+            DataModelMapProperty = DataModel.DataModelMap.MappedProperties[propertyName],
+            SqlExpression = sqlExpression,
+            Index = -1,
+            Operator = SqlOperator.OR,
+            Parameters = sqlExpression
+                .Parameters
+                .Select(x => DataModel.DataModelMap.Provider.GetDbParameter($"{propertyName}{Filters.Count}_f{paramIndex++}", x))
+                .ToArray()
+        };
+
+        var lastFilter = Filters.LastOrDefault();
+
+        if (lastFilter == null)
+        {
+            throw new InvalidOperationException("Cannot apply AND operator without a previous filter. ");
+        }
+
+        lastFilter.GroupedExpressions.Add(commandFilter);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Renders the SQL command text
+    /// </summary>
     internal protected virtual string RenderSqlCommand()
     {
         return SqlTemplate

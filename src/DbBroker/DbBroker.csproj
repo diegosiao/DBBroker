@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>DBBroker</PackageId>
-    <Version>3.0.1-beta</Version>
+    <Version>3.0.2-beta</Version>
     <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>
@@ -19,7 +19,7 @@
       Used with DBBroker.Cli dotnet tool which generates the Entity Data Models.</Description>
     <PackageTags>orm data mapping sql server oracle mysql</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/diegosiao/DBBroker</PackageProjectUrl>
     <RepositoryUrl>https://github.com/diegosiao/DBBroker</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageOutputPath>$(OutputPath)</PackageOutputPath>
@@ -50,12 +50,13 @@
   <PropertyGroup>
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <Title>DBBroker</Title>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
     <ItemGroup>
-      <_ReferenceCopyLocalPaths
-        Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))" />
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
     </ItemGroup>
     <ItemGroup>
       <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)" />
