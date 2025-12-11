@@ -17,7 +17,8 @@ A lightweight and easy to use .NET tool and library for effortless database reco
 | [DBBroker](https://www.nuget.org/packages/DBBroker) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker) | [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0#select-net-standard-version) |
 | [DBBroker.Cli](https://www.nuget.org/packages/DBBroker.Cli) | ![NuGet Version](https://img.shields.io/nuget/v/dbbroker.cli) | |
 
-**IMPORTANT:** This version has no backward compatibility with DBBroker 1.x and 2.x.
+> [!WARNING]
+> Version 3.x has no backward compatibility with DBBroker 1.x and 2.x
 
 ## How it works?
 
