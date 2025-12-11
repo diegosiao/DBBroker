@@ -1,8 +1,6 @@
-<div align="center">
-  <img src="/assets/logo-with-name.png" alt="DBBroker logo" />
-  <br/>
-  A lightweight and easy to use .NET tool and library for effortless database records manipulation.
-</div>
+# DBBroker 3.x
+
+A lightweight and easy to use .NET tool and library for effortless database records manipulation.
 
 ## NuGet
 
@@ -15,26 +13,21 @@
 
 ## What It Does?
 
-Think of DBBroker as set of two tools to manipulate database records in your .NET applications where:
-
-  1. The [DBBroker CLI tool](https://nuget.org/dbbroker.cli) generates [**Entity Data Models**](https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/entity-data-model) representing database **Tables** and **Views**;
-  2. Then [DBBroker NuGet Library](https://nuget.org/dbbroker) gives you the ability to use those **Entity Data Models** at runtime to manipulate database records.
+Differently from another popular ORM packages, DBBroker approach associates a [.NET CLI tool](https://nuget.org/dbbroker.cli) to automatically generate **Data Models** and a [library](https://nuget.org/dbbroker) that uses those Data Models at runtime to manipulate database records.
 
 ## Philosophy
 
-DBBroker's philosophy is based on the idea of reflecting database tables and views structure state into C# Entity Data Models classes used to perform database SQL commands like INSERT, UPSERT, UPDATE, DELETE, and SELECT with minimal effort and boilerplate.
+DBBroker offers features that benefit any kind of application, from the simplest to the most complex, particularly in security-restricted scenarios. Here are some key requirements it addresses:
 
-Here are some key requirements this philosophy addresses:
-
-- Applications should **NOT** be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language) commands.
+- Applications should **NOT** be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language).
 
 - Applications' Data Access Objects should act as **clients** to the database, not the other way around.
 
 - [Schema Migrations](https://en.wikipedia.org/wiki/Schema_migration) are not an option due to a development process led by **Database Administrators**.
 
-These are common requirements for many organizations or database-centered applications.
+These are common requirements for many organizations or database-centered solutions, and, arguably, by everyone who likes to keep things simple.
 
-## Quick Start
+## Quick Start⚡
 
 Open your terminal and navigate to your application's *.csproj directory. Then follow these steps:
 
@@ -53,7 +46,7 @@ dotnet nuget add DBBroker
 **Step 3:** Create a `dbbroker.config.json` file at the root of your project.
 
 ```bash
-dbbroker init --namespace="MyApp.DataModels" --connection-string "[database-connection-string]" --provider Oracle
+dbbroker init --namespace="MyApp.DataModels" --connection-string "<my_connection_string>" --provider Oracle
 ```
 
 **Step 4:** Synchronize your project with your database schemas to generate the Data Models.
@@ -72,15 +65,15 @@ var customer = new CustomersDataModel();
 customer.Name = "John Three Sixteen";
 customer.Birthday = new DateTime(1980, 3, 16);
 
-var id = await connection.Insert(customer);
+var id = await dbConnection.InsertAsync(customer);
 ```
 
 Entity persistence with transactions.
 
 ```C#
-using var connection = new SqlConnection();
-connection.Open();
-var transaction = connection.GetTransaction();
+using var dbConnection = new SqlConnection();
+dbConnection.Open();
+var transaction = dbConnection.GetTransaction();
 
 try 
 {
@@ -89,14 +82,14 @@ try
     customer.Name = "John Three Sixteen";
     customer.Birthday = new DateTime(1980, 3, 16);
 
-    await connection.InsertAsync(customer, transaction);
+    await dbConnection.InsertAsync(customer, transaction);
 
     var car = new CarEdm();
     car.Model = "Renault Twingo";
     car.Year = 2001;
     car.CustomerId = customer.Id;
 
-    await connection.InsertAsync(car, transaction);
+    await dbConnection.InsertAsync(car, transaction);
     transaction.Commit();
 }
 catch(Exception ex)
@@ -108,38 +101,48 @@ catch(Exception ex)
 Retrieving a record.
 
 ```C#
-var customer = await connection.GetByKey<CustomersDataModel>("543491fa-788a-474c-9f3b-6ed6566e5d2c");
+var result = await dbConnection
+    .Select<CustomersDataModel>()
+    .AddFilter(x => x.Id, SqlEquals.To("1e6fc0e6-1fe2-49c0-ba37-ec14bf8eddc4"))
+    .ExecuteAsync();
+
+var customer = result.FirstOrDefault();
 ```
 
 Retrieving multiple and filtered records.
 
 ```C#
-var inactiveCustomers = await connection.Select<CustomersDataModel>()
+var inactiveCustomers = await dbConnection.Select<CustomersDataModel>()
   .AddFilter(x => x.StatusId, SqlEquals.To(3))
-  .FetchFirst(records: 100, skip: 300) // helps implement a 'load more' or pagination strategy
   .ExecuteAsync();
 ```
 
-```C#
-// another example with columns
-```
+Retrieving multiple records loading only specified columns.
 
 ```C#
-// another example with columns and order by
+var inactiveCustomers = await dbConnection
+    .Select<CustomersDataModel>([
+        x => x.Id,
+        x => x.Name,
+        x => x.Birthday
+    ])
+    .OrderBy(x => x.Name)
+    .AddFilter(x => x.StatusId, SqlEquals.To(3))
+    .ExecuteAsync();
 ```
 
 ## Supported Databases
 
 | Database | Status | --provider |
 |----------|--------|--------|
+| SQL Server | ✅ | SqlServer |
 | Oracle | ✅ | Oracle |
-| SQL Server | ⚒️ | SqlServer |
-| Postgres | 🛣️ | Postgres |
+| Postgres | ⚒️ | Postgres |
 | MySQL | 🛣️ | MySql |
 
 ## Contribute
 
-We appreciate all contributions, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
+All contributions are appreciated, whether they're bug reports, feature suggestions, or pull requests. Thank you for your interest and support in improving this project!
 
 Financial support is also welcome, whether large or small contributions will help to keep this project moving and always secure.
 
