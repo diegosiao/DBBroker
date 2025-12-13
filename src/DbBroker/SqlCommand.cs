@@ -84,7 +84,7 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
         Transaction = transaction;
         SqlTemplate = sqlTemplate;
     }
-    
+
     /// <summary>
     /// Add a filter to the SQL command
     /// </summary>
@@ -93,16 +93,22 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     /// <param name="sqlExpression"></param>
     /// <returns></returns>
     public SqlCommand<TDataModel, TReturn> AddFilter<TProperty>(
-        Expression<Func<TDataModel, TProperty>> propertyLambda, 
+        Expression<Func<TDataModel, TProperty>> propertyLambda,
         SqlExpression sqlExpression)
     {
         var propertyName = ((MemberExpression)propertyLambda.Body).Member.Name;
+        var isNestedProperty = propertyLambda.Body.ToString()[2..].Contains(".");
+
+        if (this is not SqlSelectCommand<TDataModel> && isNestedProperty)
+        {
+            throw new InvalidOperationException("Filters referencing nested properties can only be added to SELECT commands. ");
+        }
 
         var commandFilter = new CommandFilter
         {
-            DataModelMapProperty = DataModel.DataModelMap.MappedProperties[propertyName],
+            DataModelMapProperty = isNestedProperty ? null : DataModel.DataModelMap.MappedProperties[propertyName],
+            Path = PropertyPathHelper.GetNestedPropertyPath(propertyLambda),
             SqlExpression = sqlExpression,
-            // ChainedExpressions = chainedExpressions,
             Index = Filters.Count,
             Parameters = sqlExpression
                 .Parameters
@@ -249,6 +255,6 @@ public abstract class SqlCommand<TDataModel, TReturn> : IFilteredCommand<TDataMo
     public virtual async Task<TReturn> ExecuteAsync(int commandTimeout = 0)
     {
         var command = PrepareCommand(commandTimeout);
-        return (TReturn)(object) await command.ExecuteNonQueryAsync();
+        return (TReturn)(object)await command.ExecuteNonQueryAsync();
     }
 }

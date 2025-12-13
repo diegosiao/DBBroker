@@ -27,6 +27,12 @@ public static class SqlRenderExtensions
         var whereClause = new StringBuilder();
         foreach (var filter in filters)
         {
+            if (filter.DataModelMapProperty is null && filter.AssociatedJoin is null)
+            {
+                // Skip invalid filters
+                continue;
+            }
+
             var filterSql = filter.RenderSql();
 
             if (string.IsNullOrEmpty(filterSql))

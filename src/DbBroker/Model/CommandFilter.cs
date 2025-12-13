@@ -14,6 +14,11 @@ public class CommandFilter
     public DataModelMapProperty DataModelMapProperty { get; set; }
 
     /// <summary>
+    /// The path of the property for nested data models
+    /// </summary>
+    public string Path { get; set; }
+
+    /// <summary>
     /// Index of the filter in the command's filter list. -1 indicates grouped filter.
     /// </summary>
     public int Index { get; set; }
@@ -42,6 +47,11 @@ public class CommandFilter
     /// Alias for the data model in the SQL command
     /// </summary>
     public string Alias { get; set; }
+
+    /// <summary>
+    /// Join associated with the filter, if any
+    /// </summary>
+    public SqlJoin AssociatedJoin { get; set; }
 
     /// <summary>
     /// Renders the SQL representation of the filter
