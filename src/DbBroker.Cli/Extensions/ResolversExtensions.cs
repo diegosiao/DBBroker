@@ -39,6 +39,7 @@ public static class ResolversExtensions
             case "date":
                 return "SqlDbType.Date";
             case "money":
+            case "decimal":
                 return "SqlDbType.Money";
             case "uniqueidentifier":
                 return "SqlDbType.UniqueIdentifier";
