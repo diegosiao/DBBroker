@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using DbBroker.Model;
 
 namespace DbBroker;
 
@@ -30,6 +29,31 @@ internal static class PropertyPathHelper
         }
 
         return path;
+    }
+
+    public static string GetNestedPropertyPathObj<TDataModel>(Expression<Func<TDataModel, object>> propertyLambda)
+    {
+        MemberExpression member = propertyLambda.Body as MemberExpression;
+        if (member == null)
+        {
+            if (propertyLambda.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember)
+            {
+                member = unaryMember;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid expression", nameof(propertyLambda));
+            }
+        }
+
+        var pathParts = new System.Collections.Generic.List<string>();
+        while (member != null)
+        {
+            pathParts.Insert(0, member.Member.Name);
+            member = member.Expression as MemberExpression;
+        }
+
+        return string.Join(".", pathParts);
     }
 
     public static bool IsRootProperty<TDataModel, TProperty>(Expression<Func<TDataModel, TProperty>> propertyLambda) where TProperty : class

@@ -91,6 +91,12 @@ public static class DbBroker
 
     /// <summary>
     /// Retrieves database record(s) for <typeparamref name="TDataModel"/>.
+    /// <para>How to play along with <paramref name="load"/>, <paramref name="ignore"/>, and <paramref name="depth"/> parameters to shape your result: </para>
+    /// <para>- <paramref name="load"/>: Used for two purposes: (1) specify collections among <typeparamref name="TDataModel"/> root properties to be loaded; (2) specify properties to be loaded, when set all properties not specified are ignored.</para>
+    /// <para>- <paramref name="ignore"/>: Specify properties to be ignored.</para>
+    /// <para>- <paramref name="depth"/>: The loading level for references. Default is zero, that means only the <typeparamref name="TDataModel"/> root properties are loaded. Needs to represent the same depth or deeper than properties specified by '<paramref name="load"/>' parameter.</para>
+    /// <para>In summary, it is necessary to decide which way is easier to shape the result in the way required: declaring the columns to be included using <paramref name="load"/> or the columns to be excluded using <paramref name="ignore"/>? Omitting both will load all properties in the <paramref name="depth"/> specified, except collections which follow its own rules.</para>
+    /// <para></para>
     /// </summary>
     /// <typeparam name="TDataModel">The Data Model type that represents the database records to be selected</typeparam>
     /// <param name="connection"></param>
@@ -99,7 +105,7 @@ public static class DbBroker
     ///     <para>PROPERTIES: Regardless of the depth being loaded, if no property of the Data Model is specified all properties will be included.</para>
     ///     <para>COLLECTIONS: Not loaded by default, only loaded if explicitly included. Only collections on Data Model root properties can be included. Only root properties of collections objects are loaded, regardless of the depth specified.</para>
     /// </param>
-    /// <param name="ignore">Properties to be ignored when building the SQL SELECT command. Useful when want to exclude columns from the SQL SELECT. Have precedence over <paramref name="load"/> parameter.</param>
+    /// <param name="ignore">Properties to be ignored when building the SQL SELECT command. Useful to exclude columns from the SQL SELECT. Have precedence over <paramref name="load"/> parameter.</param>
     /// <param name="transaction">The database transaction to use to execute this command.</param>
     /// <param name="depth">The loading level for references. Default is zero, that means only the root value based properties from the Data Model are loaded. Needs to represent the same depth or deeper than properties specified by '<paramref name="load"/>' parameter.</param>
     public static SqlSelectCommand<TDataModel> Select<TDataModel>(

@@ -41,6 +41,14 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
 
     private Dictionary<object, TDataModel> _dataModelResultDictionary;
 
+    // TODO: The depth parameter should be removed. The filters, load, and ignore expressions should determine what to load -> ResolveDepth(); With exceptions for conflicting specifications.
+    // Maybe keeping depth make sense, to avoid requiring explicit load expressions for every reference when deep loading is desired.
+    // How to reconcile both approaches?
+
+    // Precedence to determine what to load: Filters > Ignore > Load > Depth
+
+    // TODO: Implement cache for generated resolutions (joins, columns, etc.) based on the combination of datamodel, load, order by, ignore, filters, and depth.
+
     internal SqlSelectCommand(
         TDataModel dataModel,
         DbConnection connection,
@@ -156,6 +164,8 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
                 ParentIsCollection = parentIsCollection,
             };
 
+            // TODO Skip references in ignore list (compare paths)
+
             _joins.Add(join);
             LoadJoins(
                 join.Depth + 1,
@@ -248,6 +258,23 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
         // prepare filters for a select
         Filters.ForEach(x => x.Alias = "d0");
 
+        foreach (var filter in Filters.Where(f => f.DataModelMapProperty is null)) // Only for nested properties
+        {
+            var associatedJoin = _joins.FirstOrDefault(j => filter.Path.Substring(0, filter.Path.LastIndexOf('.')) == j.Path);
+
+            if (associatedJoin is null)
+            {
+                Debug.WriteLine($"Warning: Could not find associated join for filter path '{filter.Path}'. The filter will be ignored.");
+                continue;
+            }
+
+            filter.AssociatedJoin = associatedJoin;
+            filter.DataModelMapProperty = associatedJoin
+                .DataModelMap
+                .MappedProperties[filter.Path.Split('.').Last()];
+            filter.Alias = associatedJoin.RefTableNameAlias;
+        }
+
         return SqlTemplate
             .Replace("$$COLUMNS$$", RenderColumns())
             .Replace("$$TABLEFULLNAME$$", DataModel.DataModelMap.TableFullName)
@@ -311,9 +338,9 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
         var includedRootProperties = _load
             .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
             .Where(x =>
-                x.Split('.').Length == 1
-                && !DataModel.DataModelMap.MappedCollections.ContainsKey(x)
-                && !DataModel.DataModelMap.MappedReferences.ContainsKey(x));
+                x.Split('.').Length == 1 &&
+                !DataModel.DataModelMap.MappedCollections.ContainsKey(x) &&
+                !DataModel.DataModelMap.MappedReferences.ContainsKey(x));
 
         sqlSelectColumns.AddRange(
             DataModel
@@ -321,11 +348,11 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
                 .MappedProperties
                 .Where(
                     x => x.Value.IsKey
-                    || includedRootProperties.Count() == 0
-                    || includedRootProperties.Any(p => p.Equals(x.Value.PropertyName)))
+                    || (includedRootProperties.Count() == 0 || includedRootProperties.Any(p => p.Equals(x.Value.PropertyName)))
+                        && !_ignore.Any(i => PropertyPathHelper.GetNestedPropertyPath(i).Equals(x.Value.PropertyName)))
                 .Select(x => $"d0.\"{x.Value.ColumnName}\" AS {x.Value.PropertyName}"));
 
-        // Only the ones affecting joins
+        // Data Model references properties affecting joins
         var includedReferencesProperties = _load
             .Select(x => PropertyPathHelper.GetNestedPropertyPath(x))
             .Where(x => x.Split('.').Length > 1);
@@ -340,9 +367,9 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
             sqlSelectColumns.AddRange(join
                     .DataModelMap
                     .MappedProperties
-                    .Where(x => joinIncludedProperties.Any() ?
-                                    joinIncludedProperties.Contains($"{join.Path}.{x.Value.PropertyName}") || x.Value.IsKey
-                                    : true)
+                    .Where(x => x.Value.IsKey ||
+                                (!joinIncludedProperties.Any() ||
+                                joinIncludedProperties.Contains($"{join.Path}.{x.Value.PropertyName}")) && !IgnoredProperty(join, x.Value))
                     .Select(x => $"{join.RefTableNameAlias}.\"{x.Value.ColumnName}\" AS {x.Value.PropertyName}"));
         }
 
@@ -356,6 +383,32 @@ public sealed class SqlSelectCommand<TDataModel> : SqlCommand<TDataModel, IEnume
         }
 
         return string.Join(",", sqlSelectColumns);
+    }
+
+    /// <summary>
+    /// Checks if the property path is in the ignore list: Type (x.TypeProperty) or nested property (x.TypeProperty.SubProperty)
+    /// </summary>
+    private bool IgnoredProperty(SqlJoin join, DataModelMapProperty dataModelMapProperty)
+    {
+        if (_ignore.Count() == 0)
+        {
+            return false;
+        }
+
+        foreach (var ignoredProperty in _ignore)
+        {
+            var ignoredPropertyPath = PropertyPathHelper.GetNestedPropertyPathObj(ignoredProperty);
+            if (ignoredPropertyPath.StartsWith(join.Path))
+            {
+                // Check if the ignored property is the join property or a nested property
+                if (ignoredPropertyPath.Equals(join.Path) || ignoredPropertyPath.Equals($"{join.Path}.{dataModelMapProperty.PropertyName}"))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
