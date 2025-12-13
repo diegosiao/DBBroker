@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>DBBroker</PackageId>
-    <Version>3.0.2-beta</Version>
+    <Version>3.0.4</Version>
     <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>

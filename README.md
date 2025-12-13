@@ -1,6 +1,6 @@
 # DBBroker
 
-![DbBroker logo](/assets/logo-with-name.png "logo")
+![DbBroker logo](https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-with-name.png "logo")
 
 A lightweight and easy to use .NET tool and library for effortless database records manipulation.
 
@@ -8,7 +8,7 @@ A lightweight and easy to use .NET tool and library for effortless database reco
 
 - Automatically generated Data Models
 - Zero-SQL
-- Compile time database compatibility and change check
+- Compile time database schemas compatibility and change check
 
 ## NuGet
 
@@ -26,9 +26,9 @@ DBBroker approach is powerful and different from other ORMs because it associate
 
 ## Philosophy
 
-DBBroker offers features that benefit any kind of application, from the simplest to the most complex, particularly in security-restricted scenarios. Here are some key requirements it addresses:
+DBBroker offers features that benefit any kind of .NET application that interacts with databases, from the simplest to the most complex, particularly in security-restricted scenarios. Here are some key requirements it addresses that other ORMs fail:
 
-- Applications should **NOT** be responsible for executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language).
+- Applications should **NOT** be executing [DDL](https://en.wikipedia.org/wiki/Data_definition_language).
 
 - Applications' Data Access Objects should act as **clients** to the database, not the other way around.
 
