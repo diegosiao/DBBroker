@@ -1,4 +1,4 @@
-# DBBroker 3.x
+# DBBroker
 
 ![DbBroker logo](https://raw.githubusercontent.com/diegosiao/DBBroker/refs/heads/master/assets/logo-with-name.png "logo")
 

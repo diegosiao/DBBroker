@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>DBBroker</PackageId>
-    <Version>3.0.4</Version>
+    <Version>3.0.5</Version>
     <Authors>Diego De Medeiros</Authors>
     <Company></Company>
     <Copyright></Copyright>
@@ -52,6 +52,7 @@
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <Title>DBBroker</Title>
+    <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
