@@ -16,9 +16,9 @@ public class CustomerTests(ServiceProviderFixture fixture) : IClassFixture<Servi
             Id = Guid.NewGuid(),
             Name = "John Three Sixteen",
             Birthday = DateTime.Now.AddYears(-30),
-            OrdersTotal = 20,
-            CreatedAt = DateTime.UtcNow,
-            CreatedBy = Environment.UserName,
+            Orderstotal = 20,
+            Createdat = DateTime.UtcNow,
+            Createdby = Environment.UserName,
         };
 
         var rowsAffected = _sqlConnection.Insert(customer).Execute();
