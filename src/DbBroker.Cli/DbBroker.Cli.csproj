@@ -11,7 +11,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>DBBroker.Cli</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Diego De Medeiros (https://github.com/diegosiao/DBBroker)</Authors>
     <Company></Company>
     <Copyright></Copyright>

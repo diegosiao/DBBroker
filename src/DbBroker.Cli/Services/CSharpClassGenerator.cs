@@ -76,7 +76,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
         {
             configEx.Message.Error(context.Namespace);
 
-            if (Debugger.IsAttached)
+            if (Debugger.IsAttached || SyncCommand.Options.Debug)
             {
                 configEx.StackTrace?.Error(context.Namespace);
             }
@@ -88,7 +88,7 @@ public class CSharpClassGenerator : ICSharpClassGenerator
         {
             ex.Message.Error(context.Namespace);
 
-            if (Debugger.IsAttached)
+            if (Debugger.IsAttached || SyncCommand.Options.Debug)
             {
                 ex.StackTrace?.Error(context.Namespace);
             }

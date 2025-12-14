@@ -16,4 +16,10 @@ public class SyncOptions
         "file",
         HelpText = "Provide a file path to a configuration file you want to use to synchronize. You can use multiple files at once.")]
     public IEnumerable<string> ConfigurationFiles { get; init; } = [];
+
+    [Option(
+        'd',
+        "debug",
+        HelpText = "Enables debug logging for the synchronization process.", Default = false)]
+    public bool Debug { get; set; }
 }

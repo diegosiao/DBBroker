@@ -13,24 +13,11 @@ class Program
     static void Main(string[] args)
     {
         $"Running DBBroker...".Log();
-        var parser = new Parser(settings =>
-        {
-            settings.AllowMultiInstance = true;
-        });
-
-        parser
+        Parser.Default
             .ParseArguments<InitOptions, SyncOptions>(args)
             .MapResult(
-                (InitOptions opts) => InitCommand.Execute(opts),
-                (SyncOptions opts) => SyncCommand.Execute(opts),
-                errs =>
-                {
-                    foreach (var err in errs)
-                    {
-                        err.ToString()?.Error();
-                    }
-
-                    return 1;
-                });
+                  (InitOptions opts) => InitCommand.Execute(opts),
+                  (SyncOptions opts) => SyncCommand.Execute(opts),
+                  errs => 1);
     }
 }
