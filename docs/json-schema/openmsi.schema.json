@@ -4,9 +4,12 @@
   "description": "Schema for OpenMSI package definition",
   "type": "object",
   "properties": {
-    "version": {
-      "type": "string",
+    "package": {
       "description": "The schema version used for this JSON document."
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Package name" }
+      }
     }
   }
 }
