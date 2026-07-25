@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "package": {
-      "description": "The schema version used for this JSON document."
+      "description": "The schema version used for this JSON document.",
       "type": "object",
       "properties": {
         "name": { "type": "string", "description": "Package name" }
