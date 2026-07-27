@@ -8,7 +8,11 @@
       "description": "The schema version used for this JSON document.",
       "type": "object",
       "properties": {
-        "name": { "type": "string", "description": "Package name" }
+        "name": { "type": "string", "description": "Required. Package name" },
+        "version": { "type": "string", "description": "Required. Package version. Default 1.0.0" },
+        "manufacturer": { "type": "string", "description": "Package manufacturer" },
+        "productCode": { "type": "string", "description": "Required. A GUID identifying the package product. ProductCode changes with major upgrades" },
+        "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a different product version. UpgradeCode stays constant across all versions of the same application. " },
       }
     }
   }
