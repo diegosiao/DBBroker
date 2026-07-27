@@ -9,11 +9,11 @@
       "type": "object",
       "required": ["name", "version"],
       "properties": {
-        "name": { "type": "string", "description": "Required. Package name", "required": true },
-        "version": { "type": "string", "description": "Required. Package version.", "required": true },
-        "manufacturer": { "type": "string", "description": "Required. Package manufacturer or Author.", "required": true },
-        "productCode": { "type": "string", "description": "Required. A GUID identifying the package product. ProductCode changes with major upgrades but may be the same for different application versions.", "required": true },
-        "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a product version. UpgradeCode stays constant across all versions of the same application. ", "required": true }
+        "name": { "type": "string", "description": "Required. Package name" },
+        "version": { "type": "string", "description": "Required. Package version." },
+        "manufacturer": { "type": "string", "description": "Required. Package manufacturer or Author." },
+        "productCode": { "type": "string", "description": "Required. A GUID identifying the package product. ProductCode changes with major upgrades but may be the same for different application versions." },
+        "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a product version. UpgradeCode stays constant across all versions of the same application. " }
       }
     },
     "ui": {
@@ -23,8 +23,7 @@
         "template": { 
           "type": "string", 
           "description": "Required. Pre-defined UI installation wizards. Check the documentation for details about all available options. Default 'basic'.", 
-          "enum": ["basic", "settings", "license", "licenseAndSettings", "custom"],
-          "required": true
+          "enum": ["basic", "settings", "license", "licenseAndSettings", "custom"]
         },
         "templateSettings": {
           "description": "Optional. If the template specified require settings this property is used to specify them.",
@@ -42,10 +41,10 @@
         "type": "object",
         "required": ["name", "target", "location"],
         "properties": {
-          "name": { "type": "string", "description": "Required. Shortcut name displayed to the user.", "required": true },
+          "name": { "type": "string", "description": "Required. Shortcut name displayed to the user." },
           "description": { "type": "string", "description": "Details displayed to the user." },
-          "target": { "type": "string", "description": "The installed file this shortcut should point to.", "required": true },
-          "location": { "type": "string", "description": "Required. ", "enum": ["Desktop", "MenuFolder"], "required": true }
+          "target": { "type": "string", "description": "The installed file this shortcut should point to." },
+          "location": { "type": "string", "description": "Required. ", "enum": ["Desktop", "MenuFolder"] }
         }
       }
     }
