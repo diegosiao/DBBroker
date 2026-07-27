@@ -3,8 +3,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Schema for OpenMSI package definition",
   "type": "object",
-  "required": ["name", "version", "manufacturer", "productCode", "upgradeCode"],
   "properties": {
+    "required": ["name", "version", "manufacturer", "productCode", "upgradeCode"],
     "package": {
       "description": "The schema version used for this JSON document.",
       "type": "object",
@@ -20,7 +20,7 @@
       "description": ".",
       "type": "object",
       "properties": {
-        "template": { "type": "string", "description": "Required. Pre-defined UI installation wizards. Check the documentation for details about all available options. Default 'basic'.", "enum": ["basic", "settings", "licenseAndSettings", "custom"] },
+        "template": { "type": "string", "description": "Required. Pre-defined UI installation wizards. Check the documentation for details about all available options. Default 'basic'.", "enum": ["basic", "settings", "license", "licenseAndSettings", "custom"] },
         "templateSettings": {
           "description": "Optional. If the template specified require settings this property is used to specify them.",
           "type": "array",
@@ -31,12 +31,17 @@
       }
     },
     "shortcuts": {
-      "description": "",
-      "type": "object",
-      "properties": {
-        "name": { "type": "string", "description": "Required. Shortcut name displayed to the user." },
-        "description": { "type": "string", "description": "Details displayed to the user." },
-        "location": { "type": "string", "description": "Required. ", "enum": ["Desktop", "MenuFolder"] }
+      "description": "Specify which application shortcuts should be create for the application",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "target", "location"],
+        "properties": {
+          "name": { "type": "string", "description": "Required. Shortcut name displayed to the user." },
+          "description": { "type": "string", "description": "Details displayed to the user." },
+          "target": "The installed file this shortcut should point to.",
+          "location": { "type": "string", "description": "Required. ", "enum": ["Desktop", "MenuFolder"] }
+        }
       }
     }
   }
