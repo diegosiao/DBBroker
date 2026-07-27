@@ -13,7 +13,7 @@
         "version": { "type": "string", "description": "Required. Package version." },
         "manufacturer": { "type": "string", "description": "Required. Package manufacturer or Author." },
         "productCode": { "type": "string", "description": "Required. A GUID identifying the package product. ProductCode changes with major upgrades but may be the same for different application versions." },
-        "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a product version. UpgradeCode stays constant across all versions of the same application. " },
+        "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a product version. UpgradeCode stays constant across all versions of the same application. " }
       }
     },
     "ui": {
@@ -27,7 +27,7 @@
           "items": {
             "type": "object"
           }
-        },
+        }
       }
     },
     "shortcuts": {
