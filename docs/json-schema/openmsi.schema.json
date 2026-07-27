@@ -14,6 +14,15 @@
         "productCode": { "type": "string", "description": "Required. A GUID identifying the package product. ProductCode changes with major upgrades" },
         "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a different product version. UpgradeCode stays constant across all versions of the same application. " },
       }
+    },
+    "shortcuts": {
+      "description": "",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Required. Shortcut name displayed to the user." },
+        "description": { "type": "string", "description": "Details displayed to the user." },
+        "location": { "type": "string", "description": "Required. ", "enum": ["Desktop", "MenuFolder"] }
+      }
     }
   }
 }
