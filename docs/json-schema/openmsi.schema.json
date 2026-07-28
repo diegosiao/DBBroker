@@ -16,6 +16,25 @@
         "upgradeCode": { "type": "string", "description": "Required. A GUID identifying a product version. UpgradeCode stays constant across all versions of the same application. " }
       }
     },
+    "files": {
+      "description": "The application files to be deployed.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source"],
+        "properties": {
+          "source": { "type": "string", "description": "Directory or file to included. The path is relative to this file. Do not use absolute paths." },
+          "target": { "type": "string", "description": "Can only be used when a file is specified in 'source'. Changes the default target directory and/or file name." },
+          "exclude": { 
+            "type": "array", 
+            "description": "Used only be specified when a directory is specified in 'source'. A list of files or directories relative to this file to be excluded from source. Do not use absolute paths.", 
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "ui": {
       "description": ".",
       "type": "object",
